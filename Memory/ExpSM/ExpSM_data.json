@@ -1,0 +1,25 @@
+{
+  "reflexes": {
+    "1": {
+      "if": "INPUT DATA",
+      "then": ["ACTION"]
+    }
+  },
+
+  "experience": {
+    "1": {
+      "if": "INPUT DATA",
+      "then": ["ACTION"],
+      "repeatability": "high",
+      "weight": 0.82,
+      "hits": 14
+    },
+    "2": {
+      "if": "INPUT DATA",
+      "then": ["ACTION_1", "ACTION_2"],
+      "repeatability": "low",
+      "weight": 0.25,
+      "hits": 2
+    }
+  }
+}

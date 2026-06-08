@@ -1,0 +1,15 @@
+{
+  "nodes": {
+    "1": { "data": "Cup of tea" },
+    "2": { "data": "Glass" },
+    "3": { "data": "Ceramics" },
+    "4": { "data": "Tea" },
+    "5": { "data": "Hot" }
+  },
+  "edges": [
+    { "from": "1", "type": "1", "to": "2" },
+    { "from": "1", "type": "1", "to": "3" },
+    { "from": "1", "type": "1", "to": "4" },
+    { "from": "1", "type": "1", "to": "5" }
+  ]
+}
