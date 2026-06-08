@@ -1,25 +1,79 @@
 {
-  "reflexes": {
-    "1": {
-      "if": "INPUT DATA",
-      "then": ["ACTION"]
-    }
+  "meta": {
+    "name": "ExpSM",
+    "full_name": "Experience Storage Model",
+    "version": "0.2.0"
   },
-
+  "allowed_values": {
+    "experience_level": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "source": [
+      "observed",
+      "inferred",
+      "told",
+      "imported",
+      "generated",
+      "self",
+      "unknown"
+    ],
+    "status": [
+      "active",
+      "hypothesis",
+      "confirmed",
+      "conflicted",
+      "deprecated",
+      "disabled"
+    ],
+    "priority": [
+      "low",
+      "normal",
+      "high",
+      "critical"
+    ]
+  },
   "experience": {
     "1": {
-      "if": "INPUT DATA",
-      "then": ["ACTION"],
-      "repeatability": "high",
-      "weight": 0.82,
-      "hits": 14
-    },
-    "2": {
-      "if": "INPUT DATA",
-      "then": ["ACTION_1", "ACTION_2"],
-      "repeatability": "low",
-      "weight": 0.25,
-      "hits": 2
+      "level": "medium",
+      "if": "device does not work",
+      "then": [
+        "turn it off",
+        "wait a short time",
+        "turn it on again"
+      ],
+      "result": "device may start working again",
+      "recommendation": "try restart as a basic recovery action",
+      "confidence": 0.5,
+      "repeatability": 0.5,
+      "source": "told",
+      "status": "hypothesis",
+      "hits": 0,
+      "misses": 0,
+      "created_at_world": "2026-06-09T00:00:00Z",
+      "updated_at_world": "2026-06-09T00:00:00Z"
+    }
+  },
+  "reflexes": {
+    "1": {
+      "if": "critical memory write requested without snapshot",
+      "then": [
+        "create snapshot before write"
+      ],
+      "result": "memory rollback point is created before risky operation",
+      "recommendation": "always create snapshot before critical memory writes",
+      "priority": "critical",
+      "autonomy_level": 2,
+      "confidence": 0.8,
+      "repeatability": 0.9,
+      "source": "generated",
+      "status": "active",
+      "hits": 0,
+      "misses": 0,
+      "created_from_experience": null,
+      "created_at_world": "2026-06-09T00:00:00Z",
+      "updated_at_world": "2026-06-09T00:00:00Z"
     }
   }
 }
