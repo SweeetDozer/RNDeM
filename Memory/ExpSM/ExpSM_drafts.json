@@ -1,0 +1,1013 @@
+{
+  "schema": "RNDeM_ExpSM_DraftStore_v1",
+  "drafts": [
+    {
+      "draft_id": "mem_draft_001",
+      "created_tick": 11,
+      "draft_status": "draft_committed",
+      "target": "ExpSM",
+      "source_review_id": "mem_review_077",
+      "source_consolidation_candidate_id": "cons_cand_003",
+      "source_group_id": "group_002",
+      "core_signature": [
+        "positive_candidate",
+        [
+          "pat_0048"
+        ],
+        [
+          "pat_0056"
+        ],
+        [],
+        [
+          "pat_0056",
+          "pat_0063"
+        ]
+      ],
+      "if_patterns": [
+        "pat_0029",
+        "pat_0030",
+        "pat_0035",
+        "pat_0031",
+        "pat_0020"
+      ],
+      "then_patterns": [
+        "pat_0048"
+      ],
+      "result_patterns": [
+        "pat_0056"
+      ],
+      "outcome_patterns": [
+        "pat_0056",
+        "pat_0063"
+      ],
+      "core_chain": {
+        "decision_patterns": [
+          "pat_0048"
+        ],
+        "effect_patterns": [
+          "pat_0056"
+        ],
+        "predicted_patterns": [],
+        "outcome_patterns": [
+          "pat_0056",
+          "pat_0063"
+        ]
+      },
+      "metrics": {
+        "support_count": 45,
+        "avg_confidence": 0.912,
+        "avg_valence": 0.69,
+        "avg_priority": 0.678,
+        "min_confidence": 0.9,
+        "max_confidence": 0.925
+      },
+      "tone_result": {
+        "valence": 0.69
+      },
+      "review": {
+        "review_status": "approved_for_expsm",
+        "decision_score": 0.892,
+        "reasons": [
+          "pat_0115",
+          "pat_0117"
+        ]
+      },
+      "write_safety": {
+        "permanent_memory_modified": false,
+        "draft_only": true
+      },
+      "source_review_ids": [
+        "mem_review_001",
+        "mem_review_003",
+        "mem_review_005",
+        "mem_review_007",
+        "mem_review_009",
+        "mem_review_011",
+        "mem_review_017",
+        "mem_review_019",
+        "mem_review_021",
+        "mem_review_023",
+        "mem_review_025",
+        "mem_review_027",
+        "mem_review_029",
+        "mem_review_031",
+        "mem_review_033",
+        "mem_review_034",
+        "mem_review_035",
+        "mem_review_036",
+        "mem_review_037",
+        "mem_review_038",
+        "mem_review_039",
+        "mem_review_040",
+        "mem_review_041",
+        "mem_review_043",
+        "mem_review_044",
+        "mem_review_045",
+        "mem_review_046",
+        "mem_review_047",
+        "mem_review_048",
+        "mem_review_049",
+        "mem_review_050",
+        "mem_review_051",
+        "mem_review_052",
+        "mem_review_053",
+        "mem_review_054",
+        "mem_review_056",
+        "mem_review_058",
+        "mem_review_061",
+        "mem_review_062",
+        "mem_review_065",
+        "mem_review_067",
+        "mem_review_070",
+        "mem_review_072",
+        "mem_review_075",
+        "mem_review_077"
+      ],
+      "source_group_ids": [
+        "group_002"
+      ],
+      "source_consolidation_candidate_ids": [
+        "cons_cand_001",
+        "cons_cand_003",
+        "cons_cand_002"
+      ],
+      "seen_count": 45,
+      "first_seen_tick": 11,
+      "last_seen_tick": 15,
+      "merge_status": "merged",
+      "draft_signature": [
+        "core",
+        "ExpSM",
+        [
+          "positive_candidate",
+          [
+            "pat_0048"
+          ],
+          [
+            "pat_0056"
+          ],
+          [],
+          [
+            "pat_0056",
+            "pat_0063"
+          ]
+        ]
+      ],
+      "last_update_kind": "post_commit_observation",
+      "context_enrichment": {
+        "candidate_if_pattern_count": 8,
+        "final_if_pattern_count": 5,
+        "filtered_out_count": 619,
+        "min_relevance_score": 0.25,
+        "fallback_used": false,
+        "relevance_scoring_used": true
+      },
+      "if_patterns_scored": [
+        {
+          "pattern": "pat_0029",
+          "score": 1.0,
+          "sources": [
+            "core_prediction",
+            "trace_context",
+            "near_outcome_active"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "source_causal_trace_context",
+            "active_near_source_outcome",
+            "matches_core_effect_family",
+            "predicted_pattern_confirmed",
+            "generic_pattern_penalty"
+          ],
+          "seen_count": 35
+        },
+        {
+          "pattern": "pat_0030",
+          "score": 1.0,
+          "sources": [
+            "core_prediction",
+            "trace_context",
+            "near_outcome_active"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "matches_core_effect_family",
+            "predicted_pattern_confirmed",
+            "source_causal_trace_context",
+            "active_near_source_outcome"
+          ],
+          "seen_count": 35
+        },
+        {
+          "pattern": "pat_0035",
+          "score": 0.9,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "matches_core_effect_family",
+            "predicted_pattern_confirmed"
+          ],
+          "seen_count": 29
+        },
+        {
+          "pattern": "pat_0031",
+          "score": 0.85,
+          "sources": [
+            "core_prediction",
+            "trace_context",
+            "near_outcome_active"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "predicted_pattern_confirmed",
+            "unrelated_to_core_family",
+            "source_causal_trace_context",
+            "active_near_source_outcome"
+          ],
+          "seen_count": 35
+        },
+        {
+          "pattern": "pat_0020",
+          "score": 0.65,
+          "sources": [
+            "label"
+          ],
+          "reasons": [
+            "source_label",
+            "matches_core_effect_family"
+          ],
+          "seen_count": 35
+        },
+        {
+          "pattern": "pat_0034",
+          "score": 0.35,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "predicted_pattern_confirmed",
+            "unrelated_to_core_family",
+            "generic_pattern_penalty"
+          ],
+          "seen_count": 29
+        },
+        {
+          "pattern": "pat_0032",
+          "score": 0.2,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "predicted_pattern_confirmed",
+            "unrelated_to_core_family",
+            "competing_action_family_penalty"
+          ],
+          "seen_count": 29
+        },
+        {
+          "pattern": "pat_0033",
+          "score": 0.2,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "predicted_pattern_confirmed",
+            "unrelated_to_core_family",
+            "competing_action_family_penalty"
+          ],
+          "seen_count": 29
+        },
+        {
+          "pattern": "pat_0001",
+          "score": 0.05,
+          "sources": [
+            "trace_context"
+          ],
+          "reasons": [
+            "source_causal_trace_context",
+            "unrelated_to_core_family"
+          ],
+          "seen_count": 6
+        },
+        {
+          "pattern": "pat_0002",
+          "score": 0.05,
+          "sources": [
+            "trace_context"
+          ],
+          "reasons": [
+            "source_causal_trace_context",
+            "unrelated_to_core_family"
+          ],
+          "seen_count": 6
+        },
+        {
+          "pattern": "pat_0003",
+          "score": 0.05,
+          "sources": [
+            "trace_context"
+          ],
+          "reasons": [
+            "source_causal_trace_context",
+            "unrelated_to_core_family"
+          ],
+          "seen_count": 6
+        },
+        {
+          "pattern": "pat_0036",
+          "score": 0.05,
+          "sources": [
+            "trace_context"
+          ],
+          "reasons": [
+            "source_causal_trace_context",
+            "unrelated_to_core_family"
+          ],
+          "seen_count": 6
+        }
+      ],
+      "commit_review": {
+        "last_review_id": "commit_review_003",
+        "last_review_tick": 12,
+        "review_status": "ready_to_commit",
+        "reasons": [
+          "pat_0148",
+          "pat_0149",
+          "pat_0150"
+        ],
+        "decision_score": 0.974
+      },
+      "committed_experience_id": "2",
+      "committed_at_tick": 12,
+      "commit_result": {
+        "marker": 17,
+        "status": "committed_to_expsm"
+      },
+      "commit_snapshot": {
+        "seen_count": 22,
+        "metrics": {
+          "support_count": 22,
+          "avg_confidence": 0.913,
+          "avg_valence": 0.69,
+          "avg_priority": 0.678,
+          "min_confidence": 0.9,
+          "max_confidence": 0.925
+        },
+        "if_patterns": [
+          "pat_0029",
+          "pat_0030",
+          "pat_0035",
+          "pat_0020",
+          "pat_0031"
+        ],
+        "then_patterns": [
+          "pat_0048"
+        ],
+        "result_patterns": [
+          "pat_0056"
+        ],
+        "outcome_patterns": [
+          "pat_0056",
+          "pat_0063"
+        ]
+      },
+      "post_commit": {
+        "post_commit_seen_count": 23,
+        "first_post_commit_seen_tick": 11,
+        "last_post_commit_seen_tick": 15,
+        "pending_expsm_update": false,
+        "update_reason": "committed_draft_strengthened_after_update",
+        "update_review": {
+          "last_review_id": "expsm_update_review_001",
+          "last_review_tick": 10,
+          "review_status": "approved_for_expsm_update",
+          "decision_score": 1.0,
+          "reasons": [
+            "pat_0182",
+            "pat_0184",
+            "pat_0185"
+          ]
+        },
+        "update_status": "updated_in_expsm",
+        "last_applied_update_review_id": "expsm_update_review_001",
+        "last_applied_update_tick": 12,
+        "last_updated_experience_id": "2"
+      }
+    },
+    {
+      "draft_id": "mem_draft_002",
+      "created_tick": 15,
+      "draft_status": "draft_committed",
+      "target": "ExpSM",
+      "source_review_id": "mem_review_079",
+      "source_consolidation_candidate_id": "cons_cand_005",
+      "source_group_id": "group_003",
+      "core_signature": [
+        "positive_candidate",
+        [
+          "pat_0052"
+        ],
+        [
+          "pat_0060"
+        ],
+        [],
+        [
+          "pat_0060",
+          "pat_0063"
+        ]
+      ],
+      "if_patterns": [
+        "pat_0032",
+        "pat_0033",
+        "pat_0029",
+        "pat_0031",
+        "pat_0034"
+      ],
+      "then_patterns": [
+        "pat_0052"
+      ],
+      "result_patterns": [
+        "pat_0060"
+      ],
+      "outcome_patterns": [
+        "pat_0060",
+        "pat_0063"
+      ],
+      "core_chain": {
+        "decision_patterns": [
+          "pat_0052"
+        ],
+        "effect_patterns": [
+          "pat_0060"
+        ],
+        "predicted_patterns": [],
+        "outcome_patterns": [
+          "pat_0060",
+          "pat_0063"
+        ]
+      },
+      "metrics": {
+        "support_count": 26,
+        "avg_confidence": 0.838,
+        "avg_valence": 0.69,
+        "avg_priority": 0.66,
+        "min_confidence": 0.8,
+        "max_confidence": 0.863
+      },
+      "tone_result": {
+        "valence": 0.69
+      },
+      "review": {
+        "review_status": "approved_for_expsm",
+        "decision_score": 0.87,
+        "reasons": [
+          "pat_0115",
+          "pat_0117"
+        ]
+      },
+      "write_safety": {
+        "permanent_memory_modified": false,
+        "draft_only": true
+      },
+      "source_review_ids": [
+        "mem_review_002",
+        "mem_review_004",
+        "mem_review_006",
+        "mem_review_008",
+        "mem_review_010",
+        "mem_review_012",
+        "mem_review_018",
+        "mem_review_020",
+        "mem_review_022",
+        "mem_review_024",
+        "mem_review_026",
+        "mem_review_028",
+        "mem_review_030",
+        "mem_review_032",
+        "mem_review_042",
+        "mem_review_057",
+        "mem_review_060",
+        "mem_review_064",
+        "mem_review_066",
+        "mem_review_068",
+        "mem_review_069",
+        "mem_review_071",
+        "mem_review_073",
+        "mem_review_074",
+        "mem_review_078",
+        "mem_review_079"
+      ],
+      "source_group_ids": [
+        "group_003",
+        "group_004",
+        "group_005"
+      ],
+      "source_consolidation_candidate_ids": [
+        "cons_cand_002",
+        "cons_cand_004",
+        "cons_cand_003",
+        "cons_cand_005"
+      ],
+      "seen_count": 26,
+      "first_seen_tick": 15,
+      "last_seen_tick": 21,
+      "merge_status": "merged",
+      "draft_signature": [
+        "core",
+        "ExpSM",
+        [
+          "positive_candidate",
+          [
+            "pat_0052"
+          ],
+          [
+            "pat_0060"
+          ],
+          [],
+          [
+            "pat_0060",
+            "pat_0063"
+          ]
+        ]
+      ],
+      "last_update_kind": "post_commit_observation",
+      "context_enrichment": {
+        "candidate_if_pattern_count": 8,
+        "final_if_pattern_count": 5,
+        "filtered_out_count": 816,
+        "min_relevance_score": 0.25,
+        "fallback_used": false,
+        "relevance_scoring_used": true
+      },
+      "if_patterns_scored": [
+        {
+          "pattern": "pat_0032",
+          "score": 0.9,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "matches_core_effect_family",
+            "predicted_pattern_confirmed"
+          ],
+          "seen_count": 16
+        },
+        {
+          "pattern": "pat_0033",
+          "score": 0.9,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "matches_core_effect_family",
+            "predicted_pattern_confirmed"
+          ],
+          "seen_count": 16
+        },
+        {
+          "pattern": "pat_0029",
+          "score": 0.6,
+          "sources": [
+            "core_prediction",
+            "trace_context",
+            "near_outcome_active"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "predicted_pattern_confirmed",
+            "unrelated_to_core_family",
+            "competing_action_family_penalty",
+            "generic_pattern_penalty",
+            "source_causal_trace_context",
+            "active_near_source_outcome"
+          ],
+          "seen_count": 16
+        },
+        {
+          "pattern": "pat_0031",
+          "score": 0.4,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "predicted_pattern_confirmed",
+            "unrelated_to_core_family"
+          ],
+          "seen_count": 16
+        },
+        {
+          "pattern": "pat_0034",
+          "score": 0.35,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "predicted_pattern_confirmed",
+            "unrelated_to_core_family",
+            "generic_pattern_penalty"
+          ],
+          "seen_count": 14
+        },
+        {
+          "pattern": "pat_0030",
+          "score": 0.2,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "predicted_pattern_confirmed",
+            "unrelated_to_core_family",
+            "competing_action_family_penalty"
+          ],
+          "seen_count": 16
+        },
+        {
+          "pattern": "pat_0035",
+          "score": 0.1,
+          "sources": [
+            "core_prediction"
+          ],
+          "reasons": [
+            "source_core_prediction",
+            "predicted_pattern_confirmed",
+            "unrelated_to_core_family",
+            "different_modality_without_link",
+            "competing_action_family_penalty"
+          ],
+          "seen_count": 14
+        },
+        {
+          "pattern": "pat_0001",
+          "score": 0.05,
+          "sources": [
+            "trace_context"
+          ],
+          "reasons": [
+            "source_causal_trace_context",
+            "unrelated_to_core_family"
+          ],
+          "seen_count": 2
+        },
+        {
+          "pattern": "pat_0002",
+          "score": 0.05,
+          "sources": [
+            "trace_context"
+          ],
+          "reasons": [
+            "source_causal_trace_context",
+            "unrelated_to_core_family"
+          ],
+          "seen_count": 2
+        },
+        {
+          "pattern": "pat_0020",
+          "score": 0.0,
+          "sources": [
+            "label"
+          ],
+          "reasons": [
+            "source_label",
+            "unrelated_to_core_family",
+            "competing_action_family_penalty"
+          ],
+          "seen_count": 16
+        }
+      ],
+      "commit_review": {
+        "last_review_id": "commit_review_002",
+        "last_review_tick": 9,
+        "review_status": "ready_to_commit",
+        "reasons": [
+          "pat_0147",
+          "pat_0149",
+          "pat_0150"
+        ],
+        "decision_score": 0.956
+      },
+      "committed_experience_id": "3",
+      "committed_at_tick": 12,
+      "commit_result": {
+        "marker": 17,
+        "status": "committed_to_expsm"
+      },
+      "commit_snapshot": {
+        "seen_count": 14,
+        "metrics": {
+          "support_count": 14,
+          "avg_confidence": 0.852,
+          "avg_valence": 0.69,
+          "avg_priority": 0.663,
+          "min_confidence": 0.842,
+          "max_confidence": 0.863
+        },
+        "if_patterns": [
+          "pat_0032",
+          "pat_0033",
+          "pat_0031",
+          "pat_0034"
+        ],
+        "then_patterns": [
+          "pat_0052"
+        ],
+        "result_patterns": [
+          "pat_0060"
+        ],
+        "outcome_patterns": [
+          "pat_0060",
+          "pat_0063"
+        ]
+      },
+      "post_commit": {
+        "post_commit_seen_count": 12,
+        "first_post_commit_seen_tick": 15,
+        "last_post_commit_seen_tick": 21,
+        "pending_expsm_update": false,
+        "update_reason": "committed_draft_strengthened_after_update",
+        "update_review": {
+          "last_review_id": "expsm_update_review_001",
+          "last_review_tick": 9,
+          "review_status": "approved_for_expsm_update",
+          "decision_score": 0.552,
+          "reasons": [
+            "pat_0182",
+            "pat_0184",
+            "pat_0185"
+          ]
+        },
+        "update_status": "updated_in_expsm",
+        "last_applied_update_review_id": "expsm_update_review_001",
+        "last_applied_update_tick": 10,
+        "last_updated_experience_id": "3"
+      }
+    },
+    {
+      "draft_id": "mem_draft_013",
+      "created_tick": 11,
+      "draft_status": "draft_rejected",
+      "target": "ExpSM",
+      "source_review_id": "mem_review_015",
+      "source_consolidation_candidate_id": "cons_cand_003",
+      "source_group_id": "group_002",
+      "core_signature": [
+        "positive_candidate",
+        [
+          "pat_0053"
+        ],
+        [
+          "pat_0061"
+        ],
+        [],
+        [
+          "pat_0061",
+          "pat_0068"
+        ]
+      ],
+      "if_patterns": [
+        "pat_0020",
+        "pat_0029",
+        "pat_0030",
+        "pat_0031",
+        "pat_0032"
+      ],
+      "then_patterns": [
+        "pat_0053"
+      ],
+      "result_patterns": [
+        "pat_0061"
+      ],
+      "outcome_patterns": [
+        "pat_0061",
+        "pat_0068"
+      ],
+      "core_chain": {
+        "decision_patterns": [
+          "pat_0053"
+        ],
+        "effect_patterns": [
+          "pat_0061"
+        ],
+        "predicted_patterns": [],
+        "outcome_patterns": [
+          "pat_0061",
+          "pat_0068"
+        ]
+      },
+      "context_enrichment": {
+        "source": "labels/context_refs",
+        "if_pattern_count": 8,
+        "filtered_out_count": 28,
+        "fallback_used": false,
+        "candidate_if_pattern_count": 8,
+        "final_if_pattern_count": 5,
+        "min_relevance_score": 0.25,
+        "relevance_scoring_used": true
+      },
+      "metrics": {
+        "support_count": 3,
+        "avg_confidence": 0.913,
+        "avg_valence": 0.69,
+        "avg_priority": 0.678,
+        "min_confidence": 0.9,
+        "max_confidence": 0.925
+      },
+      "tone_result": {
+        "valence": 0.69
+      },
+      "review": {
+        "review_status": "approved_for_expsm",
+        "decision_score": 0.892,
+        "reasons": [
+          "pat_0120",
+          "pat_0122"
+        ]
+      },
+      "write_safety": {
+        "permanent_memory_modified": false,
+        "draft_only": true
+      },
+      "source_review_ids": [
+        "mem_review_013",
+        "mem_review_015"
+      ],
+      "source_group_ids": [
+        "group_002"
+      ],
+      "source_consolidation_candidate_ids": [
+        "cons_cand_001",
+        "cons_cand_003"
+      ],
+      "seen_count": 2,
+      "first_seen_tick": 11,
+      "last_seen_tick": 11,
+      "merge_status": "merged",
+      "draft_signature": [
+        "core",
+        "ExpSM",
+        [
+          "positive_candidate",
+          [
+            "pat_0053"
+          ],
+          [
+            "pat_0061"
+          ],
+          [],
+          [
+            "pat_0061",
+            "pat_0068"
+          ]
+        ]
+      ],
+      "last_update_kind": "merged_review",
+      "commit_review": {
+        "last_review_id": "commit_review_003",
+        "last_review_tick": 9,
+        "review_status": "rejected_incomplete",
+        "reasons": [
+          "pat_0155"
+        ],
+        "decision_score": 0.974
+      }
+    },
+    {
+      "draft_id": "mem_draft_014",
+      "created_tick": 15,
+      "draft_status": "draft_rejected",
+      "target": "ExpSM",
+      "source_review_id": "mem_review_016",
+      "source_consolidation_candidate_id": "cons_cand_004",
+      "source_group_id": "group_003",
+      "core_signature": [
+        "positive_candidate",
+        [
+          "pat_0057"
+        ],
+        [
+          "pat_0065"
+        ],
+        [],
+        [
+          "pat_0065",
+          "pat_0068"
+        ]
+      ],
+      "if_patterns": [
+        "pat_0020",
+        "pat_0029",
+        "pat_0030",
+        "pat_0031",
+        "pat_0032"
+      ],
+      "then_patterns": [
+        "pat_0057"
+      ],
+      "result_patterns": [
+        "pat_0065"
+      ],
+      "outcome_patterns": [
+        "pat_0065",
+        "pat_0068"
+      ],
+      "core_chain": {
+        "decision_patterns": [
+          "pat_0057"
+        ],
+        "effect_patterns": [
+          "pat_0065"
+        ],
+        "predicted_patterns": [],
+        "outcome_patterns": [
+          "pat_0065",
+          "pat_0068"
+        ]
+      },
+      "context_enrichment": {
+        "source": "labels/context_refs",
+        "if_pattern_count": 8,
+        "filtered_out_count": 103,
+        "fallback_used": false,
+        "candidate_if_pattern_count": 8,
+        "final_if_pattern_count": 5,
+        "min_relevance_score": 0.25,
+        "relevance_scoring_used": true
+      },
+      "metrics": {
+        "support_count": 6,
+        "avg_confidence": 0.853,
+        "avg_valence": 0.69,
+        "avg_priority": 0.663,
+        "min_confidence": 0.842,
+        "max_confidence": 0.863
+      },
+      "tone_result": {
+        "valence": 0.69
+      },
+      "review": {
+        "review_status": "approved_for_expsm",
+        "decision_score": 0.942,
+        "reasons": [
+          "pat_0120",
+          "pat_0122"
+        ]
+      },
+      "write_safety": {
+        "permanent_memory_modified": false,
+        "draft_only": true
+      },
+      "source_review_ids": [
+        "mem_review_014",
+        "mem_review_016"
+      ],
+      "source_group_ids": [
+        "group_003"
+      ],
+      "source_consolidation_candidate_ids": [
+        "cons_cand_002",
+        "cons_cand_004"
+      ],
+      "seen_count": 2,
+      "first_seen_tick": 15,
+      "last_seen_tick": 11,
+      "merge_status": "merged",
+      "draft_signature": [
+        "core",
+        "ExpSM",
+        [
+          "positive_candidate",
+          [
+            "pat_0057"
+          ],
+          [
+            "pat_0065"
+          ],
+          [],
+          [
+            "pat_0065",
+            "pat_0068"
+          ]
+        ]
+      ],
+      "last_update_kind": "merged_review",
+      "commit_review": {
+        "last_review_id": "commit_review_004",
+        "last_review_tick": 9,
+        "review_status": "rejected_incomplete",
+        "reasons": [
+          "pat_0155"
+        ],
+        "decision_score": 0.956
+      }
+    }
+  ]
+}

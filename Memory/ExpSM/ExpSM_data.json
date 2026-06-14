@@ -1,74 +1,510 @@
 {
-  "meta": {
-    "name": "ExpSM",
-    "full_name": "Experience Storage Model",
-    "version": "0.2.0"
-  },
-  "allowed_values": {
-    "experience_level": [
-      "low",
-      "medium",
-      "high"
-    ],
-    "source": [
-      "observed",
-      "inferred",
-      "told",
-      "imported",
-      "generated",
-      "self",
-      "unknown"
-    ],
-    "status": [
-      "active",
-      "hypothesis",
-      "confirmed",
-      "conflicted",
-      "deprecated",
-      "disabled"
-    ],
-    "priority": [
-      "low",
-      "normal",
-      "high",
-      "critical"
-    ]
-  },
   "experience": {
     "1": {
-      "level": "medium",
-      "if": "device does not work",
-      "then": [
-        "turn it off",
-        "wait a short time",
-        "turn it on again"
+      "level": 3,
+      "if": [
+        "NFP"
       ],
-      "result": "device may start working again",
-      "recommendation": "try restart as a basic recovery action",
+      "then": [
+        "NFP"
+      ],
+      "result": [
+        "NFP"
+      ],
+      "recommendation": [
+        "NFP"
+      ],
       "confidence": 0.5,
       "repeatability": 0.5,
-      "source": "told",
-      "status": "hypothesis",
+      "source": 3,
+      "status": "archived",
+      "archive_reason": "placeholder_nfp_seed_removed",
       "hits": 0,
       "misses": 0,
       "created_at_world": "2026-06-09T00:00:00Z",
       "updated_at_world": "2026-06-09T00:00:00Z"
+    },
+    "2": {
+      "level": 3,
+      "if": [
+        "pat_0029",
+        "pat_0030",
+        "pat_0035",
+        "pat_0020",
+        "pat_0031"
+      ],
+      "then": [
+        "pat_0048"
+      ],
+      "result": [
+        "pat_0056"
+      ],
+      "recommendation": [
+        "pat_0056",
+        "pat_0063"
+      ],
+      "confidence": 0.998,
+      "repeatability": 1.0,
+      "source": 6,
+      "status": 2,
+      "hits": 11,
+      "misses": 0,
+      "created_at_world": "2026-06-13T23:12:30Z",
+      "updated_at_world": "2026-06-13T23:52:02Z",
+      "metadata": {
+        "created_by": "RNDeM_CLC_Prototype",
+        "source": "memory_draft_commit",
+        "source_draft_id": "mem_draft_001",
+        "source_commit_review_id": "commit_review_004",
+        "draft_signature": [
+          "core",
+          "ExpSM",
+          [
+            "positive_candidate",
+            [
+              "pat_0048"
+            ],
+            [
+              "pat_0056"
+            ],
+            [],
+            [
+              "pat_0056",
+              "pat_0063"
+            ]
+          ]
+        ],
+        "seen_count": 29,
+        "support_count": 29,
+        "avg_valence": 0.69,
+        "avg_priority": 0.678,
+        "if_patterns_scored": [
+          {
+            "pattern": "pat_0029",
+            "score": 1.0,
+            "sources": [
+              "core_prediction",
+              "trace_context",
+              "near_outcome_active"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "source_causal_trace_context",
+              "active_near_source_outcome",
+              "matches_core_effect_family",
+              "predicted_pattern_confirmed",
+              "generic_pattern_penalty"
+            ],
+            "seen_count": 19
+          },
+          {
+            "pattern": "pat_0030",
+            "score": 0.9,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "matches_core_effect_family",
+              "predicted_pattern_confirmed"
+            ],
+            "seen_count": 19
+          },
+          {
+            "pattern": "pat_0035",
+            "score": 0.9,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "matches_core_effect_family",
+              "predicted_pattern_confirmed"
+            ],
+            "seen_count": 19
+          },
+          {
+            "pattern": "pat_0020",
+            "score": 0.65,
+            "sources": [
+              "label"
+            ],
+            "reasons": [
+              "source_label",
+              "matches_core_effect_family"
+            ],
+            "seen_count": 19
+          },
+          {
+            "pattern": "pat_0031",
+            "score": 0.4,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "predicted_pattern_confirmed",
+              "unrelated_to_core_family"
+            ],
+            "seen_count": 19
+          },
+          {
+            "pattern": "pat_0034",
+            "score": 0.35,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "predicted_pattern_confirmed",
+              "unrelated_to_core_family",
+              "generic_pattern_penalty"
+            ],
+            "seen_count": 19
+          },
+          {
+            "pattern": "pat_0032",
+            "score": 0.2,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "predicted_pattern_confirmed",
+              "unrelated_to_core_family",
+              "competing_action_family_penalty"
+            ],
+            "seen_count": 19
+          },
+          {
+            "pattern": "pat_0033",
+            "score": 0.2,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "predicted_pattern_confirmed",
+              "unrelated_to_core_family",
+              "competing_action_family_penalty"
+            ],
+            "seen_count": 19
+          }
+        ],
+        "experience_id": "2",
+        "avg_confidence": 0.912,
+        "last_post_commit_update_tick": 12,
+        "last_update_review_id": "expsm_update_review_001",
+        "update_count": 1,
+        "post_commit_seen_count_total": 7,
+        "source_review_ids": [
+          "mem_review_001",
+          "mem_review_003",
+          "mem_review_005",
+          "mem_review_007",
+          "mem_review_009",
+          "mem_review_011",
+          "mem_review_017",
+          "mem_review_019",
+          "mem_review_021",
+          "mem_review_023",
+          "mem_review_025",
+          "mem_review_027",
+          "mem_review_029",
+          "mem_review_031",
+          "mem_review_033",
+          "mem_review_034",
+          "mem_review_035",
+          "mem_review_036",
+          "mem_review_037",
+          "mem_review_038",
+          "mem_review_039",
+          "mem_review_040",
+          "mem_review_041",
+          "mem_review_043",
+          "mem_review_044",
+          "mem_review_045",
+          "mem_review_046",
+          "mem_review_047",
+          "mem_review_048"
+        ],
+        "source_group_ids": [
+          "group_002"
+        ],
+        "source_consolidation_candidate_ids": [
+          "cons_cand_001",
+          "cons_cand_003",
+          "cons_cand_002"
+        ],
+        "last_feedback_tick": 14,
+        "last_feedback_status": "hit",
+        "last_feedback_activation_id": "expsm_activation_005",
+        "last_feedback_decision_id": "decision_003",
+        "feedback_count": 11,
+        "applied_feedback_keys": [
+          "2|expsm_activation_001|decision_001|outcome_002",
+          "2|expsm_activation_001|decision_002|outcome_001",
+          "2|expsm_activation_003|decision_002|outcome_001",
+          "2|expsm_activation_005|decision_002|outcome_006",
+          "2|expsm_activation_001|decision_003|outcome_001",
+          "2|expsm_activation_003|decision_003|outcome_001",
+          "2|expsm_activation_005|decision_003|outcome_008",
+          "2|expsm_activation_001|decision_001",
+          "2|expsm_activation_001|decision_003",
+          "2|expsm_activation_003|decision_003",
+          "2|expsm_activation_005|decision_003"
+        ],
+        "partial_hits": 6
+      }
+    },
+    "3": {
+      "level": 3,
+      "if": [
+        "pat_0032",
+        "pat_0033",
+        "pat_0031",
+        "pat_0034"
+      ],
+      "then": [
+        "pat_0052"
+      ],
+      "result": [
+        "pat_0060"
+      ],
+      "recommendation": [
+        "pat_0060",
+        "pat_0063"
+      ],
+      "confidence": 0.999,
+      "repeatability": 1.0,
+      "source": 6,
+      "status": 2,
+      "hits": 16,
+      "misses": 0,
+      "created_at_world": "2026-06-13T23:12:30Z",
+      "updated_at_world": "2026-06-14T00:07:19Z",
+      "metadata": {
+        "created_by": "RNDeM_CLC_Prototype",
+        "source": "memory_draft_commit",
+        "source_draft_id": "mem_draft_002",
+        "source_commit_review_id": "commit_review_002",
+        "draft_signature": [
+          "core",
+          "ExpSM",
+          [
+            "positive_candidate",
+            [
+              "pat_0052"
+            ],
+            [
+              "pat_0060"
+            ],
+            [],
+            [
+              "pat_0060",
+              "pat_0063"
+            ]
+          ]
+        ],
+        "seen_count": 16,
+        "support_count": 16,
+        "avg_valence": 0.69,
+        "avg_priority": 0.663,
+        "if_patterns_scored": [
+          {
+            "pattern": "pat_0032",
+            "score": 0.9,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "matches_core_effect_family",
+              "predicted_pattern_confirmed"
+            ],
+            "seen_count": 6
+          },
+          {
+            "pattern": "pat_0033",
+            "score": 0.9,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "matches_core_effect_family",
+              "predicted_pattern_confirmed"
+            ],
+            "seen_count": 6
+          },
+          {
+            "pattern": "pat_0029",
+            "score": 0.6,
+            "sources": [
+              "core_prediction",
+              "trace_context",
+              "near_outcome_active"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "predicted_pattern_confirmed",
+              "unrelated_to_core_family",
+              "competing_action_family_penalty",
+              "generic_pattern_penalty",
+              "source_causal_trace_context",
+              "active_near_source_outcome"
+            ],
+            "seen_count": 6
+          },
+          {
+            "pattern": "pat_0031",
+            "score": 0.4,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "predicted_pattern_confirmed",
+              "unrelated_to_core_family"
+            ],
+            "seen_count": 6
+          },
+          {
+            "pattern": "pat_0034",
+            "score": 0.35,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "predicted_pattern_confirmed",
+              "unrelated_to_core_family",
+              "generic_pattern_penalty"
+            ],
+            "seen_count": 6
+          },
+          {
+            "pattern": "pat_0030",
+            "score": 0.2,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "predicted_pattern_confirmed",
+              "unrelated_to_core_family",
+              "competing_action_family_penalty"
+            ],
+            "seen_count": 6
+          },
+          {
+            "pattern": "pat_0035",
+            "score": 0.1,
+            "sources": [
+              "core_prediction"
+            ],
+            "reasons": [
+              "source_core_prediction",
+              "predicted_pattern_confirmed",
+              "unrelated_to_core_family",
+              "different_modality_without_link",
+              "competing_action_family_penalty"
+            ],
+            "seen_count": 6
+          },
+          {
+            "pattern": "pat_0020",
+            "score": 0.0,
+            "sources": [
+              "label"
+            ],
+            "reasons": [
+              "source_label",
+              "unrelated_to_core_family",
+              "competing_action_family_penalty"
+            ],
+            "seen_count": 6
+          }
+        ],
+        "experience_id": "3",
+        "avg_confidence": 0.853,
+        "last_post_commit_update_tick": 10,
+        "last_update_review_id": "expsm_update_review_001",
+        "update_count": 1,
+        "post_commit_seen_count_total": 2,
+        "source_review_ids": [
+          "mem_review_002",
+          "mem_review_004",
+          "mem_review_006",
+          "mem_review_008",
+          "mem_review_010",
+          "mem_review_012",
+          "mem_review_018",
+          "mem_review_020",
+          "mem_review_022",
+          "mem_review_024",
+          "mem_review_026",
+          "mem_review_028",
+          "mem_review_030",
+          "mem_review_032",
+          "mem_review_042",
+          "mem_review_057"
+        ],
+        "source_group_ids": [
+          "group_003"
+        ],
+        "source_consolidation_candidate_ids": [
+          "cons_cand_002",
+          "cons_cand_004"
+        ],
+        "partial_hits": 8,
+        "last_feedback_tick": 14,
+        "last_feedback_status": "hit",
+        "last_feedback_activation_id": "expsm_activation_008",
+        "last_feedback_decision_id": "decision_004",
+        "feedback_count": 16,
+        "applied_feedback_keys": [
+          "3|expsm_activation_002|decision_003|outcome_004",
+          "3|expsm_activation_004|decision_003|outcome_004",
+          "3|expsm_activation_006|decision_003|outcome_009",
+          "3|expsm_activation_008|decision_003|outcome_009",
+          "3|expsm_activation_002|decision_002|outcome_001",
+          "3|expsm_activation_002|decision_004|outcome_004",
+          "3|expsm_activation_004|decision_002|outcome_005",
+          "3|expsm_activation_004|decision_004|outcome_004",
+          "3|expsm_activation_006|decision_004|outcome_011",
+          "3|expsm_activation_008|decision_004|outcome_011",
+          "3|expsm_activation_002|decision_002",
+          "3|expsm_activation_002|decision_004",
+          "3|expsm_activation_004|decision_002",
+          "3|expsm_activation_004|decision_004",
+          "3|expsm_activation_006|decision_004",
+          "3|expsm_activation_008|decision_004"
+        ]
+      }
     }
   },
   "reflexes": {
     "1": {
-      "if": "critical memory write requested without snapshot",
-      "then": [
-        "create snapshot before write"
+      "if": [
+        "NFP"
       ],
-      "result": "memory rollback point is created before risky operation",
-      "recommendation": "always create snapshot before critical memory writes",
-      "priority": "critical",
+      "then": [
+        "NFP"
+      ],
+      "result": [
+        "NFP"
+      ],
+      "recommendation": [
+        "NFP"
+      ],
+      "priority": 1,
       "autonomy_level": 2,
       "confidence": 0.8,
       "repeatability": 0.9,
-      "source": "generated",
-      "status": "active",
+      "source": 5,
+      "status": "archived",
+      "archive_reason": "placeholder_nfp_seed_removed",
       "hits": 0,
       "misses": 0,
       "created_from_experience": null,

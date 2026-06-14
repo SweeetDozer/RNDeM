@@ -1,0 +1,103 @@
+{
+    "DTF_type":{
+        "1":"img",
+        "2":"aud",
+        "3":"sen"
+    },
+    
+    "type_proc":{
+        "1": "Create",
+        "2": "Update",
+        "3": "Delete"
+    },
+
+    "edge_type":{
+        "edge_source": {
+            "1": "unknown",
+            "2": "inferred",
+            "3": "told",
+            "4": "imported",
+            "5": "generated",
+            "6": "self",
+            "7": "observed"
+        },
+        "edge_status": {
+            "1": "hypothesis",
+            "2": "confirmed",
+            "3": "conflicted",
+            "4": "deprecated",
+            "5": "disabled"
+        }
+    },
+    
+    "ExpSM":{
+        "allowed_values": {
+            "experience_level": {
+                "1": "low",
+                "2": "medium",
+                "3": "high"
+            },
+            "source": {
+                "1": "observed",
+                "2": "inferred",
+                "3": "told",
+                "4": "imported",
+                "5": "generated",
+                "6": "self",
+                "7": "unknown"
+            },
+            "status": {
+                "1": "active",
+                "2": "hypothesis",
+                "3": "confirmed",
+                "4": "conflicted",
+                "5": "deprecated",
+                "6": "disabled"
+            },
+            "priority": {
+                "1": "critical",
+                "2": "high",
+                "3": "medium",
+                "4": "low"
+            }
+        }
+    },
+
+    "axes_schema": {
+        "novelty": "0-10",
+        "danger_risk": "0-10",
+        "context_connection": "0-10",
+        "text_type": {
+            "0": "undefined",
+            "1": "question",
+            "2": "command",
+            "3": "observation",
+            "4": "statement",
+            "5": "request",
+            "6": "note",
+            "7": "argument",
+            "8": "joke",
+            "9": "emotional_outburst",
+            "10": "technical_log"
+        },
+        "learning_potential": "0-10",
+        "contradiction": "0-10",
+        "personal_significance": "0-10",
+        "action_requirement": {
+            "0": "no_action_required",
+            "1": "internal_action_required",
+            "2": "external_action_required"
+        },
+        "urgency": "0-10",
+        "measurement_reliability": "0-10"
+    }
+
+
+
+
+
+
+
+
+
+}
