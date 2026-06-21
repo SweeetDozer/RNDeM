@@ -165,6 +165,12 @@ Recommended gradual path:
    coverage exists.
 5. Planning/task influence is later architecture work.
 
+`docs/design_mode_c_memory_gate_influence.md` expands the Mode C option as a
+design-only, not implemented proposal. It recommends `PolicyPressureReview` as
+the first possible advisory source and `MemoryWriteReviewModule` or
+`DraftCommitGate` as the first possible review-gate target, with all behavior
+disabled by default until a later accepted ADR and verifier updates exist.
+
 ## Consequences
 
 The project can discuss behavior influence without weakening the current safety
