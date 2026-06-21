@@ -27,6 +27,11 @@ Several real-input fixtures also have compact phase regression snapshots in
 python tools/verify_phase_regression_snapshots.py
 ```
 
+The expanded real-input set also includes scenario-only probes that are not in
+the phase snapshot set. They broaden ordinary input coverage while avoiding
+extra snapshot churn for cases whose contract is already covered by stable
+marker, reflection, retention, and memory-safety expectations.
+
 ## Difference from synthetic fixtures
 
 Synthetic reflection and policy-review fixtures seed
@@ -75,6 +80,39 @@ reviews.
   - Expects retention pruning, side-list caps, decision-cycle summaries, runtime
     observation views, marker 36 absence, and unchanged real Memory.
 
+- `scenarios/real_input_mixed_audio_sensor_sequence.json`
+  - Interleaves ordinary audio and sensor readings.
+  - Expects mixed input markers, decision/audit summaries, evidence pressure,
+    marker 36 absence, and unchanged real Memory.
+
+- `scenarios/real_input_stable_repetition_no_pressure.json`
+  - Repeats a stable multi-frequency audio signal.
+  - Expects the calm input/field/evaluation path, explicitly records that no
+    decision-cycle summary is expected, forbids marker 36, and keeps real Memory
+    unchanged.
+
+- `scenarios/real_input_conflict_then_stabilize.json`
+  - Starts with conflicting risky/quiet sensor readings, then stabilizes into
+    quiet sensor input.
+  - Expects natural decision and guard audits, evidence pressure review, marker
+    36 absence, and unchanged real Memory.
+
+- `scenarios/real_input_value_target_conflict.json`
+  - Alternates audio and integrity-risk sensor input over a longer run.
+  - Expects target/value-feedback observations while forbidding permanent value
+    feedback writes, marker 36, and real Memory mutation.
+
+- `scenarios/real_input_long_audio_retention_probe.json`
+  - Runs a longer audio loop under tighter event and side-list caps.
+  - Expects retention pruning, side-list cap compliance, evidence pressure
+    review, marker 36 absence, and unchanged real Memory.
+
+- `scenarios/real_input_guard_audit_probe.json`
+  - Repeats integrity-risk sensor input.
+  - Expects naturally emitted decision audits, action guard audits,
+    decision-cycle summaries, evidence pressure review, marker 36 absence, and
+    unchanged real Memory.
+
 ## Expected observations
 
 The real-input fixtures prefer partial, stable assertions:
@@ -82,6 +120,8 @@ The real-input fixtures prefer partial, stable assertions:
 - required marker presence, especially 33, 34, and 35
 - marker 36 absence
 - minimum event count rather than exact marker totals
+- explicit `decision_cycle_summary_observed: false` only for calm repeated
+  inputs that intentionally stay below the decision-summary path
 - runtime-only reflection/pressure status when naturally produced
 - retention pruning and side-list caps only in the retention fixture
 - real `Memory/ExpSM` and `Memory/AKBSM` hashes unchanged

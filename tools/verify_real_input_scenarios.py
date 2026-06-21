@@ -20,6 +20,12 @@ REAL_INPUT_SCENARIOS = [
     "real_input_integrity_preservation_loop.json",
     "real_input_value_target_repetition.json",
     "real_input_retention_with_observation_views.json",
+    "real_input_mixed_audio_sensor_sequence.json",
+    "real_input_stable_repetition_no_pressure.json",
+    "real_input_conflict_then_stabilize.json",
+    "real_input_value_target_conflict.json",
+    "real_input_long_audio_retention_probe.json",
+    "real_input_guard_audit_probe.json",
 ]
 
 
@@ -30,7 +36,8 @@ def main() -> int:
         result = run_scenario_fixture(fixture, memory_root=REAL_MEMORY_ROOT)
         required_ok = not result.required_markers_missing
         marker_36_absent = 36 not in result.marker_counts
-        decision_cycle_summary_observed = 35 in result.marker_counts
+        expected_decision_summary = bool(fixture.expect.get("decision_cycle_summary_observed", True))
+        decision_cycle_summary_observed = (35 in result.marker_counts) == expected_decision_summary
         reflection_ok = not result.reflection_expectation_violations
         retention_ok = (
             result.retention_pruned_events if fixture.expect.get("retention_pruned_events") else True
@@ -40,7 +47,10 @@ def main() -> int:
         print(f"scenario: {fixture.name}")
         _print_check("required markers", required_ok)
         _print_check("marker 36 absent", marker_36_absent)
-        _print_check("decision cycle summary observed", decision_cycle_summary_observed)
+        _print_check(
+            f"decision cycle summary observed == {expected_decision_summary}",
+            decision_cycle_summary_observed,
+        )
         _print_check("min event count", result.min_event_count_met)
         _print_check("reflection expectations", reflection_ok)
         if fixture.expect.get("retention_pruned_events"):

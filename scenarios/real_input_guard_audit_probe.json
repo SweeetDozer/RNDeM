@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "name": "real_input_guard_audit_probe",
+  "description": "Repeated integrity-risk sensor input should emphasize naturally emitted action guard audits and decision-cycle summaries.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 8
+  },
+  "inputs": [
+    {"tick": 1, "source": "scenario_real_input_guard_audit_probe", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 92.0, "memory_usage": 0.94, "damage_flag": true, "resource_pressure": 0.88}},
+    {"tick": 2, "source": "scenario_real_input_guard_audit_probe", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 91.0, "memory_usage": 0.93, "damage_flag": true, "resource_pressure": 0.86}},
+    {"tick": 3, "source": "scenario_real_input_guard_audit_probe", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 90.0, "memory_usage": 0.92, "damage_flag": true, "resource_pressure": 0.84}},
+    {"tick": 4, "source": "scenario_real_input_guard_audit_probe", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 89.0, "memory_usage": 0.91, "damage_flag": true, "resource_pressure": 0.82}},
+    {"tick": 5, "source": "scenario_real_input_guard_audit_probe", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 88.0, "memory_usage": 0.9, "damage_flag": true, "resource_pressure": 0.8}},
+    {"tick": 6, "source": "scenario_real_input_guard_audit_probe", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 87.0, "memory_usage": 0.89, "damage_flag": true, "resource_pressure": 0.78}},
+    {"tick": 7, "source": "scenario_real_input_guard_audit_probe", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 86.0, "memory_usage": 0.88, "damage_flag": true, "resource_pressure": 0.76}},
+    {"tick": 8, "source": "scenario_real_input_guard_audit_probe", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 85.0, "memory_usage": 0.87, "damage_flag": true, "resource_pressure": 0.74}}
+  ],
+  "expect": {
+    "required_markers": [1, 5, 7, 8, 12, 21, 22, 25, 33, 34, 35],
+    "forbidden_markers": [17, 20, 36],
+    "marker_order": [[1, 5], [7, 33], [33, 34], [34, 35]],
+    "min_event_count": 190,
+    "memory_unchanged": true,
+    "reflection": {
+      "history_trend_label": "uncertain_recent_history",
+      "candidate_types": ["repeated_uncertain_selection", "weak_value_influence"],
+      "need_more_evidence_active": true,
+      "reflection_review_status": "needs_more_evidence",
+      "policy_pressure_type": "evidence_pressure",
+      "policy_pressure_review_status": "evidence_pressure_review"
+    }
+  }
+}

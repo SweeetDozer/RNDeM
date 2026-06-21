@@ -44,6 +44,7 @@ python tools/verify_scenario_fixtures.py
     "memory_unchanged": true,
     "retention_pruned_events": false,
     "side_list_caps_respected": true,
+    "decision_cycle_summary_observed": true,
     "reflection": {
       "history_trend_label": "uncertain_recent_history",
       "candidate_types": ["repeated_uncertain_selection"],
@@ -63,6 +64,12 @@ scenario contract.
 `min_event_count` is optional. It is useful for real-input fixtures that should
 exercise enough of the runtime pipeline to produce downstream observation views
 without pinning exact marker counts.
+
+`decision_cycle_summary_observed` is optional and currently used by the focused
+real-input verifier. It defaults to `true` there because most real-input
+fixtures should naturally reach marker 35. Calm repeated-input probes can set it
+to `false` to document that they intentionally remain below the
+decision-summary path.
 
 ## Input kinds
 
@@ -113,6 +120,9 @@ Real-input fixtures live beside the synthetic fixtures and are documented in
 `docs/real_input_scenarios.md`. They use ordinary `audio` and `sensor` inputs
 only, then assert the decision audit, guard audit, decision-cycle summary, and
 runtime-only reflection/pressure observations produced by the normal pipeline.
+One stable repetition probe explicitly asserts that no decision-cycle summary is
+expected; the rest of the expanded real-input set keeps marker 35 as part of the
+scenario contract.
 
 The focused verifier is:
 
@@ -128,6 +138,8 @@ python tools/verify_phase_regression_snapshots.py
 
 Snapshots are stored in `scenarios/regression_snapshots/` and are regenerated
 explicitly with `python tools/generate_phase_regression_snapshots.py`.
+New real-input expansion fixtures are scenario coverage only for now and are not
+added automatically to `tools.phase_regression_snapshots.SELECTED_SCENARIOS`.
 
 ## Memory safety
 

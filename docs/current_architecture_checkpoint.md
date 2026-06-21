@@ -273,7 +273,9 @@ Fixture groups:
   precise reflection-state coverage
 - policy review fixtures: focused PolicyPressureReview status coverage
 - real-input scenarios: ordinary audio/sensor probes with no synthetic
-  reflection/pressure injection
+  reflection/pressure injection, including mixed input, stable repetition,
+  conflict-then-stabilize, value/target conflict, retention, and guard-audit
+  probes
 - retention fixtures: context and side-list cap checks
 
 Focused scenario verifiers:
@@ -321,7 +323,7 @@ Focused scenario verifiers:
 | `tools/verify_decay_semantics.py` | field decay semantics |
 | `tools/verify_context_retention_policy.py` | ContextMemory retention |
 | `tools/verify_context_side_list_retention_policy.py` | side-list retention |
-| `tools/verify_real_input_scenarios.py` | ordinary audio/sensor real-input pipeline coverage |
+| `tools/verify_real_input_scenarios.py` | ordinary audio/sensor real-input pipeline coverage, including scenario-only expansion fixtures |
 | `tools/verify_scenario_fixtures.py` | all scenario marker, retention, reflection, and memory safety fixtures |
 | `tools/verify_scoring_selection_semantics.py` | scoring/selection source-label semantics |
 | `tools/verify_pattern_semantics.py` | PatternRegistry semantic metadata stability |
@@ -338,16 +340,16 @@ Focused scenario verifiers:
 - `PolicyPressureReview` is observational-only.
 - Mechanism-search is mostly next-tick material.
 - AKBSM writes remain blocked by default.
-- Real-input scenarios are still simple audio/sensor probes.
+- Real-input scenarios are still simple audio/sensor probes, but now include
+  mixed, stable, conflict, retention, value/target, and guard-audit coverage.
 - Git status is unavailable in the current environment.
 - One ambiguous runtime audit finding remains in demo/display code:
   `build_demo_image_from_memory()` splits image debug names for display.
 
 ## Recommended next work
 
-1. Expand real-input scenarios with more ordinary input combinations.
-2. Add deeper phase-level regression snapshots around selected marker windows.
-3. Design a behavior influence ADR for reflection/pressure, but do not implement
+1. Add deeper phase-level regression snapshots around selected marker windows.
+2. Design a behavior influence ADR for reflection/pressure, but do not implement
    influence by default.
-4. Later inspect whether AKBSM writes can be safely introduced.
-5. Later improve project packaging and git hygiene.
+3. Later inspect whether AKBSM writes can be safely introduced.
+4. Later improve project packaging and git hygiene.

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "name": "real_input_conflict_then_stabilize",
+  "description": "Risky and quiet sensor conflict followed by stable quiet readings should keep decision and guard audits observable.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 10
+  },
+  "inputs": [
+    {"tick": 1, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 91.0, "memory_usage": 0.94, "damage_flag": true, "resource_pressure": 0.86}},
+    {"tick": 2, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_resource_pressure"], "activation": 0.2, "payload": {"cpu_temp": 43.0, "memory_usage": 0.28, "damage_flag": false, "resource_pressure": 0.06}},
+    {"tick": 3, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 0.95, "payload": {"cpu_temp": 89.0, "memory_usage": 0.91, "damage_flag": true, "resource_pressure": 0.8}},
+    {"tick": 4, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_resource_pressure"], "activation": 0.2, "payload": {"cpu_temp": 42.0, "memory_usage": 0.25, "damage_flag": false, "resource_pressure": 0.05}},
+    {"tick": 5, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_resource_pressure"], "activation": 0.25, "payload": {"cpu_temp": 41.0, "memory_usage": 0.24, "damage_flag": false, "resource_pressure": 0.04}},
+    {"tick": 6, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_resource_pressure"], "activation": 0.25, "payload": {"cpu_temp": 40.0, "memory_usage": 0.24, "damage_flag": false, "resource_pressure": 0.04}},
+    {"tick": 7, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_resource_pressure"], "activation": 0.25, "payload": {"cpu_temp": 40.0, "memory_usage": 0.23, "damage_flag": false, "resource_pressure": 0.03}},
+    {"tick": 8, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_resource_pressure"], "activation": 0.25, "payload": {"cpu_temp": 39.0, "memory_usage": 0.22, "damage_flag": false, "resource_pressure": 0.03}},
+    {"tick": 9, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_resource_pressure"], "activation": 0.25, "payload": {"cpu_temp": 39.0, "memory_usage": 0.22, "damage_flag": false, "resource_pressure": 0.03}},
+    {"tick": 10, "source": "scenario_real_input_conflict_then_stabilize", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_resource_pressure"], "activation": 0.25, "payload": {"cpu_temp": 39.0, "memory_usage": 0.22, "damage_flag": false, "resource_pressure": 0.03}}
+  ],
+  "expect": {
+    "required_markers": [1, 5, 6, 7, 8, 12, 25, 27, 33, 34, 35],
+    "forbidden_markers": [17, 20, 36],
+    "marker_order": [[1, 7], [7, 33], [33, 34], [34, 35]],
+    "min_event_count": 180,
+    "memory_unchanged": true,
+    "reflection": {
+      "history_trend_label": "uncertain_recent_history",
+      "candidate_types": ["repeated_uncertain_selection", "weak_value_influence"],
+      "need_more_evidence_active": true,
+      "reflection_review_status": "needs_more_evidence",
+      "policy_pressure_type": "evidence_pressure",
+      "policy_pressure_review_status": "evidence_pressure_review"
+    }
+  }
+}
