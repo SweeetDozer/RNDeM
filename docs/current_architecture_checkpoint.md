@@ -261,6 +261,11 @@ This chain is observational-only. Under the current ADR, it must not affect
 scoring, selection, guards, memory gates, memory writes, `FieldUpdater`, or
 `NeuromodulationModule`. `PolicyPressureReview` does not influence behavior.
 
+`docs/adr_behavior_influence_modes.md` documents possible future behavior
+influence modes as proposed / discussion-only architecture. It does not approve
+or implement behavior influence. Current behavior remains Mode A:
+observation-only.
+
 ## Scenario and testing structure
 
 Scenario fixtures live in `scenarios/*.json` and run through
@@ -297,6 +302,9 @@ Focused scenario verifiers:
   explicitly changes that.
 - Keep reflection/pressure observational-only.
 - Keep `PolicyPressureReview` disconnected from behavior.
+- Treat behavior influence modes beyond observation-only as proposed
+  discussion-only until a later accepted ADR, feature flag, verifier updates,
+  memory safety checks, and rollback instructions exist.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -316,6 +324,7 @@ Focused scenario verifiers:
 | `tools/verify_phase_regression_snapshots.py` | compact marker, decision, audit, reflection/pressure, retention, and memory-safety baselines for selected scenarios |
 | `tools/verify_run_tick_phase_split_equivalence.py` | scenario expectations pass and real ExpSM/AKBSM stay unchanged |
 | `tools/verify_policy_pressure_influence_boundary.py` | reflection/pressure disconnected from scoring, guards, gates, fields, and neuromodulation |
+| `tools/verify_behavior_influence_adr.py` | behavior influence modes ADR exists, documents current observation-only policy, forbidden direct connections, and core safety verifiers |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -336,7 +345,8 @@ Focused scenario verifiers:
 - No planning.
 - No LLM calls.
 - No chatbot behavior.
-- Reflection/pressure cannot influence behavior yet.
+- Reflection/pressure cannot influence behavior yet; behavior influence modes
+  are documented only as proposed / discussion-only architecture.
 - `PolicyPressureReview` is observational-only.
 - Mechanism-search is mostly next-tick material.
 - AKBSM writes remain blocked by default.
@@ -348,8 +358,9 @@ Focused scenario verifiers:
 
 ## Recommended next work
 
-1. Add deeper phase-level regression snapshots around selected marker windows.
-2. Design a behavior influence ADR for reflection/pressure, but do not implement
-   influence by default.
-3. Later inspect whether AKBSM writes can be safely introduced.
-4. Later improve project packaging and git hygiene.
+1. Review `docs/adr_behavior_influence_modes.md` and decide whether Mode A
+   remains the only accepted mode for the next pass.
+2. Add deeper phase-level regression snapshots around selected marker windows.
+3. Design Mode C advisory memory-gate influence only after explicit approval.
+4. Later inspect whether AKBSM writes can be safely introduced.
+5. Later improve project packaging.

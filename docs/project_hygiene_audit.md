@@ -10,30 +10,21 @@ Working directory:
 /home/mors/Документы/RNDeM_CLC_Prototype
 ```
 
-`find .. -maxdepth 3 -name .git -type d` found:
+Git is now configured for this prototype repository.
 
 ```text
-../RNDeM_CLC_Prototype/.git
+main tracks origin/main
+origin uses git@github.com:SweeetDozer/RNDeM.git
+v0.0.1 marks the stable RNDeM CLC prototype baseline
+v0.0.2 marks expanded real-input scenario coverage
 ```
 
-The `.git` directory exists but is empty:
+Current workflow recommendation:
 
-```text
-.git/
-```
-
-`git rev-parse --show-toplevel` failed:
-
-```text
-fatal: не найден git репозиторий (или один из его каталогов вплоть до точки монтирования /)
-Останавливаю поиск на границе файловой системы (так как GIT_DISCOVERY_ACROSS_FILESYSTEM не установлен).
-```
-
-`git status --short` failed with the same message.
-
-Conclusion: this directory is not currently a usable Git repository, even though
-an empty `.git` directory is present. Do not run `git init`, delete `.git`, or
-repair Git state without explicit user approval.
+- keep `main` stable;
+- use short review branches for architecture/design passes;
+- push review branches without automatic merge or tag unless explicitly asked;
+- preserve baseline tags and memory-safety verifier expectations.
 
 ## Packaging files
 
@@ -102,9 +93,8 @@ Safe generated/cache artifacts should stay ignored:
 - OS metadata
 - ad-hoc `*.log` audit output
 
-Current root-level `*.log` files appear to be historical audit/run outputs and
-are good candidates to leave untracked in a future real Git repository. This
-pass did not delete or move them.
+Current root-level `*.log` files, if present, should remain local unless a later
+audit-output policy says otherwise. This pass did not delete or move them.
 
 ## Memory tracking policy recommendation
 
@@ -127,8 +117,20 @@ Regression snapshots should probably be tracked. They are compact baselines used
 by `tools/verify_phase_regression_snapshots.py`, and they intentionally exclude
 volatile IDs, raw memory dumps, and temporary paths.
 
-Recommendation: track `scenarios/regression_snapshots/*.snapshot.json` if/when a
-real Git repository is initialized.
+Recommendation: keep tracking `scenarios/regression_snapshots/*.snapshot.json`
+as reviewable baselines.
+
+## ADR tracking recommendation
+
+Architecture decision records are project state and should be tracked. Current
+high-level ADRs include:
+
+- `docs/adr_run_tick_phase_split_boundaries.md`
+- `docs/adr_policy_pressure_influence_boundary.md`
+- `docs/adr_behavior_influence_modes.md`
+
+`docs/adr_behavior_influence_modes.md` is proposed / discussion-only. It
+documents future behavior influence modes without changing runtime behavior.
 
 ## Audit output tracking recommendation
 
@@ -141,11 +143,11 @@ in a later packaging pass.
 
 ## Recommended safe next actions
 
-1. Ask explicitly before repairing or initializing Git state.
+1. Keep `main` stable and use review branches for design-only passes.
 2. Decide whether baseline `Memory/` files are tracked project assets or
    operator-local state.
 3. Decide whether root-level historical `*.log` files should be archived or
-   removed after a valid Git repository exists.
+   removed.
 4. Add `pyproject.toml` and dependency metadata only after current scripts and
    verifier commands are mapped.
 5. Keep regression snapshots tracked as reviewable baselines.

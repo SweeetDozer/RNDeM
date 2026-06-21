@@ -6,6 +6,7 @@ fixtures, phase regression snapshots, and focused verifier scripts.
 Start with:
 
 - `docs/current_architecture_checkpoint.md`
+- `docs/adr_behavior_influence_modes.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
 
@@ -13,11 +14,12 @@ Useful checks:
 
 ```bash
 python tools/verify_project_hygiene.py
+python tools/verify_behavior_influence_adr.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
 ```
 
-The current directory contains an empty `.git` directory, but it is not a valid
-Git repository. Do not initialize or repair Git state without an explicit
-operator decision.
+Git is configured for this prototype. `main` contains the current baseline and
+tags `v0.0.1` and `v0.0.2`; architecture/design branches should be reviewed and
+merged manually.
