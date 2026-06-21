@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "name": "policy_review_value_signal_pressure",
+  "description": "Weak value full-chain history should produce value signal pressure review.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 1
+  },
+  "synthetic_decision_cycle_summaries": [
+    {"tick": 0, "cycle_status": "clean_selection", "cycle_confidence": "high", "flags": ["no_value_influence"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}},
+    {"tick": 0, "cycle_status": "clean_selection", "cycle_confidence": "high", "flags": ["no_value_influence"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}},
+    {"tick": 0, "cycle_status": "clean_selection", "cycle_confidence": "medium", "flags": ["no_value_influence"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}},
+    {"tick": 0, "cycle_status": "other_selection", "cycle_confidence": "medium", "flags": ["no_value_influence"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}},
+    {"tick": 0, "cycle_status": "other_selection", "cycle_confidence": "medium", "flags": ["no_value_influence"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}}
+  ],
+  "inputs": [
+    {
+      "tick": 1,
+      "source": "scenario_policy_review_value_signal_pressure",
+      "kind": "tick",
+      "patterns": [],
+      "activation": 0.0,
+      "payload": {}
+    }
+  ],
+  "expect": {
+    "required_markers": [35],
+    "forbidden_markers": [17, 20],
+    "marker_order": [],
+    "memory_unchanged": true,
+    "reflection": {
+      "history_trend_label": "mostly_clean",
+      "candidate_types": ["weak_value_influence"],
+      "policy_pressure_type": "value_signal_pressure",
+      "policy_pressure_active": true,
+      "policy_pressure_review_status": "value_signal_pressure_review",
+      "policy_pressure_review_primary_issue": "weak_value_influence",
+      "policy_pressure_review_pressure_type": "value_signal_pressure",
+      "policy_pressure_review_active": true,
+      "policy_pressure_review_recommended_future_operation": "inspect_value_signal_coverage"
+    }
+  }
+}

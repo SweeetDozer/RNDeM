@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "name": "real_input_conflicting_sensor_signal",
+  "description": "Alternating risky and quiet sensor input should exercise ordinary risk labels, decisions, audits, and uncertainty pressure.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 8
+  },
+  "inputs": [
+    {
+      "tick": 1,
+      "source": "scenario_real_input_conflicting_sensor_signal",
+      "kind": "sensor",
+      "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"],
+      "activation": 1.0,
+      "payload": {"cpu_temp": 90.0, "memory_usage": 0.93, "damage_flag": true, "resource_pressure": 0.85}
+    },
+    {
+      "tick": 2,
+      "source": "scenario_real_input_conflicting_sensor_signal",
+      "kind": "sensor",
+      "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"],
+      "activation": 0.15,
+      "payload": {"cpu_temp": 42.0, "memory_usage": 0.25, "damage_flag": false, "resource_pressure": 0.05}
+    },
+    {
+      "tick": 3,
+      "source": "scenario_real_input_conflicting_sensor_signal",
+      "kind": "sensor",
+      "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"],
+      "activation": 1.0,
+      "payload": {"cpu_temp": 90.0, "memory_usage": 0.93, "damage_flag": true, "resource_pressure": 0.85}
+    },
+    {
+      "tick": 4,
+      "source": "scenario_real_input_conflicting_sensor_signal",
+      "kind": "sensor",
+      "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"],
+      "activation": 0.15,
+      "payload": {"cpu_temp": 42.0, "memory_usage": 0.25, "damage_flag": false, "resource_pressure": 0.05}
+    },
+    {
+      "tick": 5,
+      "source": "scenario_real_input_conflicting_sensor_signal",
+      "kind": "sensor",
+      "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"],
+      "activation": 1.0,
+      "payload": {"cpu_temp": 90.0, "memory_usage": 0.93, "damage_flag": true, "resource_pressure": 0.85}
+    },
+    {
+      "tick": 6,
+      "source": "scenario_real_input_conflicting_sensor_signal",
+      "kind": "sensor",
+      "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"],
+      "activation": 0.15,
+      "payload": {"cpu_temp": 42.0, "memory_usage": 0.25, "damage_flag": false, "resource_pressure": 0.05}
+    },
+    {
+      "tick": 7,
+      "source": "scenario_real_input_conflicting_sensor_signal",
+      "kind": "sensor",
+      "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"],
+      "activation": 1.0,
+      "payload": {"cpu_temp": 90.0, "memory_usage": 0.93, "damage_flag": true, "resource_pressure": 0.85}
+    },
+    {
+      "tick": 8,
+      "source": "scenario_real_input_conflicting_sensor_signal",
+      "kind": "sensor",
+      "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"],
+      "activation": 0.15,
+      "payload": {"cpu_temp": 42.0, "memory_usage": 0.25, "damage_flag": false, "resource_pressure": 0.05}
+    }
+  ],
+  "expect": {
+    "required_markers": [1, 5, 6, 7, 8, 12, 25, 27, 33, 34, 35],
+    "forbidden_markers": [17, 20, 36],
+    "marker_order": [[1, 7], [7, 33], [33, 34], [34, 35]],
+    "min_event_count": 150,
+    "memory_unchanged": true,
+    "reflection": {
+      "history_trend_label": "uncertain_recent_history",
+      "candidate_types": ["repeated_uncertain_selection", "weak_value_influence"],
+      "need_more_evidence_active": true,
+      "reflection_review_status": "needs_more_evidence",
+      "policy_pressure_type": "evidence_pressure",
+      "policy_pressure_review_status": "evidence_pressure_review",
+      "policy_pressure_review_active": true
+    }
+  }
+}

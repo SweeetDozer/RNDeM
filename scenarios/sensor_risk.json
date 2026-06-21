@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "name": "sensor_risk",
+  "description": "High-risk sensor input should produce raw input, tone update, and consolidation pressure markers.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 1
+  },
+  "inputs": [
+    {
+      "tick": 1,
+      "source": "scenario_sensor_risk",
+      "kind": "sensor",
+      "patterns": ["sen_cpu_hot", "sen_memory_pressure", "sen_integrity_warning"],
+      "activation": 1.0,
+      "payload": {
+        "cpu_temp": 88.0,
+        "memory_usage": 0.92,
+        "damage_flag": true,
+        "resource_pressure": 0.8
+      }
+    }
+  ],
+  "expect": {
+    "required_markers": [1, 5, 6, 12],
+    "forbidden_markers": [17, 20],
+    "marker_order": [[1, 6], [6, 12]],
+    "memory_unchanged": true
+  }
+}

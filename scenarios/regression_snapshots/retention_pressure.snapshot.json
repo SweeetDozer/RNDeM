@@ -1,0 +1,94 @@
+{
+  "action_guard_status_counts": {
+    "guard_effect": {},
+    "severity": {}
+  },
+  "candidate_source_counts": {},
+  "decision_audit_status_counts": {
+    "audit_confidence": {},
+    "selected_source_type": {},
+    "value_influence": {},
+    "value_scope": {}
+  },
+  "decision_cycle_summary_status_counts": {
+    "cycle_confidence": {},
+    "cycle_status": {},
+    "flags": {}
+  },
+  "event_count": 30,
+  "marker_counts": {
+    "2": 30
+  },
+  "marker_sequence": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+  ],
+  "memory_safety": {
+    "akbsm_unchanged": true,
+    "exp_sm_unchanged": true,
+    "semantic_core_unchanged": true,
+    "technical_feedback_unchanged": true
+  },
+  "need_more_evidence_active_count": 0,
+  "policy_pressure_review_status_counts": {},
+  "policy_pressure_type_counts": {},
+  "reflection_review_status_counts": {},
+  "retention_summary": {
+    "context": {
+      "after": 30,
+      "before": 80,
+      "enabled": true,
+      "newest_tick": 80,
+      "oldest_tick": 51,
+      "pruned": 50
+    },
+    "side_lists": {
+      "enabled": true,
+      "total_after": 20,
+      "total_before": 80,
+      "total_pruned": 60
+    }
+  },
+  "scenario": "retention_pressure",
+  "schema_version": 1,
+  "selected_decisions": [],
+  "side_list_counts": {
+    "action_guard_audits": 0,
+    "decision_audits": 0,
+    "decision_cycle_summaries": 0,
+    "decisions": 0,
+    "expsm_mechanism_searches": 0,
+    "target_satisfaction_observations": 0,
+    "value_feedback_candidates": 0,
+    "value_feedback_reviews": 0
+  },
+  "tick_count": 30
+}

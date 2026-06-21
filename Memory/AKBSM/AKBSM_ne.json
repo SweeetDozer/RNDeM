@@ -1,0 +1,12 @@
+{
+    "1": {
+        "from": "1",
+        "type": "3",
+        "to": "2",
+        "confidence": 0.9,
+        "source": 6,
+        "status": 2,
+        "hits": 312,
+        "misses": 4
+    }
+}

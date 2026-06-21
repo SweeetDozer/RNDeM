@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "name": "policy_review_uncertainty_pressure",
+  "description": "Direct test-only synthetic uncertainty pressure should produce uncertainty pressure review.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 0
+  },
+  "inputs": [
+    {
+      "tick": 0,
+      "source": "scenario_policy_review_uncertainty_pressure",
+      "kind": "synthetic_policy_pressure_review",
+      "patterns": [],
+      "activation": 0.0,
+      "payload": {
+        "policy_pressure": {
+          "pressure_type": "uncertainty_pressure",
+          "active": true,
+          "severity": "medium",
+          "confidence": 0.7,
+          "source_review_status": "uncertain_recent_behavior",
+          "source_primary_issue": "repeated_uncertain_selection",
+          "recommended_future_operation": "inspect_candidate_discrimination"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20],
+    "marker_order": [],
+    "memory_unchanged": true,
+    "reflection": {
+      "policy_pressure_type": "uncertainty_pressure",
+      "policy_pressure_active": true,
+      "policy_pressure_review_status": "uncertainty_pressure_review",
+      "policy_pressure_review_primary_issue": "repeated_uncertain_selection",
+      "policy_pressure_review_pressure_type": "uncertainty_pressure",
+      "policy_pressure_review_active": true,
+      "policy_pressure_review_recommended_future_operation": "inspect_candidate_discrimination"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "name": "real_input_integrity_preservation_loop",
+  "description": "Repeated high-risk integrity sensor input should naturally exercise risk, ExpSM feedback, audits, and evidence pressure.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 6
+  },
+  "inputs": [
+    {"tick": 1, "source": "scenario_real_input_integrity_preservation_loop", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 88.0, "memory_usage": 0.92, "damage_flag": true, "resource_pressure": 0.8}},
+    {"tick": 2, "source": "scenario_real_input_integrity_preservation_loop", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 88.0, "memory_usage": 0.92, "damage_flag": true, "resource_pressure": 0.8}},
+    {"tick": 3, "source": "scenario_real_input_integrity_preservation_loop", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 88.0, "memory_usage": 0.92, "damage_flag": true, "resource_pressure": 0.8}},
+    {"tick": 4, "source": "scenario_real_input_integrity_preservation_loop", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 88.0, "memory_usage": 0.92, "damage_flag": true, "resource_pressure": 0.8}},
+    {"tick": 5, "source": "scenario_real_input_integrity_preservation_loop", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 88.0, "memory_usage": 0.92, "damage_flag": true, "resource_pressure": 0.8}},
+    {"tick": 6, "source": "scenario_real_input_integrity_preservation_loop", "kind": "sensor", "patterns": ["sen_cpu_temp_high", "sen_memory_pressure", "sen_integrity_warning", "sen_resource_pressure"], "activation": 1.0, "payload": {"cpu_temp": 88.0, "memory_usage": 0.92, "damage_flag": true, "resource_pressure": 0.8}}
+  ],
+  "expect": {
+    "required_markers": [1, 5, 7, 8, 12, 21, 22, 25, 33, 34, 35],
+    "forbidden_markers": [17, 20, 36],
+    "marker_order": [[1, 5], [7, 33], [33, 34], [34, 35]],
+    "min_event_count": 150,
+    "memory_unchanged": true,
+    "reflection": {
+      "history_trend_label": "uncertain_recent_history",
+      "candidate_types": ["repeated_uncertain_selection", "weak_value_influence"],
+      "need_more_evidence_active": true,
+      "reflection_review_status": "needs_more_evidence",
+      "policy_pressure_type": "evidence_pressure",
+      "policy_pressure_review_status": "evidence_pressure_review"
+    }
+  }
+}

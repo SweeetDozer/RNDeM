@@ -1,0 +1,254 @@
+{
+  "action_guard_status_counts": {
+    "guard_effect": {
+      "no_blocked_candidates": 3
+    },
+    "severity": {
+      "none": 3
+    }
+  },
+  "candidate_source_counts": {
+    "expsm_activation": 6,
+    "expsm_mechanism_search": 2,
+    "unknown": 3
+  },
+  "decision_audit_status_counts": {
+    "audit_confidence": {
+      "narrow_win": 2,
+      "tie_like": 1
+    },
+    "selected_source_type": {
+      "expsm_activation": 3
+    },
+    "value_influence": {
+      "none_or_tiny": 3
+    },
+    "value_scope": {
+      "no_value": 3
+    }
+  },
+  "decision_cycle_summary_status_counts": {
+    "cycle_confidence": {
+      "low": 1,
+      "medium": 2
+    },
+    "cycle_status": {
+      "uncertain_selection": 3
+    },
+    "flags": {
+      "narrow_decision": 2,
+      "no_value_influence": 3,
+      "tie_like_decision": 1
+    }
+  },
+  "event_count": 117,
+  "marker_counts": {
+    "1": 6,
+    "10": 2,
+    "11": 1,
+    "12": 6,
+    "21": 6,
+    "24": 3,
+    "25": 12,
+    "26": 7,
+    "27": 6,
+    "28": 2,
+    "3": 1,
+    "33": 3,
+    "34": 3,
+    "35": 3,
+    "4": 3,
+    "5": 3,
+    "6": 41,
+    "7": 3,
+    "8": 3,
+    "9": 3
+  },
+  "marker_sequence": [
+    1,
+    6,
+    12,
+    1,
+    6,
+    12,
+    1,
+    6,
+    12,
+    1,
+    5,
+    4,
+    6,
+    21,
+    21,
+    12,
+    7,
+    33,
+    34,
+    35,
+    24,
+    8,
+    6,
+    25,
+    25,
+    26,
+    26,
+    27,
+    27,
+    28,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    1,
+    5,
+    4,
+    6,
+    21,
+    21,
+    12,
+    7,
+    33,
+    34,
+    35,
+    24,
+    8,
+    6,
+    25,
+    25,
+    25,
+    25,
+    25,
+    26,
+    27,
+    28,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    1,
+    5,
+    4,
+    6,
+    3,
+    21,
+    21,
+    12,
+    7,
+    33,
+    34,
+    35,
+    24,
+    8,
+    6,
+    9,
+    9,
+    9,
+    25,
+    25,
+    25,
+    25,
+    25,
+    26,
+    26,
+    26,
+    26,
+    27,
+    27,
+    27,
+    10,
+    10,
+    11,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+  ],
+  "memory_safety": {
+    "akbsm_unchanged": true,
+    "exp_sm_unchanged": true,
+    "semantic_core_unchanged": true,
+    "technical_feedback_unchanged": true
+  },
+  "need_more_evidence_active_count": 1,
+  "policy_pressure_review_status_counts": {
+    "evidence_pressure_review": 1
+  },
+  "policy_pressure_type_counts": {
+    "evidence_pressure": 1
+  },
+  "reflection_review_status_counts": {
+    "needs_more_evidence": 1
+  },
+  "retention_summary": {
+    "context": {
+      "after": 117,
+      "before": 117,
+      "enabled": true,
+      "newest_tick": 6,
+      "oldest_tick": 1,
+      "pruned": 0
+    },
+    "side_lists": {
+      "enabled": true,
+      "total_after": 129,
+      "total_before": 129,
+      "total_pruned": 0
+    }
+  },
+  "scenario": "decision_audit_cycle",
+  "schema_version": 1,
+  "selected_decisions": [
+    {
+      "action_pattern": "pat_0048",
+      "candidate_score": 0.666,
+      "guard_status": "",
+      "source": "expsm_activation",
+      "tick": 4
+    },
+    {
+      "action_pattern": "pat_0052",
+      "candidate_score": 0.51,
+      "guard_status": "",
+      "source": "expsm_activation",
+      "tick": 5
+    },
+    {
+      "action_pattern": "pat_0048",
+      "candidate_score": 0.666,
+      "guard_status": "",
+      "source": "expsm_activation",
+      "tick": 6
+    }
+  ],
+  "side_list_counts": {
+    "action_guard_audits": 3,
+    "decision_audits": 3,
+    "decision_cycle_summaries": 3,
+    "decisions": 3,
+    "expsm_mechanism_searches": 2,
+    "target_satisfaction_observations": 0,
+    "value_feedback_candidates": 0,
+    "value_feedback_reviews": 0
+  },
+  "tick_count": 6
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "name": "decision_audit_cycle",
+  "description": "Demo audio rhythm should eventually produce decision audit, guard audit, and decision-cycle summary markers.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 6
+  },
+  "inputs": [
+    {
+      "tick": 1,
+      "source": "scenario_decision_audit_cycle",
+      "kind": "audio",
+      "patterns": ["aud_freq_440", "aud_freq_880", "aud_freq_1200"],
+      "activation": 0.2,
+      "payload": {"frequencies": {"440": 0.2, "880": 0.2, "1200": 0.1}}
+    },
+    {
+      "tick": 2,
+      "source": "scenario_decision_audit_cycle",
+      "kind": "audio",
+      "patterns": ["aud_freq_440", "aud_freq_880", "aud_freq_1200"],
+      "activation": 0.9,
+      "payload": {"frequencies": {"440": 0.9, "880": 0.2, "1200": 0.1}}
+    },
+    {
+      "tick": 3,
+      "source": "scenario_decision_audit_cycle",
+      "kind": "audio",
+      "patterns": ["aud_freq_440", "aud_freq_880", "aud_freq_1200"],
+      "activation": 0.25,
+      "payload": {"frequencies": {"440": 0.25, "880": 0.2, "1200": 0.1}}
+    },
+    {
+      "tick": 4,
+      "source": "scenario_decision_audit_cycle",
+      "kind": "audio",
+      "patterns": ["aud_freq_440", "aud_freq_880", "aud_freq_1200"],
+      "activation": 0.85,
+      "payload": {"frequencies": {"440": 0.85, "880": 0.2, "1200": 0.1}}
+    },
+    {
+      "tick": 5,
+      "source": "scenario_decision_audit_cycle",
+      "kind": "audio",
+      "patterns": ["aud_freq_440", "aud_freq_880", "aud_freq_1200"],
+      "activation": 0.2,
+      "payload": {"frequencies": {"440": 0.2, "880": 0.2, "1200": 0.1}}
+    },
+    {
+      "tick": 6,
+      "source": "scenario_decision_audit_cycle",
+      "kind": "audio",
+      "patterns": ["aud_freq_440", "aud_freq_880", "aud_freq_1200"],
+      "activation": 0.9,
+      "payload": {"frequencies": {"440": 0.9, "880": 0.2, "1200": 0.1}}
+    }
+  ],
+  "expect": {
+    "required_markers": [7, 8, 33, 34, 35],
+    "forbidden_markers": [17, 20],
+    "marker_order": [[7, 33], [33, 34], [34, 35], [35, 8]],
+    "memory_unchanged": true
+  }
+}

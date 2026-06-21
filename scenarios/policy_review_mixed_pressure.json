@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "name": "policy_review_mixed_pressure",
+  "description": "Direct test-only synthetic mixed pressure should produce mixed pressure review.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 0
+  },
+  "inputs": [
+    {
+      "tick": 0,
+      "source": "scenario_policy_review_mixed_pressure",
+      "kind": "synthetic_policy_pressure_review",
+      "patterns": [],
+      "activation": 0.0,
+      "payload": {
+        "policy_pressure": {
+          "pressure_type": "mixed_policy_pressure",
+          "active": true,
+          "severity": "low",
+          "confidence": 0.6,
+          "source_review_status": "mixed_reflection_state",
+          "source_primary_issue": "mixed_cycle_history",
+          "recommended_future_operation": "review_mixed_history"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20],
+    "marker_order": [],
+    "memory_unchanged": true,
+    "reflection": {
+      "policy_pressure_type": "mixed_policy_pressure",
+      "policy_pressure_active": true,
+      "policy_pressure_review_status": "mixed_pressure_review",
+      "policy_pressure_review_primary_issue": "mixed_cycle_history",
+      "policy_pressure_review_pressure_type": "mixed_policy_pressure",
+      "policy_pressure_review_active": true,
+      "policy_pressure_review_recommended_future_operation": "review_mixed_history"
+    }
+  }
+}

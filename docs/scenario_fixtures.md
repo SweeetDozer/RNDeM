@@ -1,0 +1,137 @@
+# Scenario fixtures
+
+Scenario fixtures live in `scenarios/*.json`. They are partial golden tests for
+runtime marker flow: a fixture defines input events, runs them against a
+temporary copy of `Memory`, and checks marker presence, forbidden markers,
+marker order, retention pressure, and real-memory immutability.
+
+The verifier is:
+
+```bash
+python tools/verify_scenario_fixtures.py
+```
+
+## Schema
+
+```json
+{
+  "schema_version": 1,
+  "name": "audio_periodic",
+  "description": "Human-readable purpose.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 6,
+    "context_max_events": 5000,
+    "protected_recent_events": 200,
+    "side_list_default_max_entries": 500
+  },
+  "inputs": [
+    {
+      "tick": 1,
+      "source": "scenario_name",
+      "kind": "audio",
+      "patterns": ["aud_freq_440"],
+      "activation": 0.9,
+      "payload": {}
+    }
+  ],
+  "expect": {
+    "required_markers": [1, 6, 12],
+    "forbidden_markers": [17, 20],
+    "marker_order": [[1, 6]],
+    "min_event_count": 40,
+    "memory_unchanged": true,
+    "retention_pruned_events": false,
+    "side_list_caps_respected": true,
+    "reflection": {
+      "history_trend_label": "uncertain_recent_history",
+      "candidate_types": ["repeated_uncertain_selection"],
+      "need_more_evidence_active": true,
+      "reflection_review_status": "needs_more_evidence",
+      "policy_pressure_type": "evidence_pressure",
+      "policy_pressure_active": true
+    }
+  }
+}
+```
+
+`required_markers` is intentionally partial. These fixtures should not lock down
+the complete runtime log; they should only pin markers that are important to a
+scenario contract.
+
+`min_event_count` is optional. It is useful for real-input fixtures that should
+exercise enough of the runtime pipeline to produce downstream observation views
+without pinning exact marker counts.
+
+## Input kinds
+
+`audio` calls `CLCRuntime.feed_audio` with `payload.frequencies`.
+
+`sensor` calls `CLCRuntime.feed_sensor` with `cpu_temp`, `memory_usage`,
+`damage_flag`, and `resource_pressure`.
+
+`image` calls `CLCRuntime.feed_image` with `payload.pixels`.
+
+`module_update_burst` is a test-only pressure adapter. It pushes a burst of
+`MODULE_UPDATE` operations into the context manager and applies pending
+retention. This exists so retention fixtures can exercise event and side-list
+bounds without changing runtime scoring, tick phases, or permanent memory.
+
+## Reflection expectations
+
+Fixtures can optionally define `expect.reflection` fields for the runtime-only
+reflection/pressure chain. Supported fields are:
+
+- `history_trend_label`
+- `candidate_types`
+- `need_more_evidence_active`
+- `need_more_evidence_reason`
+- `reflection_review_status`
+- `reflection_review_primary_issue`
+- `policy_pressure_type`
+- `policy_pressure_active`
+- `policy_pressure_recommended_future_operation`
+- `policy_pressure_review_status`
+- `policy_pressure_review_primary_issue`
+- `policy_pressure_review_pressure_type`
+- `policy_pressure_review_active`
+- `policy_pressure_review_recommended_future_operation`
+
+The test-only input kind `synthetic_policy_pressure_review` may be used by
+scenario fixtures to build a runtime-only `PolicyPressureReview` without writing
+`ContextMemory` or permanent memory. It exists only for review states that the
+full upstream chain cannot naturally produce under current dominance rules.
+
+Fixtures can also include `synthetic_decision_cycle_summaries` to seed marker 35
+payloads into temporary runtime memory before inputs run. This is test-only and
+does not modify real memory.
+
+## Real-input scenarios
+
+Real-input fixtures live beside the synthetic fixtures and are documented in
+`docs/real_input_scenarios.md`. They use ordinary `audio` and `sensor` inputs
+only, then assert the decision audit, guard audit, decision-cycle summary, and
+runtime-only reflection/pressure observations produced by the normal pipeline.
+
+The focused verifier is:
+
+```bash
+python tools/verify_real_input_scenarios.py
+```
+
+Selected fixtures also have compact regression snapshots:
+
+```bash
+python tools/verify_phase_regression_snapshots.py
+```
+
+Snapshots are stored in `scenarios/regression_snapshots/` and are regenerated
+explicitly with `python tools/generate_phase_regression_snapshots.py`.
+
+## Memory safety
+
+The scenario runner copies `Memory` into a temporary directory and creates
+`CLCRuntime(..., memory_is_temporary=True)`. The verifier also checks that the
+real memory hashes for ExpSM and AKBSM are unchanged before and after all
+fixtures.

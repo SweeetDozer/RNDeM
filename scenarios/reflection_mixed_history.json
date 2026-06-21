@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "name": "reflection_mixed_history",
+  "description": "Mixed synthetic decision-cycle history should produce mixed candidate and current-rule evidence pressure.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 1
+  },
+  "synthetic_decision_cycle_summaries": [
+    {"tick": 0, "cycle_status": "clean_selection", "cycle_confidence": "high", "flags": [], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}},
+    {"tick": 0, "cycle_status": "guard_constrained_selection", "cycle_confidence": "medium", "flags": ["guard_blocked_high_score"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "blocked_high_score_candidate", "severity": "medium"}},
+    {"tick": 0, "cycle_status": "uncertain_selection", "cycle_confidence": "low", "flags": ["narrow_decision"], "selected": {"source": "expsm_activation"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}},
+    {"tick": 0, "cycle_status": "value_influenced_selection", "cycle_confidence": "medium", "flags": ["value_promoted_selected"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "positive_bonus"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}},
+    {"tick": 0, "cycle_status": "other_selection", "cycle_confidence": "medium", "flags": [], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}}
+  ],
+  "inputs": [
+    {
+      "tick": 1,
+      "source": "scenario_reflection_mixed_history",
+      "kind": "tick",
+      "patterns": [],
+      "activation": 0.0,
+      "payload": {}
+    }
+  ],
+  "expect": {
+    "required_markers": [35],
+    "forbidden_markers": [17, 20],
+    "marker_order": [],
+    "memory_unchanged": true,
+    "reflection": {
+      "history_trend_label": "mixed_recent_history",
+      "candidate_types": ["mixed_cycle_history"],
+      "need_more_evidence_active": true,
+      "need_more_evidence_reason": "mixed_cycle_history",
+      "reflection_review_status": "needs_more_evidence",
+      "reflection_review_primary_issue": "mixed_cycle_history",
+      "policy_pressure_type": "evidence_pressure",
+      "policy_pressure_active": true,
+      "policy_pressure_recommended_future_operation": "inspect_recent_decision_context"
+    }
+  }
+}
