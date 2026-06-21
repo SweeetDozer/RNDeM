@@ -272,6 +272,11 @@ gate currently reads `PolicyPressureReview`, `PolicyPressure`,
 `ReflectionReview`, `NeedMoreEvidenceSignal`, or any reflection/pressure
 advisory payload.
 
+`docs/adr_mode_c_first_experiment.md` records the accepted design decision for a
+possible first Mode C experiment: `PolicyPressureReview` as the only source and
+`MemoryWriteReviewModule` as the first target. It is not implemented and does
+not change current Mode A behavior.
+
 ## Scenario and testing structure
 
 Scenario fixtures live in `scenarios/*.json` and run through
@@ -314,6 +319,9 @@ Focused scenario verifiers:
 - Treat the Mode C memory-gate advisory design as documentation only; do not
   connect reflection/pressure to memory gates until a later accepted ADR
   updates policy and verifiers.
+- Treat the Mode C first-experiment ADR as a design decision only; do not add
+  advisory metadata, feature flags, or gate inputs until an implementation pass
+  is explicitly approved.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -335,6 +343,7 @@ Focused scenario verifiers:
 | `tools/verify_policy_pressure_influence_boundary.py` | reflection/pressure disconnected from scoring, guards, gates, fields, and neuromodulation |
 | `tools/verify_behavior_influence_adr.py` | behavior influence modes ADR exists, documents current observation-only policy, forbidden direct connections, and core safety verifiers |
 | `tools/verify_mode_c_design_doc.py` | Mode C memory-gate advisory design exists, stays design-only, documents forbidden behavior, and core safety verifiers pass |
+| `tools/verify_mode_c_first_experiment_adr.py` | first Mode C experiment ADR exists, documents source/target choice, forbidden effects, profile policy, future scenarios/verifiers, and core safety verifiers |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -358,6 +367,8 @@ Focused scenario verifiers:
 - Reflection/pressure cannot influence behavior yet; behavior influence modes
   are documented only as proposed / discussion-only architecture.
 - Mode C memory-gate advisory influence is design-only and not implemented.
+- Mode C first-experiment source/target choice is accepted as design only and
+  not implemented.
 - `PolicyPressureReview` is observational-only.
 - Mechanism-search is mostly next-tick material.
 - AKBSM writes remain blocked by default.
@@ -369,10 +380,10 @@ Focused scenario verifiers:
 
 ## Recommended next work
 
-1. Review `docs/design_mode_c_memory_gate_influence.md` and answer the Mode C
-   open questions before any implementation.
-2. Review `docs/adr_behavior_influence_modes.md` and decide whether Mode A
+1. Review `docs/adr_mode_c_first_experiment.md` before any implementation pass.
+2. Review `docs/design_mode_c_memory_gate_influence.md` and answer remaining
+   Mode C open questions before implementation.
+3. Review `docs/adr_behavior_influence_modes.md` and decide whether Mode A
    remains the only accepted mode for the next pass.
-3. Add deeper phase-level regression snapshots around selected marker windows.
-4. Later inspect whether AKBSM writes can be safely introduced.
-5. Later improve project packaging.
+4. Add deeper phase-level regression snapshots around selected marker windows.
+5. Later inspect whether AKBSM writes can be safely introduced.

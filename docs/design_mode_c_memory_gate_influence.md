@@ -106,6 +106,11 @@ Potential memory review targets:
 First Mode C target should be `MemoryWriteReviewModule` or `DraftCommitGate`,
 not `ExpSMUpdateWriter`, not `ValueFeedbackUpdateWriter`, and not any writer.
 
+`docs/adr_mode_c_first_experiment.md` narrows this design for the first future
+experiment: use `PolicyPressureReview` as the only source and
+`MemoryWriteReviewModule` as the first target. `DraftCommitGate` remains a later
+draft-promotion target.
+
 ## Advisory Payload Shape
 
 Example future payload only:
@@ -233,7 +238,7 @@ reverted rather than patched around.
 
 ## Open Questions
 
-- Should Mode C advise MemoryWriteReviewModule or DraftCommitGate first?
+- Which exact advisory metadata keys should MemoryWriteReviewModule expose?
 - Should safe_demo always block Mode C?
 - Should draft_only allow advisory metadata?
 - What confidence threshold is required?

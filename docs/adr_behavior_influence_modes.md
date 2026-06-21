@@ -171,6 +171,11 @@ the first possible advisory source and `MemoryWriteReviewModule` or
 `DraftCommitGate` as the first possible review-gate target, with all behavior
 disabled by default until a later accepted ADR and verifier updates exist.
 
+`docs/adr_mode_c_first_experiment.md` accepts a narrower design decision for a
+possible first experiment: `PolicyPressureReview` as the only advisory source
+and `MemoryWriteReviewModule` as the first target. It remains not implemented
+and keeps current runtime behavior in Mode A.
+
 ## Consequences
 
 The project can discuss behavior influence without weakening the current safety

@@ -8,6 +8,7 @@ Start with:
 - `docs/current_architecture_checkpoint.md`
 - `docs/adr_behavior_influence_modes.md`
 - `docs/design_mode_c_memory_gate_influence.md`
+- `docs/adr_mode_c_first_experiment.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
 
@@ -17,6 +18,7 @@ Useful checks:
 python tools/verify_project_hygiene.py
 python tools/verify_behavior_influence_adr.py
 python tools/verify_mode_c_design_doc.py
+python tools/verify_mode_c_first_experiment_adr.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
