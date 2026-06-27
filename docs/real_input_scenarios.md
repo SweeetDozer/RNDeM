@@ -32,6 +32,11 @@ the phase snapshot set. They broaden ordinary input coverage while avoiding
 extra snapshot churn for cases whose contract is already covered by stable
 marker, reflection, retention, and memory-safety expectations.
 
+Disabled Mode C fixtures are also scenario-only coverage. They verify that the
+disabled scaffold has no default effect and that `PolicyPressureReview` remains
+observational, but they are not added to phase regression snapshots because they
+test scaffold/no-effect policy rather than canonical phase output.
+
 ## Difference from synthetic fixtures
 
 Synthetic reflection and policy-review fixtures seed
@@ -112,6 +117,32 @@ reviews.
   - Expects naturally emitted decision audits, action guard audits,
     decision-cycle summaries, evidence pressure review, marker 36 absence, and
     unchanged real Memory.
+
+## Disabled Mode C scenario-only fixtures
+
+- `scenarios/mode_c_disabled_no_effect.json`
+  - Runs stable audio input with the default disabled scaffold.
+  - Expects ordinary input/context/evaluation markers, marker 36 absence, and
+    unchanged real Memory.
+
+- `scenarios/mode_c_safe_demo_no_effect.json`
+  - Runs the ordinary safe-demo audio decision path.
+  - Expects decision/audit summaries and evidence pressure review while Mode C
+    remains disabled and disconnected from memory gates.
+
+- `scenarios/mode_c_draft_only_metadata_absent.json`
+  - Runs ordinary sensor input under `draft_only`.
+  - Verifies that the default scaffold still has no advisory metadata effect.
+
+- `scenarios/mode_c_policy_flag_default_no_advisory.json`
+  - Seeds policy-review pressure and runs a tick.
+  - Verifies that pressure review can exist while the Mode C policy flag stays
+    disabled by default.
+
+- `scenarios/mode_c_pressure_review_still_observational.json`
+  - Seeds guard-pressure history and runs a tick.
+  - Verifies that `PolicyPressureReview` remains observational and disconnected
+    from behavior.
 
 ## Expected observations
 

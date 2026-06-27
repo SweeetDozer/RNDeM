@@ -141,6 +141,28 @@ explicitly with `python tools/generate_phase_regression_snapshots.py`.
 New real-input expansion fixtures are scenario coverage only for now and are not
 added automatically to `tools.phase_regression_snapshots.SELECTED_SCENARIOS`.
 
+## Disabled Mode C fixtures
+
+Disabled Mode C fixtures live beside the other scenario fixtures:
+
+- `mode_c_disabled_no_effect`
+- `mode_c_safe_demo_no_effect`
+- `mode_c_draft_only_metadata_absent`
+- `mode_c_policy_flag_default_no_advisory`
+- `mode_c_pressure_review_still_observational`
+
+They prove the disabled scaffold has no default behavior effect, no marker 36,
+no real-memory mutation, and no `PolicyPressureReview` connection to memory
+gates. They are scenario-only coverage because they verify scaffold/no-effect
+behavior rather than canonical phase output. The phase regression snapshot set
+was not expanded for these fixtures.
+
+The focused verifier is:
+
+```bash
+python tools/verify_mode_c_disabled_scenarios.py
+```
+
 ## Memory safety
 
 The scenario runner copies `Memory` into a temporary directory and creates

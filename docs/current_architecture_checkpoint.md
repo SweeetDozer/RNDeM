@@ -298,16 +298,24 @@ Fixture groups:
   reflection/pressure injection, including mixed input, stable repetition,
   conflict-then-stabilize, value/target conflict, retention, and guard-audit
   probes
+- disabled Mode C fixtures: scenario-only coverage proving the scaffold has no
+  default behavior effect, `PolicyPressureReview` remains observational, marker
+  36 is absent, and real Memory is unchanged
 - retention fixtures: context and side-list cap checks
 
 Focused scenario verifiers:
 
 - `tools/verify_scenario_fixtures.py`
 - `tools/verify_real_input_scenarios.py`
+- `tools/verify_mode_c_disabled_scenarios.py`
 - `tools/verify_reflection_pressure_scenarios.py`
 - `tools/verify_policy_pressure_review_scenarios.py`
 - `tools/verify_phase_level_invariants.py`
 - `tools/verify_phase_regression_snapshots.py`
+
+Disabled Mode C fixtures are not part of the phase regression snapshot set. They
+are scenario-only coverage because they verify scaffold/no-effect behavior
+rather than canonical phase output.
 
 ## Safety boundaries
 
@@ -350,6 +358,7 @@ Focused scenario verifiers:
 | `tools/verify_mode_c_design_doc.py` | Mode C memory-gate advisory design exists, stays design-only, documents forbidden behavior, and core safety verifiers pass |
 | `tools/verify_mode_c_first_experiment_adr.py` | first Mode C experiment ADR exists, documents source/target choice, forbidden effects, profile policy, future scenarios/verifiers, and core safety verifiers |
 | `tools/verify_mode_c_disabled_scaffold.py` | Mode C scaffold remains disabled by default, metadata-only, disconnected from behavior, marker 36 absent, and real ExpSM/AKBSM hashes unchanged |
+| `tools/verify_mode_c_disabled_scenarios.py` | disabled Mode C fixtures exist, pass scenario runner, keep scaffold no-op, preserve influence boundary, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |

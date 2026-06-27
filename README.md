@@ -20,6 +20,7 @@ python tools/verify_behavior_influence_adr.py
 python tools/verify_mode_c_design_doc.py
 python tools/verify_mode_c_first_experiment_adr.py
 python tools/verify_mode_c_disabled_scaffold.py
+python tools/verify_mode_c_disabled_scenarios.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -27,7 +28,8 @@ python tools/verify_scenario_fixtures.py
 
 Mode C has disabled-by-default scaffold only. `PolicyPressureReview` is not
 connected to memory gates by default, marker 36 is absent, and future enabled
-behavior still requires explicit approval.
+behavior still requires explicit approval. Disabled Mode C fixtures are
+scenario-only coverage and are not added to the phase regression snapshot set.
 
 Git is configured for this prototype. `main` contains the current baseline and
 tags `v0.0.1` and `v0.0.2`; architecture/design branches should be reviewed and

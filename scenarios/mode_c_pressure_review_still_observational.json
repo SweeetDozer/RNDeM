@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "name": "mode_c_pressure_review_still_observational",
+  "description": "PolicyPressureReview remains observational and disconnected from memory gates while Mode C scaffold is disabled.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 1
+  },
+  "synthetic_decision_cycle_summaries": [
+    {"tick": 0, "cycle_status": "guard_constrained_selection", "cycle_confidence": "medium", "flags": ["guard_constrained", "no_value_influence"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "blocked_high_score_candidates", "severity": "high"}},
+    {"tick": 0, "cycle_status": "guard_constrained_selection", "cycle_confidence": "medium", "flags": ["guard_constrained", "no_value_influence"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "blocked_high_score_candidates", "severity": "high"}},
+    {"tick": 0, "cycle_status": "uncertain_selection", "cycle_confidence": "medium", "flags": ["narrow_decision", "no_value_influence"], "selected": {"source": "expsm_activation"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}},
+    {"tick": 0, "cycle_status": "clean_selection", "cycle_confidence": "medium", "flags": ["no_value_influence"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}},
+    {"tick": 0, "cycle_status": "clean_selection", "cycle_confidence": "high", "flags": ["no_value_influence"], "selected": {"source": "baseline/internal"}, "decision_summary": {"value_influence": "none_or_tiny"}, "guard_summary": {"guard_effect": "no_blocked_candidates", "severity": "none"}}
+  ],
+  "inputs": [
+    {"tick": 1, "source": "scenario_mode_c_pressure_review_still_observational", "kind": "tick", "patterns": [], "activation": 0.0, "payload": {}}
+  ],
+  "expect": {
+    "required_markers": [35],
+    "forbidden_markers": [17, 20, 36],
+    "marker_order": [],
+    "memory_unchanged": true,
+    "reflection": {
+      "history_trend_label": "guard_constrained_recent_history",
+      "candidate_types": ["guard_policy_tension"],
+      "policy_pressure_type": "evidence_pressure",
+      "policy_pressure_active": true,
+      "policy_pressure_review_status": "evidence_pressure_review",
+      "policy_pressure_review_primary_issue": "guard_policy_tension",
+      "policy_pressure_review_pressure_type": "evidence_pressure",
+      "policy_pressure_review_active": true,
+      "policy_pressure_review_recommended_future_operation": "inspect_guard_policy_tension"
+    }
+  }
+}
