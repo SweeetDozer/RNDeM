@@ -1,6 +1,6 @@
 # Mode C: Advisory Memory-Gate Influence Design
 
-Status: design-only / not implemented
+Status: design-only / disabled scaffold implemented / behavior not implemented
 
 ## Context
 
@@ -9,8 +9,9 @@ advisory memory-gate influence mode. Mode C is the first recommended
 behavior-adjacent step only because it can be bounded at review gates before any
 writer or permanent memory mutation.
 
-This document designs what Mode C could mean. It does not approve Mode C and it
-does not implement behavior influence.
+This document designs what Mode C could mean. A disabled-by-default scaffold now
+exists, but it does not approve Mode C and it does not implement behavior
+influence.
 
 ## Current Policy
 
@@ -18,7 +19,12 @@ Current runtime is still Mode A.
 
 PolicyPressureReview does not influence behavior. Reflection/pressure chain is
 observational-only. No memory gate currently reads pressure/review signals. This
-document is design-only.
+document remains design-only for behavior.
+
+The scaffold consists of `mode_c_memory_gate_advisory_enabled=False` on
+`MemoryMutationPolicy` and metadata-only advisory types in
+`clc/runtime/mode_c_advisory.py`. The provider is no-op by default and is not
+connected to `MemoryWriteReviewModule`, `DraftCommitGate`, or any writer.
 
 No runtime, scoring, selection, guard, memory gate, memory writer, field,
 neuromodulation, planning, ExpSM, or AKBSM behavior changes in this pass.
@@ -141,7 +147,7 @@ DecisionSelector input.
 
 ## Runtime Policy Gate
 
-Mode C requires a future feature flag or runtime profile gate.
+Mode C requires an explicit feature flag or runtime profile gate.
 
 Example future policy:
 
@@ -152,7 +158,8 @@ draft_only may allow advisory for drafts only
 mutating_memory may allow advisory to review gates, not writers
 ```
 
-No such policy is implemented in this pass.
+The policy flag exists and defaults to `False` in all profiles. That flag is a
+gate only; it does not connect `PolicyPressureReview` to memory gates yet.
 
 Recommended policy behavior:
 
@@ -163,6 +170,10 @@ Recommended policy behavior:
 - `mutating_memory` may allow advisory metadata to review gates, but writers
   still obey MemoryMutationPolicy
 - disabled behavior must match current Mode A snapshots
+
+`tools/verify_mode_c_disabled_scaffold.py` verifies the disabled default,
+metadata-only payload, no marker 36, no scoring/selection references, and real
+ExpSM/AKBSM hash stability.
 
 ## Safety Boundaries
 

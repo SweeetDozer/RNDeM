@@ -1,6 +1,6 @@
 # Mode C First Experiment
 
-Status: accepted design / not implemented
+Status: accepted design / disabled scaffold implemented
 
 ## Context
 
@@ -9,9 +9,9 @@ influence. `docs/design_mode_c_memory_gate_influence.md` narrows Mode C as a
 future design space, but current runtime policy remains Mode A: observation
 only.
 
-This ADR decides the first safe Mode C experiment in advance. It does not
-implement Mode C, connect pressure/review signals to memory gates, or change
-runtime behavior.
+This ADR decides the first safe Mode C experiment in advance. A disabled
+scaffold now exists for the future experiment, but it does not enable Mode C,
+connect pressure/review signals to memory gates, or change runtime behavior.
 
 ## Decision
 
@@ -129,6 +129,17 @@ No confidence, severity, or review status may force approval.
 Mode C must be disabled by default in all profiles until a later implementation
 ADR explicitly changes that.
 
+Current scaffold:
+
+- `MemoryMutationPolicy.mode_c_memory_gate_advisory_enabled` defaults to
+  `False` for `safe_demo`, `draft_only`, and `mutating_memory`.
+- `MemoryGateAdvisory` and `ModeCMemoryGateAdvisoryProvider` live in
+  `clc/runtime/mode_c_advisory.py`.
+- The provider returns no advisory while disabled and is not wired into
+  `MemoryWriteReviewModule`.
+- `PolicyPressureReview` remains disconnected from behavior and memory gates by
+  default.
+
 ## Confidence/Severity Policy
 
 Low confidence advisory must not affect a gate.
@@ -172,6 +183,7 @@ snapshots.
 Future required verifiers and updates:
 
 - `tools/verify_mode_c_first_experiment_adr.py`
+- `tools/verify_mode_c_disabled_scaffold.py`
 - future `tools/verify_mode_c_advisory_memory_gate.py`
 - `tools/verify_policy_pressure_influence_boundary.py` update
 - `tools/verify_memory_mutation_policy.py` update
