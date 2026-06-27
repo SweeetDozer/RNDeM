@@ -128,9 +128,14 @@ high-level ADRs include:
 - `docs/adr_run_tick_phase_split_boundaries.md`
 - `docs/adr_policy_pressure_influence_boundary.md`
 - `docs/adr_behavior_influence_modes.md`
+- `docs/adr_akbsm_write_policy.md`
 
 `docs/adr_behavior_influence_modes.md` is proposed / discussion-only. It
 documents future behavior influence modes without changing runtime behavior.
+
+`docs/adr_akbsm_write_policy.md` is proposed / design-only. It documents that
+AKBSM writes remain blocked by default and that future AKBSM write work needs
+separate gates, verifiers, scenario coverage, auditability, and rollback.
 
 ## Audit output tracking recommendation
 

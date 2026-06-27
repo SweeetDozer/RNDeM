@@ -251,6 +251,11 @@ AKBSM supports associative lookup and association probes. Current safe-demo and
 draft-only profiles do not write AKBSM. Even in `mutating_memory`,
 `allow_akbsm_write` is currently false.
 
+`docs/adr_akbsm_write_policy.md` documents future AKBSM write policy as
+proposed / design-only architecture. It keeps the current policy in Mode 0: no
+AKBSM writes. The only recommended first future step is draft-only
+`AKBSMAssociationProposal` metadata, not graph mutation.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -335,6 +340,10 @@ rather than canonical phase output.
   accepted implementation pass updates policy, gates, scenarios, and verifiers.
 - Treat the Mode C first-experiment ADR as a source/target design decision; the
   current scaffold adds a disabled policy gate and metadata type only.
+- Treat the AKBSM write-policy ADR as design-only. Do not implement permanent
+  AKBSM writes without a later accepted ADR, explicit write policy, review gate,
+  relation registry validation, rollback journal, scenario coverage, and memory
+  hash verifier updates.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -359,6 +368,7 @@ rather than canonical phase output.
 | `tools/verify_mode_c_first_experiment_adr.py` | first Mode C experiment ADR exists, documents source/target choice, forbidden effects, profile policy, future scenarios/verifiers, and core safety verifiers |
 | `tools/verify_mode_c_disabled_scaffold.py` | Mode C scaffold remains disabled by default, metadata-only, disconnected from behavior, marker 36 absent, and real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_mode_c_disabled_scenarios.py` | disabled Mode C fixtures exist, pass scenario runner, keep scaffold no-op, preserve influence boundary, and leave real ExpSM/AKBSM hashes unchanged |
+| `tools/verify_akbsm_write_policy_adr.py` | AKBSM write-policy ADR exists, documents no-write current policy, candidate write modes, forbidden writes, future coverage, and core AKBSM/memory safety verifiers |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -388,6 +398,8 @@ rather than canonical phase output.
 - `PolicyPressureReview` is observational-only.
 - Mechanism-search is mostly next-tick material.
 - AKBSM writes remain blocked by default.
+- AKBSM write policy is design-only; no `AKBSMAssociationProposal` or permanent
+  AKBSM write path is implemented.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.
 - Git status is unavailable in the current environment.
@@ -402,4 +414,5 @@ rather than canonical phase output.
 3. Review `docs/adr_behavior_influence_modes.md` and decide whether Mode A
    remains the only accepted mode for the next pass.
 4. Add deeper phase-level regression snapshots around selected marker windows.
-5. Later inspect whether AKBSM writes can be safely introduced.
+5. Review `docs/adr_akbsm_write_policy.md` before any AKBSM write design or
+   implementation pass.
