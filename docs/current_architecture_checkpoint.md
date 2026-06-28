@@ -352,6 +352,9 @@ canonical phase output.
   AKBSM writes without a later accepted ADR, explicit write policy, review gate,
   relation registry validation, rollback journal, scenario coverage, and memory
   hash verifier updates.
+- Treat the draft-only AKBSM association proposal design as design-only. No
+  `AKBSMAssociationProposal` object, proposal storage, writer connection,
+  relation type creation, concept creation, or AKBSM mutation is implemented.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -378,6 +381,7 @@ canonical phase output.
 | `tools/verify_mode_c_disabled_scenarios.py` | disabled Mode C fixtures exist, pass scenario runner, keep scaffold no-op, preserve influence boundary, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_write_policy_adr.py` | AKBSM write-policy ADR exists, documents no-write current policy, candidate write modes, forbidden writes, future coverage, and core AKBSM/memory safety verifiers |
 | `tools/verify_akbsm_write_disabled_scenarios.py` | AKBSM write-disabled fixtures exist, pass scenario runner, keep AKBSM writes blocked by policy, preserve AKBSM association probes, and leave real ExpSM/AKBSM hashes unchanged |
+| `tools/verify_akbsm_draft_proposal_design.py` | draft-only AKBSM association proposal design exists, stays design-only, documents metadata-only proposal shape, forbidden behavior, profile policy, future coverage, and core safety verifiers |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -409,6 +413,8 @@ canonical phase output.
 - AKBSM writes remain blocked by default.
 - AKBSM write policy is design-only; no `AKBSMAssociationProposal` or permanent
   AKBSM write path is implemented.
+- Draft-only AKBSM association proposal design is documented, but no proposal
+  object, proposal storage, or commit path is implemented.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.
 - Git status is unavailable in the current environment.
@@ -423,5 +429,6 @@ canonical phase output.
 3. Review `docs/adr_behavior_influence_modes.md` and decide whether Mode A
    remains the only accepted mode for the next pass.
 4. Add deeper phase-level regression snapshots around selected marker windows.
-5. Review `docs/adr_akbsm_write_policy.md` before any AKBSM write design or
+5. Review `docs/adr_akbsm_write_policy.md` and
+   `docs/design_akbsm_draft_association_proposal.md` before any AKBSM proposal
    implementation pass.

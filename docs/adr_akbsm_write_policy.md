@@ -17,6 +17,10 @@ This ADR does not change runtime behavior, enable Mode C, connect
 `PolicyPressureReview` to memory gates, add new cognitive markers, add marker
 36, or modify ExpSM, value feedback memory, or AKBSM.
 
+`docs/design_akbsm_draft_association_proposal.md` refines the recommended Mode
+1 draft-only proposal shape. That document is also design-only and does not
+approve proposal implementation, proposal storage, or AKBSM writes.
+
 ## Current Policy
 
 Current AKBSM writes are blocked.
@@ -176,9 +180,14 @@ These gates are cumulative. Missing any gate means no permanent AKBSM write.
 Current design-only verifier:
 
 - `tools/verify_akbsm_write_policy_adr.py`
+- `tools/verify_akbsm_draft_proposal_design.py`
 
 Future verifier requirements:
 
+- future `tools/verify_akbsm_draft_proposal_no_commit.py`
+- future `tools/verify_akbsm_proposal_validation.py`
+- future `tools/verify_akbsm_relation_type_policy.py`
+- future `tools/verify_akbsm_proposal_dedup_conflict.py`
 - future `tools/verify_akbsm_write_draft_policy.py`
 - future `tools/verify_akbsm_no_write_safe_demo.py`
 - future `tools/verify_akbsm_relation_registry.py`
