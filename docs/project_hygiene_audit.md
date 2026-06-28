@@ -24,6 +24,8 @@ Current workflow recommendation:
 - keep `main` stable;
 - use short review branches for architecture/design passes;
 - push review branches without automatic merge or tag unless explicitly asked;
+- treat `docs/post_v0_0_2_safety_architecture_checkpoint.md` as a
+  documentation checkpoint, not a runtime release;
 - preserve baseline tags and memory-safety verifier expectations.
 
 ## Packaging files
@@ -129,6 +131,7 @@ high-level ADRs include:
 - `docs/adr_policy_pressure_influence_boundary.md`
 - `docs/adr_behavior_influence_modes.md`
 - `docs/adr_akbsm_write_policy.md`
+- `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 
 `docs/adr_behavior_influence_modes.md` is proposed / discussion-only. It
 documents future behavior influence modes without changing runtime behavior.
@@ -136,6 +139,10 @@ documents future behavior influence modes without changing runtime behavior.
 `docs/adr_akbsm_write_policy.md` is proposed / design-only. It documents that
 AKBSM writes remain blocked by default and that future AKBSM write work needs
 separate gates, verifiers, scenario coverage, auditability, and rollback.
+
+`docs/post_v0_0_2_safety_architecture_checkpoint.md` summarizes safety
+architecture after v0.0.2. It is a documentation checkpoint and does not create
+a new runtime tag.
 
 ## Audit output tracking recommendation
 
@@ -156,3 +163,5 @@ in a later packaging pass.
 4. Add `pyproject.toml` and dependency metadata only after current scripts and
    verifier commands are mapped.
 5. Keep regression snapshots tracked as reviewable baselines.
+6. Create a post-v0.0.2 safety checkpoint tag only after explicit approval and a
+   clean validation pass.

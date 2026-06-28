@@ -288,6 +288,10 @@ possible first Mode C experiment: `PolicyPressureReview` as the only source and
 `MemoryWriteReviewModule` as the first target. The source/target behavior is
 not implemented; current Mode A behavior is unchanged.
 
+`docs/post_v0_0_2_safety_architecture_checkpoint.md` summarizes the current
+post-v0.0.2 safety architecture state. It is a documentation checkpoint, not a
+new runtime release, and it does not create a tag.
+
 ## Scenario and testing structure
 
 Scenario fixtures live in `scenarios/*.json` and run through
@@ -377,6 +381,7 @@ canonical phase output.
 | `tools/verify_behavior_influence_adr.py` | behavior influence modes ADR exists, documents current observation-only policy, forbidden direct connections, and core safety verifiers |
 | `tools/verify_mode_c_design_doc.py` | Mode C memory-gate advisory design exists, stays design-only, documents forbidden behavior, and core safety verifiers pass |
 | `tools/verify_mode_c_first_experiment_adr.py` | first Mode C experiment ADR exists, documents source/target choice, forbidden effects, profile policy, future scenarios/verifiers, and core safety verifiers |
+| `tools/verify_post_v0_0_2_safety_checkpoint.py` | post-v0.0.2 safety checkpoint exists, documents baseline, disabled Mode C state, blocked AKBSM state, forbidden changes, scenario/verifier coverage, and core safety verifiers |
 | `tools/verify_mode_c_disabled_scaffold.py` | Mode C scaffold remains disabled by default, metadata-only, disconnected from behavior, marker 36 absent, and real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_mode_c_disabled_scenarios.py` | disabled Mode C fixtures exist, pass scenario runner, keep scaffold no-op, preserve influence boundary, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_write_policy_adr.py` | AKBSM write-policy ADR exists, documents no-write current policy, candidate write modes, forbidden writes, future coverage, and core AKBSM/memory safety verifiers |
@@ -415,6 +420,8 @@ canonical phase output.
   AKBSM write path is implemented.
 - Draft-only AKBSM association proposal design is documented, but no proposal
   object, proposal storage, or commit path is implemented.
+- Post-v0.0.2 safety architecture checkpoint is documented, but no new runtime
+  release/tag has been created for it.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.
 - Git status is unavailable in the current environment.
@@ -432,3 +439,5 @@ canonical phase output.
 5. Review `docs/adr_akbsm_write_policy.md` and
    `docs/design_akbsm_draft_association_proposal.md` before any AKBSM proposal
    implementation pass.
+6. Review `docs/post_v0_0_2_safety_architecture_checkpoint.md` before any
+   post-v0.0.2 safety tag or enabled behavior pass.

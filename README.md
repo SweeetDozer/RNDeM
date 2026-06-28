@@ -11,6 +11,7 @@ Start with:
 - `docs/adr_mode_c_first_experiment.md`
 - `docs/adr_akbsm_write_policy.md`
 - `docs/design_akbsm_draft_association_proposal.md`
+- `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
 
@@ -23,6 +24,7 @@ python tools/verify_mode_c_design_doc.py
 python tools/verify_mode_c_first_experiment_adr.py
 python tools/verify_mode_c_disabled_scaffold.py
 python tools/verify_mode_c_disabled_scenarios.py
+python tools/verify_post_v0_0_2_safety_checkpoint.py
 python tools/verify_akbsm_write_policy_adr.py
 python tools/verify_akbsm_write_disabled_scenarios.py
 python tools/verify_akbsm_draft_proposal_design.py
@@ -42,6 +44,9 @@ Draft-only AKBSM association proposals are documented as design-only in
 path is implemented.
 AKBSM write-disabled fixtures are scenario-only coverage and are not added to
 the phase regression snapshot set.
+Post-v0.0.2 safety architecture is summarized in
+`docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is not a runtime
+release and does not create a tag.
 
 Git is configured for this prototype. `main` contains the current baseline and
 tags `v0.0.1` and `v0.0.2`; architecture/design branches should be reviewed and
