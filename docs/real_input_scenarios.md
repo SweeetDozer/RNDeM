@@ -37,6 +37,12 @@ disabled scaffold has no default effect and that `PolicyPressureReview` remains
 observational, but they are not added to phase regression snapshots because they
 test scaffold/no-effect policy rather than canonical phase output.
 
+AKBSM write-disabled fixtures are scenario-only coverage. They verify that
+AKBSM remains blocked under current runtime profiles and that pressure review or
+Mode C policy cannot write AKBSM. They are not added to phase regression
+snapshots because they verify no-write safety rather than canonical phase
+output.
+
 ## Difference from synthetic fixtures
 
 Synthetic reflection and policy-review fixtures seed
@@ -143,6 +149,33 @@ reviews.
   - Seeds guard-pressure history and runs a tick.
   - Verifies that `PolicyPressureReview` remains observational and disconnected
     from behavior.
+
+## AKBSM write-disabled scenario-only fixtures
+
+- `scenarios/akbsm_write_disabled_no_effect.json`
+  - Runs stable safe-demo audio input.
+  - Verifies ordinary processing with no permanent AKBSM mutation.
+
+- `scenarios/akbsm_safe_demo_no_write.json`
+  - Runs the ordinary safe-demo decision/audit path.
+  - Verifies that AKBSM probes can occur without writing AKBSM.
+
+- `scenarios/akbsm_draft_only_no_commit.json`
+  - Runs ordinary audio input under `draft_only`.
+  - Verifies that draft-only does not commit AKBSM writes.
+
+- `scenarios/akbsm_mutating_memory_still_blocked.json`
+  - Runs ordinary input under `mutating_memory`.
+  - Verifies that mutating-memory mode still leaves AKBSM writes blocked by
+    policy.
+
+- `scenarios/akbsm_pressure_review_no_graph_write.json`
+  - Seeds policy-pressure review history.
+  - Verifies that `PolicyPressureReview` cannot write AKBSM or mutate the graph.
+
+- `scenarios/akbsm_repeated_signal_no_association_write.json`
+  - Runs repeated audio input that reaches AKBSM association probes.
+  - Verifies probes remain observation-only and no association write occurs.
 
 ## Expected observations
 

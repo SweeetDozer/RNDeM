@@ -163,6 +163,33 @@ The focused verifier is:
 python tools/verify_mode_c_disabled_scenarios.py
 ```
 
+## AKBSM write-disabled fixtures
+
+AKBSM write-disabled fixtures live beside the other scenario fixtures:
+
+- `akbsm_write_disabled_no_effect`
+- `akbsm_safe_demo_no_write`
+- `akbsm_draft_only_no_commit`
+- `akbsm_mutating_memory_still_blocked`
+- `akbsm_pressure_review_no_graph_write`
+- `akbsm_repeated_signal_no_association_write`
+
+They prove current runtime profiles do not write AKBSM, `safe_demo` blocks
+AKBSM writes, `draft_only` does not commit AKBSM writes, `mutating_memory`
+still leaves AKBSM writes blocked by policy, and `PolicyPressureReview` or Mode
+C cannot write AKBSM. They also keep marker 36 absent and real Memory hashes
+unchanged.
+
+They are scenario-only coverage because they verify no-write safety rather than
+canonical phase output. The phase regression snapshot set was not expanded for
+these fixtures.
+
+The focused verifier is:
+
+```bash
+python tools/verify_akbsm_write_disabled_scenarios.py
+```
+
 ## Memory safety
 
 The scenario runner copies `Memory` into a temporary directory and creates

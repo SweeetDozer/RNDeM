@@ -306,6 +306,9 @@ Fixture groups:
 - disabled Mode C fixtures: scenario-only coverage proving the scaffold has no
   default behavior effect, `PolicyPressureReview` remains observational, marker
   36 is absent, and real Memory is unchanged
+- AKBSM write-disabled fixtures: scenario-only coverage proving AKBSM remains
+  blocked under current profiles, `PolicyPressureReview` and Mode C cannot write
+  AKBSM, marker 36 is absent, and real Memory is unchanged
 - retention fixtures: context and side-list cap checks
 
 Focused scenario verifiers:
@@ -313,6 +316,7 @@ Focused scenario verifiers:
 - `tools/verify_scenario_fixtures.py`
 - `tools/verify_real_input_scenarios.py`
 - `tools/verify_mode_c_disabled_scenarios.py`
+- `tools/verify_akbsm_write_disabled_scenarios.py`
 - `tools/verify_reflection_pressure_scenarios.py`
 - `tools/verify_policy_pressure_review_scenarios.py`
 - `tools/verify_phase_level_invariants.py`
@@ -321,6 +325,10 @@ Focused scenario verifiers:
 Disabled Mode C fixtures are not part of the phase regression snapshot set. They
 are scenario-only coverage because they verify scaffold/no-effect behavior
 rather than canonical phase output.
+
+AKBSM write-disabled fixtures are not part of the phase regression snapshot set.
+They are scenario-only coverage because they verify no-write safety rather than
+canonical phase output.
 
 ## Safety boundaries
 
@@ -369,6 +377,7 @@ rather than canonical phase output.
 | `tools/verify_mode_c_disabled_scaffold.py` | Mode C scaffold remains disabled by default, metadata-only, disconnected from behavior, marker 36 absent, and real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_mode_c_disabled_scenarios.py` | disabled Mode C fixtures exist, pass scenario runner, keep scaffold no-op, preserve influence boundary, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_write_policy_adr.py` | AKBSM write-policy ADR exists, documents no-write current policy, candidate write modes, forbidden writes, future coverage, and core AKBSM/memory safety verifiers |
+| `tools/verify_akbsm_write_disabled_scenarios.py` | AKBSM write-disabled fixtures exist, pass scenario runner, keep AKBSM writes blocked by policy, preserve AKBSM association probes, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |

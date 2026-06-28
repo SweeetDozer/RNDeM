@@ -23,6 +23,7 @@ python tools/verify_mode_c_first_experiment_adr.py
 python tools/verify_mode_c_disabled_scaffold.py
 python tools/verify_mode_c_disabled_scenarios.py
 python tools/verify_akbsm_write_policy_adr.py
+python tools/verify_akbsm_write_disabled_scenarios.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -34,6 +35,8 @@ behavior still requires explicit approval. Disabled Mode C fixtures are
 scenario-only coverage and are not added to the phase regression snapshot set.
 AKBSM write policy is documented as design-only in
 `docs/adr_akbsm_write_policy.md`; AKBSM writes remain blocked by default.
+AKBSM write-disabled fixtures are scenario-only coverage and are not added to
+the phase regression snapshot set.
 
 Git is configured for this prototype. `main` contains the current baseline and
 tags `v0.0.1` and `v0.0.2`; architecture/design branches should be reviewed and
