@@ -190,6 +190,31 @@ The focused verifier is:
 python tools/verify_akbsm_write_disabled_scenarios.py
 ```
 
+## AKBSM draft proposal disabled fixtures
+
+AKBSM draft proposal disabled fixtures live beside the other scenario fixtures:
+
+- `akbsm_draft_proposal_disabled_no_effect`
+- `akbsm_draft_proposal_safe_demo_no_proposal`
+- `akbsm_draft_proposal_draft_only_no_proposal`
+- `akbsm_draft_proposal_mutating_memory_no_proposal`
+- `akbsm_draft_proposal_repeated_signal_no_proposal`
+- `akbsm_draft_proposal_pressure_review_no_proposal`
+
+They prove the draft proposal provider remains no-op under current profiles,
+does not create proposal metadata, does not write `ContextMemory`, does not
+write AKBSM, keeps marker 36 absent, and leaves real Memory hashes unchanged.
+
+They are scenario-only coverage because they verify disabled scaffold/no-effect
+safety rather than canonical phase output. The phase regression snapshot set was
+not expanded for these fixtures.
+
+The focused verifier is:
+
+```bash
+python tools/verify_akbsm_draft_proposal_disabled_scenarios.py
+```
+
 ## Memory safety
 
 The scenario runner copies `Memory` into a temporary directory and creates

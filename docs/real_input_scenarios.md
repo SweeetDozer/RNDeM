@@ -43,6 +43,12 @@ Mode C policy cannot write AKBSM. They are not added to phase regression
 snapshots because they verify no-write safety rather than canonical phase
 output.
 
+Disabled AKBSM draft proposal fixtures are scenario-only coverage. They verify
+that the draft proposal scaffold/provider remains no-op, does not emit proposal
+metadata, does not write AKBSM, and does not add marker 36. They are not added
+to phase regression snapshots because they verify disabled scaffold safety
+rather than canonical phase output.
+
 ## Difference from synthetic fixtures
 
 Synthetic reflection and policy-review fixtures seed
@@ -176,6 +182,32 @@ reviews.
 - `scenarios/akbsm_repeated_signal_no_association_write.json`
   - Runs repeated audio input that reaches AKBSM association probes.
   - Verifies probes remain observation-only and no association write occurs.
+
+## AKBSM draft proposal disabled scenario-only fixtures
+
+- `scenarios/akbsm_draft_proposal_disabled_no_effect.json`
+  - Runs stable safe-demo audio input.
+  - Verifies ordinary processing while the proposal scaffold stays absent.
+
+- `scenarios/akbsm_draft_proposal_safe_demo_no_proposal.json`
+  - Runs the safe-demo decision/audit path.
+  - Verifies AKBSM probes and pressure review do not create draft proposals.
+
+- `scenarios/akbsm_draft_proposal_draft_only_no_proposal.json`
+  - Runs ordinary sensor input under `draft_only`.
+  - Verifies draft-only does not enable AKBSM draft proposal creation.
+
+- `scenarios/akbsm_draft_proposal_mutating_memory_no_proposal.json`
+  - Runs ordinary audio input under `mutating_memory`.
+  - Verifies mutating-memory mode does not enable AKBSM draft proposals.
+
+- `scenarios/akbsm_draft_proposal_repeated_signal_no_proposal.json`
+  - Runs repeated audio input that reaches AKBSM association probes.
+  - Verifies repeated evidence remains observation-only.
+
+- `scenarios/akbsm_draft_proposal_pressure_review_no_proposal.json`
+  - Seeds policy-pressure review history.
+  - Verifies pressure review remains disconnected from AKBSM proposal creation.
 
 ## Expected observations
 

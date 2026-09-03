@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "name": "akbsm_draft_proposal_draft_only_no_proposal",
+  "description": "Draft-only profile still keeps AKBSM draft proposal creation disabled by default.",
+  "runtime": {
+    "profile": "draft_only",
+    "memory_is_temporary": true,
+    "max_ticks": 4
+  },
+  "inputs": [
+    {"tick": 1, "source": "scenario_akbsm_draft_proposal_draft_only_no_proposal", "kind": "sensor", "patterns": ["sen_cpu_temp", "sen_memory_pressure"], "activation": 0.45, "payload": {"cpu_temp": 55.0, "memory_usage": 0.35, "damage_flag": false, "resource_pressure": 0.25}},
+    {"tick": 2, "source": "scenario_akbsm_draft_proposal_draft_only_no_proposal", "kind": "sensor", "patterns": ["sen_cpu_temp", "sen_memory_pressure"], "activation": 0.5, "payload": {"cpu_temp": 57.0, "memory_usage": 0.38, "damage_flag": false, "resource_pressure": 0.3}},
+    {"tick": 3, "source": "scenario_akbsm_draft_proposal_draft_only_no_proposal", "kind": "sensor", "patterns": ["sen_cpu_temp", "sen_memory_pressure"], "activation": 0.48, "payload": {"cpu_temp": 56.0, "memory_usage": 0.36, "damage_flag": false, "resource_pressure": 0.28}},
+    {"tick": 4, "source": "scenario_akbsm_draft_proposal_draft_only_no_proposal", "kind": "sensor", "patterns": ["sen_cpu_temp", "sen_memory_pressure"], "activation": 0.52, "payload": {"cpu_temp": 58.0, "memory_usage": 0.4, "damage_flag": false, "resource_pressure": 0.32}}
+  ],
+  "expect": {
+    "required_markers": [1, 6, 12],
+    "forbidden_markers": [17, 20, 32, 36],
+    "marker_order": [[1, 6], [6, 12]],
+    "min_event_count": 12,
+    "memory_unchanged": true
+  }
+}

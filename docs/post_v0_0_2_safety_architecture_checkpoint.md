@@ -122,6 +122,7 @@ Scenario-only coverage groups:
 - real-input scenario expansion
 - disabled Mode C scenario coverage
 - AKBSM write-disabled scenario coverage
+- disabled AKBSM draft proposal scenario coverage
 
 Disabled Mode C fixtures:
 
@@ -140,8 +141,17 @@ AKBSM write-disabled fixtures:
 - `scenarios/akbsm_pressure_review_no_graph_write.json`
 - `scenarios/akbsm_repeated_signal_no_association_write.json`
 
-Mode C disabled and AKBSM write-disabled fixtures are scenario-only coverage.
-They do not expand phase regression snapshots.
+Disabled AKBSM draft proposal fixtures:
+
+- `scenarios/akbsm_draft_proposal_disabled_no_effect.json`
+- `scenarios/akbsm_draft_proposal_safe_demo_no_proposal.json`
+- `scenarios/akbsm_draft_proposal_draft_only_no_proposal.json`
+- `scenarios/akbsm_draft_proposal_mutating_memory_no_proposal.json`
+- `scenarios/akbsm_draft_proposal_repeated_signal_no_proposal.json`
+- `scenarios/akbsm_draft_proposal_pressure_review_no_proposal.json`
+
+Mode C disabled, AKBSM write-disabled, and disabled AKBSM draft proposal
+fixtures are scenario-only coverage. They do not expand phase regression snapshots.
 
 ## Verifier coverage
 
@@ -156,6 +166,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_write_disabled_scenarios.py`
 - `tools/verify_akbsm_draft_proposal_design.py`
 - `tools/verify_akbsm_draft_proposal_scaffold.py`
+- `tools/verify_akbsm_draft_proposal_disabled_scenarios.py`
 
 Existing core guards:
 
