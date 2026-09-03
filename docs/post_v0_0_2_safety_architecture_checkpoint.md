@@ -6,7 +6,7 @@ This is a documentation checkpoint after v0.0.2.
 
 It is not a new runtime release.
 
-No tag is created by this pass.
+This checkpoint is tagged as `v0.0.3`.
 
 ## Scope
 
@@ -16,9 +16,8 @@ remains disabled, what is explicitly forbidden, and which verifier/scenario
 layers protect the system.
 
 This document does not change runtime behavior, enable Mode C, implement AKBSM
-writes, implement AKBSM proposal runtime objects, connect
-`PolicyPressureReview` to memory gates, connect any module to AKBSM writers, or
-add marker 36.
+writes, enable AKBSM proposal creation, connect `PolicyPressureReview` to
+memory gates, connect any module to AKBSM writers, or add marker 36.
 
 ## Baseline
 
@@ -26,10 +25,9 @@ add marker 36.
 
 `v0.0.2` = expanded real-input scenario coverage.
 
-`post-v0.0.2` `main` contains safety architecture additions but no new runtime
-tag yet.
+`post-v0.0.2` `main` contains safety architecture additions.
 
-`v0.0.2` remains the last tagged runtime baseline.
+`v0.0.3` marks the post-v0.0.2 safety architecture checkpoint.
 
 ## Current runtime guarantees
 
@@ -37,7 +35,9 @@ tag yet.
 - Mode C disabled by default
 - Mode C provider no-op by default
 - AKBSM writes blocked
-- AKBSM proposal implementation absent
+- draft proposal scaffold exists
+- draft proposal scaffold disabled by default
+- draft proposal provider is no-op
 - `PolicyPressureReview` observational/disconnected
 - marker 36 absent
 - ExpSM/AKBSM memory hashes unchanged
@@ -92,19 +92,28 @@ Draft proposal design exists:
 
 - `docs/design_akbsm_draft_association_proposal.md`
 
+Draft proposal scaffold exists:
+
+- `clc/runtime/akbsm_draft_proposal.py`
+- `tools/verify_akbsm_draft_proposal_scaffold.py`
+
 AKBSM writes blocked.
 
-AKBSM proposal implementation absent.
+AKBSM proposal creation disabled by default.
 
-No runtime proposal object exists.
+`AKBSMAssociationProposal` is immutable metadata only.
+
+`commit_allowed` defaults to `False` and `commit_allowed=True` is rejected.
+
+`AKBSMDraftProposalProvider` is no-op by default.
 
 No AKBSM writes exist.
 
 No permanent AKBSM mutation path exists.
 
-The draft proposal design is metadata-only and design-only. It does not approve
-proposal storage, commit behavior, relation type creation, concept creation, or
-writer calls.
+The draft proposal design remains design-only for behavior and writes. It does
+not approve proposal storage, commit behavior, relation type creation, concept
+creation, or writer calls.
 
 ## Scenario coverage
 
@@ -146,6 +155,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_write_policy_adr.py`
 - `tools/verify_akbsm_write_disabled_scenarios.py`
 - `tools/verify_akbsm_draft_proposal_design.py`
+- `tools/verify_akbsm_draft_proposal_scaffold.py`
 
 Existing core guards:
 
@@ -182,7 +192,7 @@ commit AKBSM writes.
 - allowing Mode C to affect `DecisionSelector`, `ActionScoring`,
   `ActionProposer`, or `ModeActionGuard`
 - implementing AKBSM writes
-- implementing AKBSM proposal runtime objects
+- enabling AKBSM proposal creation
 - committing AKBSM draft proposals
 - mutating AKBSM from `PolicyPressureReview`, Mode C, ValueFeedback, or
   `DecisionSelector`
@@ -192,7 +202,7 @@ commit AKBSM writes.
 ## Known limitations
 
 - Mode C scaffold exists but is not wired to behavior.
-- AKBSM proposal is design-only.
+- AKBSM proposal behavior is design-only; disabled scaffold exists.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.
@@ -201,7 +211,7 @@ commit AKBSM writes.
 
 Option A: stop before enabled behavior.
 
-Option B: create draft-only AKBSM proposal scaffold disabled by default.
+Option B: add disabled AKBSM draft proposal scenario fixtures.
 
 Option C: create Mode C disabled integration tests without enabling behavior.
 
@@ -209,9 +219,9 @@ Option D: prepare v0.0.3 safety checkpoint tag only after explicit approval.
 
 ## Release/tag policy
 
-No tag is created by this pass.
+No tag is created by implementation/scaffold passes.
 
-Do not create a v0.0.3 safety checkpoint tag without explicit approval.
+Do not create later checkpoint tags without explicit approval.
 
 Any future tag should follow a clean validation pass, unchanged memory hashes,
 cache cleanup, and a reviewed checkpoint/release note.

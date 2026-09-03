@@ -18,8 +18,8 @@ This ADR does not change runtime behavior, enable Mode C, connect
 36, or modify ExpSM, value feedback memory, or AKBSM.
 
 `docs/design_akbsm_draft_association_proposal.md` refines the recommended Mode
-1 draft-only proposal shape. That document is also design-only and does not
-approve proposal implementation, proposal storage, or AKBSM writes.
+1 draft-only proposal shape. A disabled-by-default scaffold now exists, but it
+does not approve proposal creation, proposal storage, or AKBSM writes.
 
 ## Current Policy
 
@@ -58,7 +58,10 @@ it must not mutate the AKBSM graph.
 Runtime may create metadata that proposes a possible association, but the
 proposal is not a graph mutation and cannot be committed by default.
 
-This is the recommended first future step if AKBSM write work is ever approved.
+Disabled scaffold for this mode exists in `clc/runtime/akbsm_draft_proposal.py`.
+`akbsm_draft_proposals_enabled` defaults to `False`, and
+`AKBSMDraftProposalProvider` is no-op by default. Proposal creation still
+requires explicit future approval and scenario coverage.
 
 ### Mode 2: Temporary-Session AKBSM Association
 
@@ -112,9 +115,9 @@ Rules:
 - The proposal must not create relation types.
 - The proposal must include source, tick, evidence, and reason.
 
-First future step recommendation: draft-only AKBSM proposal. Permanent AKBSM
-writes should not be implemented until strong scenario coverage and rollback
-exist.
+Current first step: disabled draft-only AKBSM proposal scaffold. Permanent
+AKBSM writes should not be implemented until strong scenario coverage and
+rollback exist.
 
 ## Forbidden Writes
 
@@ -141,19 +144,21 @@ No hidden adapter or renamed helper may create the same direct write effect.
 `safe_demo`:
 
 - AKBSM writes forbidden.
-- AKBSM proposals forbidden unless explicitly future-enabled as temporary debug
-  metadata.
+- AKBSM proposals disabled by default.
+- `AKBSMDraftProposalProvider` remains no-op.
 - Real AKBSM hashes must remain unchanged.
 
 `draft_only`:
 
-- Future `AKBSMAssociationProposal` may be allowed as draft metadata only.
+- `AKBSMAssociationProposal` exists as metadata-only scaffold.
+- Proposal creation remains disabled by default.
 - No permanent AKBSM mutation.
 - `commit_allowed` remains `False` by default.
 
 `mutating_memory`:
 
 - Permanent AKBSM writes still forbidden by default.
+- Proposal creation remains disabled by default.
 - Future review-gated permanent write requires a separate ADR and verifier
   suite.
 - `allow_akbsm_write` must remain false until that later approval exists.
@@ -181,6 +186,7 @@ Current design-only verifier:
 
 - `tools/verify_akbsm_write_policy_adr.py`
 - `tools/verify_akbsm_draft_proposal_design.py`
+- `tools/verify_akbsm_draft_proposal_scaffold.py`
 
 Future verifier requirements:
 

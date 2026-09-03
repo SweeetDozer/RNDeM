@@ -17,6 +17,7 @@ class MemoryMutationPolicy:
     allow_expsm_update: bool
     allow_value_feedback_update: bool
     allow_akbsm_write: bool
+    akbsm_draft_proposals_enabled: bool = False
     mode_c_memory_gate_advisory_enabled: bool = False
     real_memory_root: str | None = None
     memory_is_temporary: bool = False
@@ -31,6 +32,7 @@ class MemoryMutationPolicy:
             "allow_expsm_update": self.allow_expsm_update,
             "allow_value_feedback_update": self.allow_value_feedback_update,
             "allow_akbsm_write": self.allow_akbsm_write,
+            "akbsm_draft_proposals_enabled": self.akbsm_draft_proposals_enabled,
             "mode_c_memory_gate_advisory_enabled": self.mode_c_memory_gate_advisory_enabled,
         }
 

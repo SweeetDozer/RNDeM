@@ -25,6 +25,9 @@ reflection/pressure influence are not implemented.
   `mutating_memory` profiles.
 - `mode_c_advisory.py` defines disabled-by-default Mode C advisory payload
   scaffold. It is metadata-only and not wired into memory gates.
+- `akbsm_draft_proposal.py` defines disabled-by-default AKBSM draft proposal
+  payload/provider scaffold. It is metadata-only and not wired into AKBSM
+  writers, behavior modules, or storage.
 
 `clc/context/`
 
@@ -197,6 +200,9 @@ Memory profiles:
 - `mode_c_memory_gate_advisory_enabled`: defaults to `False` in every profile.
   The disabled scaffold has no safe_demo effect and does not connect
   `PolicyPressureReview` to `MemoryWriteReviewModule`.
+- `akbsm_draft_proposals_enabled`: defaults to `False` in every profile. The
+  disabled scaffold has no safe_demo effect and does not create, store, or
+  commit AKBSM proposals.
 
 ## Action and decision model
 
@@ -253,8 +259,10 @@ draft-only profiles do not write AKBSM. Even in `mutating_memory`,
 
 `docs/adr_akbsm_write_policy.md` documents future AKBSM write policy as
 proposed / design-only architecture. It keeps the current policy in Mode 0: no
-AKBSM writes. The only recommended first future step is draft-only
-`AKBSMAssociationProposal` metadata, not graph mutation.
+AKBSM writes. `AKBSMAssociationProposal` now exists as immutable
+metadata-only scaffold, but the provider is disabled/no-op by default and no
+proposal storage, commit path, relation type creation, concept creation, or
+AKBSM mutation is implemented.
 
 ## Reflection and pressure chain
 
@@ -356,9 +364,11 @@ canonical phase output.
   AKBSM writes without a later accepted ADR, explicit write policy, review gate,
   relation registry validation, rollback journal, scenario coverage, and memory
   hash verifier updates.
-- Treat the draft-only AKBSM association proposal design as design-only. No
-  `AKBSMAssociationProposal` object, proposal storage, writer connection,
-  relation type creation, concept creation, or AKBSM mutation is implemented.
+- Treat the draft-only AKBSM association proposal scaffold as disabled
+  infrastructure only. `AKBSMAssociationProposal` and
+  `AKBSMDraftProposalProvider` exist, but proposal creation is disabled/no-op by
+  default and no proposal storage, writer connection, relation type creation,
+  concept creation, or AKBSM mutation is implemented.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -386,7 +396,8 @@ canonical phase output.
 | `tools/verify_mode_c_disabled_scenarios.py` | disabled Mode C fixtures exist, pass scenario runner, keep scaffold no-op, preserve influence boundary, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_write_policy_adr.py` | AKBSM write-policy ADR exists, documents no-write current policy, candidate write modes, forbidden writes, future coverage, and core AKBSM/memory safety verifiers |
 | `tools/verify_akbsm_write_disabled_scenarios.py` | AKBSM write-disabled fixtures exist, pass scenario runner, keep AKBSM writes blocked by policy, preserve AKBSM association probes, and leave real ExpSM/AKBSM hashes unchanged |
-| `tools/verify_akbsm_draft_proposal_design.py` | draft-only AKBSM association proposal design exists, stays design-only, documents metadata-only proposal shape, forbidden behavior, profile policy, future coverage, and core safety verifiers |
+| `tools/verify_akbsm_draft_proposal_design.py` | draft-only AKBSM association proposal design exists, documents disabled scaffold status, metadata-only proposal shape, forbidden behavior, profile policy, future coverage, and core safety verifiers |
+| `tools/verify_akbsm_draft_proposal_scaffold.py` | AKBSM proposal scaffold remains disabled/no-op by default, metadata-only, disconnected from behavior/writers/storage, marker 36 absent, and real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -416,12 +427,12 @@ canonical phase output.
 - `PolicyPressureReview` is observational-only.
 - Mechanism-search is mostly next-tick material.
 - AKBSM writes remain blocked by default.
-- AKBSM write policy is design-only; no `AKBSMAssociationProposal` or permanent
-  AKBSM write path is implemented.
-- Draft-only AKBSM association proposal design is documented, but no proposal
-  object, proposal storage, or commit path is implemented.
-- Post-v0.0.2 safety architecture checkpoint is documented, but no new runtime
-  release/tag has been created for it.
+- AKBSM write policy is design-only for permanent writes; no permanent AKBSM
+  write path is implemented.
+- Draft-only AKBSM association proposal scaffold exists, but the provider is
+  disabled/no-op by default and no proposal storage or commit path is
+  implemented.
+- Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.
 - Git status is unavailable in the current environment.

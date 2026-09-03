@@ -11,9 +11,9 @@ DOC_PATH = ROOT / "docs" / "post_v0_0_2_safety_architecture_checkpoint.md"
 BASELINE_TERMS = (
     "v0.0.1",
     "v0.0.2",
+    "v0.0.3",
     "post-v0.0.2",
     "not a new runtime release",
-    "No tag",
 )
 
 MODE_C_TERMS = (
@@ -28,7 +28,9 @@ MODE_C_TERMS = (
 
 AKBSM_TERMS = (
     "AKBSM writes blocked",
-    "AKBSM proposal implementation absent",
+    "draft proposal scaffold exists",
+    "disabled by default",
+    "provider is no-op",
     "draft proposal design",
     "no permanent AKBSM mutation",
 )
@@ -46,6 +48,7 @@ COVERAGE_TERMS = (
     "verify_mode_c_disabled_scenarios.py",
     "verify_akbsm_write_disabled_scenarios.py",
     "verify_akbsm_draft_proposal_design.py",
+    "verify_akbsm_draft_proposal_scaffold.py",
     "phase regression snapshots",
     "scenario-only coverage",
 )
@@ -53,6 +56,7 @@ COVERAGE_TERMS = (
 CORE_SAFETY_VERIFIERS = (
     "tools/verify_mode_c_disabled_scenarios.py",
     "tools/verify_akbsm_write_disabled_scenarios.py",
+    "tools/verify_akbsm_draft_proposal_scaffold.py",
     "tools/verify_memory_mutation_policy.py",
     "tools/verify_phase_regression_snapshots.py",
 )

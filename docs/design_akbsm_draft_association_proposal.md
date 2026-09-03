@@ -1,6 +1,6 @@
 # Draft-only AKBSM Association Proposal Design
 
-Status: design-only / not implemented
+Status: design accepted / disabled scaffold implemented / AKBSM writes not implemented
 
 ## Context
 
@@ -10,8 +10,9 @@ module may mutate AKBSM.
 
 This document refines the future Mode 1 direction from
 `docs/adr_akbsm_write_policy.md`: a draft-only association proposal that is
-metadata-only and cannot commit. It does not implement any proposal object,
-writer, gate, marker, scenario, or runtime behavior.
+metadata-only and cannot commit. The current implementation adds only a
+disabled-by-default runtime scaffold; it does not add a writer, gate, marker,
+scenario, storage path, or runtime behavior.
 
 ## Current policy
 
@@ -19,13 +20,18 @@ AKBSM writes remain blocked.
 
 No runtime module may mutate AKBSM.
 
-No proposal implementation exists yet.
+`AKBSMAssociationProposal` and `AKBSMDraftProposalProvider` exist as runtime
+scaffold only in `clc/runtime/akbsm_draft_proposal.py`.
 
-This document is design-only.
+`akbsm_draft_proposals_enabled` defaults to `False` in all runtime profiles.
+
+The provider is no-op and returns no proposals.
+
+This document remains design-only for behavior and AKBSM writes.
 
 ## Design goal
 
-A future `AKBSMAssociationProposal` should mean:
+`AKBSMAssociationProposal` should mean:
 
 > the runtime observed enough evidence to propose that an association might
 > exist
@@ -41,7 +47,8 @@ graph operation.
 
 - Implement AKBSM writes.
 - Enable AKBSM writes.
-- Add runtime AKBSM proposal objects.
+- Enable runtime AKBSM proposal creation.
+- Persist runtime AKBSM proposals.
 - Connect any module to AKBSM writers.
 - Change default behavior.
 - Enable Mode C behavior.
@@ -51,7 +58,7 @@ graph operation.
 
 ## Proposal shape
 
-Future payload example only:
+Payload:
 
 ```python
 from dataclasses import dataclass
@@ -82,7 +89,7 @@ Rules:
 
 ## Allowed proposal sources
 
-Possible future first sources:
+Possible future first sources if proposal creation is explicitly enabled later:
 
 - `AKBSMAssociationProbe`
 - `AKBSMAssociationField`
@@ -127,6 +134,8 @@ No permanent file writes.
 
 No AKBSM file writes.
 
+No proposal storage is implemented in the current scaffold.
+
 ## Validation requirements
 
 Future proposal validation must require:
@@ -138,6 +147,9 @@ Future proposal validation must require:
 - `evidence` is non-empty.
 - `reason` is non-empty.
 - `commit_allowed` is `False` by default.
+
+Current scaffold validation requires confidence within `0.0..1.0` and rejects
+`commit_allowed=True`.
 
 ## Confidence/evidence policy
 
@@ -190,21 +202,22 @@ Every future proposal must record:
 
 - no permanent AKBSM write
 - proposal disabled by default
-- future debug-only proposal may be allowed only if no file mutation occurs
+- current scaffold provider is no-op
 
 `draft_only`:
 
-- draft proposal may be allowed in future
+- draft proposal creation remains disabled by default
 - no permanent AKBSM write
 
 `mutating_memory`:
 
-- draft proposal may be allowed in future
+- draft proposal creation remains disabled by default
 - permanent AKBSM write still forbidden without separate ADR
 
 ## Required future verifiers
 
-- future `tools/verify_akbsm_draft_proposal_design.py`
+- `tools/verify_akbsm_draft_proposal_design.py`
+- `tools/verify_akbsm_draft_proposal_scaffold.py`
 - future `tools/verify_akbsm_draft_proposal_no_commit.py`
 - future `tools/verify_akbsm_proposal_validation.py`
 - future `tools/verify_akbsm_relation_type_policy.py`

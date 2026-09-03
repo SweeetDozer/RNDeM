@@ -141,8 +141,7 @@ AKBSM writes remain blocked by default and that future AKBSM write work needs
 separate gates, verifiers, scenario coverage, auditability, and rollback.
 
 `docs/post_v0_0_2_safety_architecture_checkpoint.md` summarizes safety
-architecture after v0.0.2. It is a documentation checkpoint and does not create
-a new runtime tag.
+architecture after v0.0.2. It is the checkpoint documented by tag `v0.0.3`.
 
 ## Audit output tracking recommendation
 
@@ -163,5 +162,5 @@ in a later packaging pass.
 4. Add `pyproject.toml` and dependency metadata only after current scripts and
    verifier commands are mapped.
 5. Keep regression snapshots tracked as reviewable baselines.
-6. Create a post-v0.0.2 safety checkpoint tag only after explicit approval and a
-   clean validation pass.
+6. Keep AKBSM proposal scaffolding disabled by default until a later explicit
+   implementation pass adds proposal creation verifiers and scenarios.

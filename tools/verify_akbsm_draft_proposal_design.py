@@ -9,8 +9,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DOC_PATH = ROOT / "docs" / "design_akbsm_draft_association_proposal.md"
 
 STATUS_TERMS = (
-    "design-only",
-    "not implemented",
+    "design accepted",
+    "disabled scaffold implemented",
+    "AKBSM writes not implemented",
     "AKBSM writes remain blocked",
 )
 
@@ -34,6 +35,7 @@ FORBIDDEN_BEHAVIOR_TERMS = (
     "cannot create relation types",
     "cannot create concepts",
     "permanent AKBSM write",
+    "No proposal storage is implemented",
     "marker 36",
 )
 
@@ -46,6 +48,7 @@ PROFILE_TERMS = (
 FUTURE_COVERAGE_TERMS = (
     "akbsm_proposal_disabled_no_effect",
     "akbsm_draft_only_proposal_no_commit",
+    "verify_akbsm_draft_proposal_scaffold",
     "verify_akbsm_draft_proposal_no_commit",
     "verify_akbsm_proposal_validation",
 )

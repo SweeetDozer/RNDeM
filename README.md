@@ -28,6 +28,7 @@ python tools/verify_post_v0_0_2_safety_checkpoint.py
 python tools/verify_akbsm_write_policy_adr.py
 python tools/verify_akbsm_write_disabled_scenarios.py
 python tools/verify_akbsm_draft_proposal_design.py
+python tools/verify_akbsm_draft_proposal_scaffold.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -39,15 +40,15 @@ behavior still requires explicit approval. Disabled Mode C fixtures are
 scenario-only coverage and are not added to the phase regression snapshot set.
 AKBSM write policy is documented as design-only in
 `docs/adr_akbsm_write_policy.md`; AKBSM writes remain blocked by default.
-Draft-only AKBSM association proposals are documented as design-only in
-`docs/design_akbsm_draft_association_proposal.md`; no proposal object or write
-path is implemented.
+Draft-only AKBSM association proposals now have a disabled-by-default runtime
+scaffold in `clc/runtime/akbsm_draft_proposal.py`; the provider is no-op,
+proposals are metadata-only, and no write path is implemented.
 AKBSM write-disabled fixtures are scenario-only coverage and are not added to
 the phase regression snapshot set.
 Post-v0.0.2 safety architecture is summarized in
-`docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is not a runtime
-release and does not create a tag.
+`docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
+`v0.0.3` and is not an enabled-behavior runtime release.
 
 Git is configured for this prototype. `main` contains the current baseline and
-tags `v0.0.1` and `v0.0.2`; architecture/design branches should be reviewed and
-merged manually.
+tags `v0.0.1`, `v0.0.2`, and `v0.0.3`; architecture/design branches should be
+reviewed and merged manually.

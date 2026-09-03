@@ -67,6 +67,7 @@ def _case_direct_safe_default(before: dict[str, str | None]) -> bool:
         and policy.allow_expsm_commit is False
         and policy.allow_expsm_update is False
         and policy.allow_value_feedback_update is False
+        and policy.akbsm_draft_proposals_enabled is False
         and blocked
         and after["expsm"] == before["expsm"]
         and after["drafts"] == before["drafts"]
@@ -96,6 +97,7 @@ def _case_draft_only(temp_memory: Path) -> bool:
         and policy.allow_expsm_update is False
         and policy.allow_value_feedback_update is False
         and policy.allow_akbsm_write is False
+        and policy.akbsm_draft_proposals_enabled is False
         and blocked
     )
 
@@ -125,6 +127,8 @@ def _case_mutating_temp_fixture(temp_memory: Path) -> bool:
     after_real = _real_hashes()
     return (
         policy.allow_value_feedback_update is True
+        and policy.akbsm_draft_proposals_enabled is False
+        and policy.allow_akbsm_write is False
         and any(operation.marker == OperationMarker.VALUE_FEEDBACK_UPDATED for operation in operations)
         and before_temp != after_temp
         and after_real == before_real
