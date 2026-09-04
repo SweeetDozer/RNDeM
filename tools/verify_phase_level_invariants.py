@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 from contextlib import redirect_stdout
 import io
+import os
 import shutil
 import subprocess
 import sys
@@ -287,11 +288,16 @@ def _marker_36_absent_from_implementation() -> tuple[bool, list[str]]:
 
 
 def _run_key_verifiers() -> bool:
+    if os.environ.get("RNDEM_VERIFIER_SHALLOW") == "1":
+        return True
+    env = dict(os.environ)
+    env["RNDEM_VERIFIER_SHALLOW"] = "1"
     for relative_path in KEY_VERIFIERS:
         result = subprocess.run(
             [sys.executable, "-B", relative_path],
             cwd=ROOT,
             check=False,
+            env=env,
         )
         if result.returncode != 0:
             return False

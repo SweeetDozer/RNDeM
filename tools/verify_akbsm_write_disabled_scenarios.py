@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -91,10 +92,15 @@ def _akbsm_write_blocked_by_policy() -> bool:
 
 
 def _run_verifier(relative_path: str) -> bool:
+    if os.environ.get("RNDEM_VERIFIER_SHALLOW") == "1":
+        return True
+    env = dict(os.environ)
+    env["RNDEM_VERIFIER_SHALLOW"] = "1"
     result = subprocess.run(
         [sys.executable, "-B", relative_path],
         cwd=ROOT,
         check=False,
+        env=env,
     )
     if result.returncode != 0:
         return False

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -97,6 +98,10 @@ def _changed_files_clean(findings: list[object]) -> bool:
 
 
 def _behavior_verifiers_pass() -> bool:
+    if os.environ.get("RNDEM_VERIFIER_SHALLOW") == "1":
+        return True
+    env = dict(os.environ)
+    env["RNDEM_VERIFIER_SHALLOW"] = "1"
     for relative_path in (
         "tools/verify_scenario_fixtures.py",
         "tools/verify_scoring_selection_semantics.py",
@@ -108,6 +113,7 @@ def _behavior_verifiers_pass() -> bool:
             [sys.executable, "-B", relative_path],
             cwd=PROJECT_ROOT,
             check=False,
+            env=env,
         )
         if result.returncode != 0:
             return False

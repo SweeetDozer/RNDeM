@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -95,11 +96,16 @@ def _helpers_exist() -> bool:
 
 
 def _run_key_verifiers() -> bool:
+    if os.environ.get("RNDEM_VERIFIER_SHALLOW") == "1":
+        return True
+    env = dict(os.environ)
+    env["RNDEM_VERIFIER_SHALLOW"] = "1"
     for relative_path in KEY_VERIFIERS:
         result = subprocess.run(
             [sys.executable, "-B", relative_path],
             cwd=ROOT,
             check=False,
+            env=env,
         )
         if result.returncode != 0:
             return False

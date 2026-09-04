@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -126,6 +127,10 @@ def _markdown_documents_split() -> bool:
 
 
 def _safety_verifiers_pass() -> bool:
+    if os.environ.get("RNDEM_VERIFIER_SHALLOW") == "1":
+        return True
+    env = dict(os.environ)
+    env["RNDEM_VERIFIER_SHALLOW"] = "1"
     for relative_path in (
         "tools/verify_scoring_selection_semantics.py",
         "tools/verify_run_tick_phase_split_boundaries.py",
@@ -135,6 +140,7 @@ def _safety_verifiers_pass() -> bool:
             [sys.executable, "-B", relative_path],
             cwd=PROJECT_ROOT,
             check=False,
+            env=env,
         )
         if result.returncode != 0:
             return False

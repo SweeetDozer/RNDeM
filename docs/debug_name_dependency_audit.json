@@ -6806,7 +6806,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 89,
+      "line": 90,
       "path": "tools/verify_akbsm_draft_proposal_disabled_scenarios.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
@@ -6817,7 +6817,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 184,
+      "line": 185,
       "path": "tools/verify_akbsm_draft_proposal_disabled_scenarios.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
@@ -6828,7 +6828,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 191,
+      "line": 192,
       "path": "tools/verify_akbsm_draft_proposal_disabled_scenarios.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
@@ -6839,7 +6839,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 75,
+      "line": 76,
       "path": "tools/verify_akbsm_write_disabled_scenarios.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
@@ -6850,7 +6850,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 78,
+      "line": 79,
       "path": "tools/verify_akbsm_write_disabled_scenarios.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
@@ -7917,7 +7917,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 102,
+      "line": 103,
       "path": "tools/verify_unknown_runtime_logic_split.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
