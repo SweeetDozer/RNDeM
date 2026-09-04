@@ -97,6 +97,10 @@ Draft proposal scaffold exists:
 - `clc/runtime/akbsm_draft_proposal.py`
 - `tools/verify_akbsm_draft_proposal_scaffold.py`
 
+First enabled draft proposal experiment ADR exists:
+
+- `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -114,6 +118,12 @@ No permanent AKBSM mutation path exists.
 The draft proposal design remains design-only for behavior and writes. It does
 not approve proposal storage, commit behavior, relation type creation, concept
 creation, or writer calls.
+
+The first enabled draft proposal experiment ADR remains design-only. It selects
+`AKBSMAssociationProbe` as the only future proposal source, defers
+AKBSMAssociationField, forbids behavior, pressure, scoring, action, value,
+Mode C, ExpSM, and memory writer sources, keeps the experiment unimplemented,
+leaves default runtime unchanged, and keeps AKBSM writes blocked.
 
 ## Scenario coverage
 
@@ -167,6 +177,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_draft_proposal_design.py`
 - `tools/verify_akbsm_draft_proposal_scaffold.py`
 - `tools/verify_akbsm_draft_proposal_disabled_scenarios.py`
+- `tools/verify_akbsm_first_enabled_draft_proposal_adr.py`
 
 Existing core guards:
 
@@ -214,6 +225,8 @@ commit AKBSM writes.
 
 - Mode C scaffold exists but is not wired to behavior.
 - AKBSM proposal behavior is design-only; disabled scaffold exists.
+- First enabled AKBSM draft proposal experiment is design-only; it selects
+  `AKBSMAssociationProbe` only and defers AKBSMAssociationField.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.
@@ -224,7 +237,8 @@ Option A: stop before enabled behavior.
 
 Option B: add disabled AKBSM draft proposal scenario fixtures.
 
-Option C: create Mode C disabled integration tests without enabling behavior.
+Option C: create a design-only ADR for the first enabled AKBSM draft proposal
+experiment.
 
 Option D: prepare v0.0.3 safety checkpoint tag only after explicit approval.
 

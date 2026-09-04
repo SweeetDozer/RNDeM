@@ -196,13 +196,9 @@ def _run_verifier(relative_path: str) -> bool:
     result = subprocess.run(
         [sys.executable, "-B", relative_path],
         cwd=ROOT,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
         check=False,
     )
     if result.returncode != 0:
-        print(result.stdout)
         return False
     return True
 

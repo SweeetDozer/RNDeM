@@ -21,6 +21,13 @@ This ADR does not change runtime behavior, enable Mode C, connect
 1 draft-only proposal shape. A disabled-by-default scaffold now exists, but it
 does not approve proposal creation, proposal storage, or AKBSM writes.
 
+`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` is design-only and
+decides the first future enabled draft proposal experiment:
+`AKBSMAssociationProbe` is the only proposal source, AKBSMAssociationField is
+deferred, all behavior, pressure, scoring, action, value, Mode C, ExpSM, and
+memory writer sources are forbidden, the experiment is not implemented, default
+runtime is unchanged, and AKBSM writes remain blocked.
+
 ## Current Policy
 
 Current AKBSM writes are blocked.
@@ -119,6 +126,10 @@ Current first step: disabled draft-only AKBSM proposal scaffold. Permanent
 AKBSM writes should not be implemented until strong scenario coverage and
 rollback exist.
 
+First future enabled proposal creation, if approved later, should start from
+`AKBSMAssociationProbe` only and remain temporary metadata.
+AKBSMAssociationField is deferred.
+
 ## Forbidden Writes
 
 The following are forbidden unless later explicitly approved:
@@ -187,6 +198,7 @@ Current design-only verifier:
 - `tools/verify_akbsm_write_policy_adr.py`
 - `tools/verify_akbsm_draft_proposal_design.py`
 - `tools/verify_akbsm_draft_proposal_scaffold.py`
+- `tools/verify_akbsm_first_enabled_draft_proposal_adr.py`
 
 Future verifier requirements:
 

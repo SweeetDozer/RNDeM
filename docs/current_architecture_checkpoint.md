@@ -264,6 +264,13 @@ metadata-only scaffold, but the provider is disabled/no-op by default and no
 proposal storage, commit path, relation type creation, concept creation, or
 AKBSM mutation is implemented.
 
+`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` documents the first
+future enabled draft proposal experiment as design-only. The future source is
+`AKBSMAssociationProbe` only; AKBSMAssociationField is deferred. Behavior,
+pressure, scoring, action, value, Mode C, ExpSM, and memory writer sources are
+forbidden. The experiment is not implemented, default runtime is unchanged, and
+AKBSM writes remain blocked.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -377,6 +384,10 @@ proposal/no-effect safety rather than canonical phase output.
   `AKBSMDraftProposalProvider` exist, but proposal creation is disabled/no-op by
   default and no proposal storage, writer connection, relation type creation,
   concept creation, or AKBSM mutation is implemented.
+- Treat the first enabled AKBSM draft proposal experiment ADR as design-only.
+  Do not implement proposal creation until a later pass explicitly approves the
+  `AKBSMAssociationProbe`-only source, keeps AKBSMAssociationField deferred,
+  and adds the required scenario and verifier coverage.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -407,6 +418,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_draft_proposal_design.py` | draft-only AKBSM association proposal design exists, documents disabled scaffold status, metadata-only proposal shape, forbidden behavior, profile policy, future coverage, and core safety verifiers |
 | `tools/verify_akbsm_draft_proposal_scaffold.py` | AKBSM proposal scaffold remains disabled/no-op by default, metadata-only, disconnected from behavior/writers/storage, marker 36 absent, and real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_draft_proposal_disabled_scenarios.py` | disabled AKBSM draft proposal fixtures exist, pass scenario runner, keep proposal provider no-op, prevent proposal wiring/writes, keep marker 36 absent, and leave real ExpSM/AKBSM hashes unchanged |
+| `tools/verify_akbsm_first_enabled_draft_proposal_adr.py` | first enabled AKBSM draft proposal experiment ADR exists, documents `AKBSMAssociationProbe` as the only future source, defers `AKBSMAssociationField`, forbids behavior/pressure/scoring/action/value/writer sources, and keeps current safety verifiers passing |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -441,6 +453,10 @@ proposal/no-effect safety rather than canonical phase output.
 - Draft-only AKBSM association proposal scaffold exists, but the provider is
   disabled/no-op by default and no proposal storage or commit path is
   implemented.
+- First enabled AKBSM draft proposal experiment is design-only. The selected
+  future source is `AKBSMAssociationProbe` only, while AKBSMAssociationField
+  and behavior/pressure/scoring/action/value/writer sources are deferred or
+  forbidden.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.
@@ -457,7 +473,8 @@ proposal/no-effect safety rather than canonical phase output.
    remains the only accepted mode for the next pass.
 4. Add deeper phase-level regression snapshots around selected marker windows.
 5. Review `docs/adr_akbsm_write_policy.md` and
-   `docs/design_akbsm_draft_association_proposal.md` before any AKBSM proposal
-   implementation pass.
+   `docs/design_akbsm_draft_association_proposal.md` and
+   `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` before any AKBSM
+   proposal implementation pass.
 6. Review `docs/post_v0_0_2_safety_architecture_checkpoint.md` before any
    post-v0.0.2 safety tag or enabled behavior pass.

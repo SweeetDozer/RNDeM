@@ -29,6 +29,13 @@ The provider is no-op and returns no proposals.
 
 This document remains design-only for behavior and AKBSM writes.
 
+`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` decides the first
+future enabled experiment as design-only: `AKBSMAssociationProbe` is the only
+proposal source, AKBSMAssociationField is deferred, all behavior, pressure,
+scoring, action, value, Mode C, ExpSM, and memory writer sources are forbidden,
+the experiment is not implemented, default runtime is unchanged, and AKBSM
+writes remain blocked.
+
 ## Design goal
 
 `AKBSMAssociationProposal` should mean:
@@ -96,9 +103,8 @@ Possible future first sources if proposal creation is explicitly enabled later:
 - repeated stable real-input scenarios
 - explicit review-only modules
 
-Recommended first future source: `AKBSMAssociationProbe` or
-`AKBSMAssociationField`, whichever is closest to read-only AKBSM association
-evidence at implementation time.
+Recommended first future source: `AKBSMAssociationProbe` only.
+AKBSMAssociationField is deferred.
 
 ## Forbidden proposal sources
 
@@ -218,6 +224,7 @@ Every future proposal must record:
 
 - `tools/verify_akbsm_draft_proposal_design.py`
 - `tools/verify_akbsm_draft_proposal_scaffold.py`
+- `tools/verify_akbsm_first_enabled_draft_proposal_adr.py`
 - future `tools/verify_akbsm_draft_proposal_no_commit.py`
 - future `tools/verify_akbsm_proposal_validation.py`
 - future `tools/verify_akbsm_relation_type_policy.py`

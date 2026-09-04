@@ -131,6 +131,7 @@ high-level ADRs include:
 - `docs/adr_policy_pressure_influence_boundary.md`
 - `docs/adr_behavior_influence_modes.md`
 - `docs/adr_akbsm_write_policy.md`
+- `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 
 `docs/adr_behavior_influence_modes.md` is proposed / discussion-only. It
@@ -142,6 +143,12 @@ separate gates, verifiers, scenario coverage, auditability, and rollback.
 
 `docs/post_v0_0_2_safety_architecture_checkpoint.md` summarizes safety
 architecture after v0.0.2. It is the checkpoint documented by tag `v0.0.3`.
+
+`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` is design-only. It
+selects `AKBSMAssociationProbe` as the only first future proposal source,
+defers AKBSMAssociationField, forbids behavior/pressure/scoring/action/value,
+Mode C, ExpSM, and memory writer sources, and leaves default runtime and AKBSM
+writes unchanged.
 
 ## Audit output tracking recommendation
 
@@ -164,3 +171,5 @@ in a later packaging pass.
 5. Keep regression snapshots tracked as reviewable baselines.
 6. Keep AKBSM proposal scaffolding disabled by default until a later explicit
    implementation pass adds proposal creation verifiers and scenarios.
+7. Keep first enabled AKBSM draft proposal work design-only until a later
+   explicit implementation pass is approved.
