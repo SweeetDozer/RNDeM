@@ -19,14 +19,16 @@ This ADR does not change runtime behavior, enable Mode C, connect
 
 `docs/design_akbsm_draft_association_proposal.md` refines the recommended Mode
 1 draft-only proposal shape. A disabled-by-default scaffold now exists, but it
-does not approve proposal creation, proposal storage, or AKBSM writes.
+does not approve proposal storage or AKBSM writes. The first controlled
+enabled proposal experiment is test/scenario-only and uses
+`AKBSMAssociationProbe` as its only source.
 
-`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` is design-only and
-decides the first future enabled draft proposal experiment:
-`AKBSMAssociationProbe` is the only proposal source, AKBSMAssociationField is
-deferred, all behavior, pressure, scoring, action, value, Mode C, ExpSM, and
-memory writer sources are forbidden, the experiment is not implemented, default
-runtime is unchanged, and AKBSM writes remain blocked.
+`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` defines the first
+controlled enabled draft proposal experiment: `AKBSMAssociationProbe` is the
+only proposal source, AKBSMAssociationField is deferred, all behavior,
+pressure, scoring, action, value, Mode C, ExpSM, and memory writer sources are
+forbidden, the provider path is test/scenario-only, default runtime is
+unchanged, and AKBSM writes remain blocked.
 
 ## Current Policy
 
@@ -68,7 +70,7 @@ proposal is not a graph mutation and cannot be committed by default.
 Disabled scaffold for this mode exists in `clc/runtime/akbsm_draft_proposal.py`.
 `akbsm_draft_proposals_enabled` defaults to `False`, and
 `AKBSMDraftProposalProvider` is no-op by default. Proposal creation still
-requires explicit future approval and scenario coverage.
+requires an explicit test/scenario policy flag and scenario coverage.
 
 ### Mode 2: Temporary-Session AKBSM Association
 
@@ -126,9 +128,8 @@ Current first step: disabled draft-only AKBSM proposal scaffold. Permanent
 AKBSM writes should not be implemented until strong scenario coverage and
 rollback exist.
 
-First future enabled proposal creation, if approved later, should start from
-`AKBSMAssociationProbe` only and remain temporary metadata.
-AKBSMAssociationField is deferred.
+First controlled enabled proposal creation starts from `AKBSMAssociationProbe`
+only and remains temporary metadata. AKBSMAssociationField is deferred.
 
 ## Forbidden Writes
 
@@ -156,7 +157,9 @@ No hidden adapter or renamed helper may create the same direct write effect.
 
 - AKBSM writes forbidden.
 - AKBSM proposals disabled by default.
-- `AKBSMDraftProposalProvider` remains no-op.
+- `AKBSMDraftProposalProvider` remains no-op by default.
+- Explicit test/scenario-only proposal creation may return temporary metadata
+  from `AKBSMAssociationProbe` only.
 - Real AKBSM hashes must remain unchanged.
 
 `draft_only`:
@@ -165,6 +168,7 @@ No hidden adapter or renamed helper may create the same direct write effect.
 - Proposal creation remains disabled by default.
 - No permanent AKBSM mutation.
 - `commit_allowed` remains `False` by default.
+- `commit_allowed=True` is rejected.
 
 `mutating_memory`:
 

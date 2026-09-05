@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "name": "akbsm_draft_proposal_enabled_commit_forbidden",
+  "description": "Scenario metadata for rejecting commit-enabled AKBSM draft proposals.",
+  "runtime": {
+    "profile": "draft_only",
+    "memory_is_temporary": true,
+    "max_ticks": 0
+  },
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "akbsm_draft_proposal_experiment": {
+      "test_only": true,
+      "explicit_enabled_flag": true,
+      "normal_runtime_disabled": true,
+      "source": "AKBSMAssociationProbe",
+      "temporary_metadata_only": true,
+      "commit_allowed": false,
+      "commit_allowed_true_rejected": true,
+      "akbsm_write_forbidden": true,
+      "expsm_write_forbidden": true
+    }
+  }
+}

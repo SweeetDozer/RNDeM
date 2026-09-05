@@ -32,6 +32,7 @@ python tools/verify_akbsm_draft_proposal_design.py
 python tools/verify_akbsm_draft_proposal_scaffold.py
 python tools/verify_akbsm_draft_proposal_disabled_scenarios.py
 python tools/verify_akbsm_first_enabled_draft_proposal_adr.py
+python tools/verify_akbsm_probe_draft_proposal_experiment.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -44,23 +45,24 @@ scenario-only coverage and are not added to the phase regression snapshot set.
 AKBSM write policy is documented as design-only in
 `docs/adr_akbsm_write_policy.md`; AKBSM writes remain blocked by default.
 Draft-only AKBSM association proposals now have a disabled-by-default runtime
-scaffold in `clc/runtime/akbsm_draft_proposal.py`; the provider is no-op,
-proposals are metadata-only, and no write path is implemented.
+scaffold in `clc/runtime/akbsm_draft_proposal.py`; the provider is no-op by
+default, proposals are metadata-only, and no write path is implemented.
 AKBSM write-disabled fixtures are scenario-only coverage and are not added to
 the phase regression snapshot set.
 Disabled AKBSM draft proposal fixtures are scenario-only coverage for the no-op
 provider/scaffold boundary and are not added to the phase regression snapshot
 set.
-The first enabled draft proposal experiment is documented as design-only in
-`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md`: the future source
-is `AKBSMAssociationProbe` only, AKBSMAssociationField is deferred, behavior,
-pressure, scoring, action, value, Mode C, ExpSM, and memory writer sources are
-forbidden, the experiment is not implemented, default runtime is unchanged, and
+The first enabled draft proposal experiment is documented in
+`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` and exists as a
+controlled test/scenario-only provider path: the enabled source is
+`AKBSMAssociationProbe` only, AKBSMAssociationField is deferred, behavior,
+pressure, scoring, action, value, Mode C, ExpSM, and memory writer sources
+remain forbidden, proposal creation remains disabled in normal runtime, and
 AKBSM writes remain blocked.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
 
 Git is configured for this prototype. `main` contains the current baseline and
-tags `v0.0.1`, `v0.0.2`, `v0.0.3`, and `v0.0.4`; architecture/design branches should be
+tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, and `v0.0.5`; architecture/design branches should be
 reviewed and merged manually.

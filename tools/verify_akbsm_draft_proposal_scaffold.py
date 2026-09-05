@@ -13,7 +13,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from clc.runtime.akbsm_draft_proposal import AKBSMAssociationProposal, AKBSMDraftProposalProvider
+from clc.runtime.akbsm_draft_proposal import (
+    AKBSM_PROBE_PROPOSAL_SOURCE,
+    AKBSMAssociationProposal,
+    AKBSMDraftProposalProvider,
+)
 from clc.runtime.memory_mutation_policy import MemoryMutationPolicy, RuntimeProfile, policy_for_profile
 
 
@@ -58,7 +62,10 @@ def main() -> int:
         "payload_shape": _case_payload_shape(),
         "payload_validation": _case_payload_validation(),
         "provider_noop_by_default": _case_provider_noop_by_default(),
-        "provider_noop_when_enabled": _case_provider_noop_when_enabled(),
+        "provider_noop_when_disabled": _case_provider_noop_when_disabled(),
+        "provider_noop_without_probe_evidence": _case_provider_noop_without_probe_evidence(),
+        "provider_enabled_probe_metadata_only": _case_provider_enabled_probe_metadata_only(),
+        "provider_forbidden_sources_noop": _case_provider_forbidden_sources_noop(),
         "no_forbidden_integrations": _case_no_forbidden_integrations(),
         "no_file_or_writer_calls": _case_no_file_or_writer_calls(),
         "akbsm_write_policy_still_passes": _run_verifier("tools/verify_akbsm_write_policy_adr.py"),
@@ -136,6 +143,8 @@ def _case_payload_shape() -> bool:
 def _case_payload_validation() -> bool:
     confidence_rejected = False
     commit_rejected = False
+    empty_metadata_rejected = False
+    empty_evidence_rejected = False
     evidence_tupled = AKBSMAssociationProposal(
         source="verify",
         tick=1,
@@ -154,7 +163,15 @@ def _case_payload_validation() -> bool:
         AKBSMAssociationProposal("verify", 1, "pat_a", "supports", "pat_b", 0.5, (), "bad", True)
     except ValueError:
         commit_rejected = True
-    return confidence_rejected and commit_rejected and evidence_tupled
+    try:
+        AKBSMAssociationProposal("verify", 1, "", "supports", "pat_b", 0.5, ("probe:1",), "bad")
+    except ValueError:
+        empty_metadata_rejected = True
+    try:
+        AKBSMAssociationProposal("verify", 1, "pat_a", "supports", "pat_b", 0.5, (), "bad")
+    except ValueError:
+        empty_evidence_rejected = True
+    return confidence_rejected and commit_rejected and empty_metadata_rejected and empty_evidence_rejected and evidence_tupled
 
 
 def _case_provider_noop_by_default() -> bool:
@@ -162,7 +179,12 @@ def _case_provider_noop_by_default() -> bool:
     return provider.from_association_evidence(object()) == ()
 
 
-def _case_provider_noop_when_enabled() -> bool:
+def _case_provider_noop_when_disabled() -> bool:
+    provider = AKBSMDraftProposalProvider(policy_for_profile(RuntimeProfile.DRAFT_ONLY))
+    return provider.from_association_evidence(_probe_payload(), source=AKBSM_PROBE_PROPOSAL_SOURCE, tick=7) == ()
+
+
+def _case_provider_noop_without_probe_evidence() -> bool:
     policy = MemoryMutationPolicy(
         profile=RuntimeProfile.DRAFT_ONLY,
         allow_draft_writes=True,
@@ -174,6 +196,57 @@ def _case_provider_noop_when_enabled() -> bool:
     )
     provider = AKBSMDraftProposalProvider(policy)
     return provider.from_association_evidence(object()) == ()
+
+
+def _case_provider_enabled_probe_metadata_only() -> bool:
+    policy = MemoryMutationPolicy(
+        profile=RuntimeProfile.DRAFT_ONLY,
+        allow_draft_writes=True,
+        allow_expsm_commit=False,
+        allow_expsm_update=False,
+        allow_value_feedback_update=False,
+        allow_akbsm_write=False,
+        akbsm_draft_proposals_enabled=True,
+    )
+    provider = AKBSMDraftProposalProvider(policy)
+    proposals = provider.from_association_evidence(_probe_payload(), source=AKBSM_PROBE_PROPOSAL_SOURCE, tick=7)
+    return (
+        len(proposals) == 1
+        and proposals[0].source == AKBSM_PROBE_PROPOSAL_SOURCE
+        and proposals[0].tick == 7
+        and proposals[0].subject_id == "pat_source"
+        and proposals[0].relation_type == "supports"
+        and proposals[0].object_id == "pat_object"
+        and proposals[0].confidence == 0.72
+        and proposals[0].evidence
+        and proposals[0].commit_allowed is False
+    )
+
+
+def _case_provider_forbidden_sources_noop() -> bool:
+    policy = MemoryMutationPolicy(
+        profile=RuntimeProfile.DRAFT_ONLY,
+        allow_draft_writes=True,
+        allow_expsm_commit=False,
+        allow_expsm_update=False,
+        allow_value_feedback_update=False,
+        allow_akbsm_write=False,
+        akbsm_draft_proposals_enabled=True,
+    )
+    provider = AKBSMDraftProposalProvider(policy)
+    forbidden_sources = (
+        "AKBSMAssociationField",
+        "PolicyPressureReview",
+        "Mode C",
+        "DecisionSelector",
+        "ActionScoring",
+        "ActionProposer",
+        "ModeActionGuard",
+        "ValueFeedback",
+        "ExpSM",
+        "memory writers",
+    )
+    return all(provider.from_association_evidence(_probe_payload(), source=source, tick=7) == () for source in forbidden_sources)
 
 
 def _case_no_forbidden_integrations() -> bool:
@@ -230,6 +303,26 @@ def _sample_proposal() -> AKBSMAssociationProposal:
         evidence=("probe:1",),
         reason="metadata only",
     )
+
+
+def _probe_payload() -> dict[str, object]:
+    return {
+        "probe_id": "akbsm_probe_001",
+        "source_target_observation_id": "target_observation_001",
+        "source_pattern_id": "pat_source",
+        "activation": 0.61,
+        "associated_patterns": [
+            {
+                "pattern_id": "pat_object",
+                "relation_type": "supports",
+                "score": 0.72,
+                "path": ["pat_source", "pat_object"],
+            }
+        ],
+        "memory_modified": False,
+        "permanent_memory_modified": False,
+        "akbsm_modified": False,
+    }
 
 
 def _call_name(func: ast.expr) -> str:

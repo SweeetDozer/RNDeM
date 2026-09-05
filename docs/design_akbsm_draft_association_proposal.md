@@ -11,8 +11,9 @@ module may mutate AKBSM.
 This document refines the future Mode 1 direction from
 `docs/adr_akbsm_write_policy.md`: a draft-only association proposal that is
 metadata-only and cannot commit. The current implementation adds only a
-disabled-by-default runtime scaffold; it does not add a writer, gate, marker,
-scenario, storage path, or runtime behavior.
+disabled-by-default runtime scaffold plus a controlled test/scenario-only
+enabled provider path for `AKBSMAssociationProbe`; it does not add a writer,
+gate, marker, storage path, or normal runtime behavior.
 
 ## Current policy
 
@@ -25,16 +26,22 @@ scaffold only in `clc/runtime/akbsm_draft_proposal.py`.
 
 `akbsm_draft_proposals_enabled` defaults to `False` in all runtime profiles.
 
-The provider is no-op and returns no proposals.
+The provider is no-op by default and returns no proposals when
+`akbsm_draft_proposals_enabled=False`.
+
+The first controlled enabled experiment exists only through explicit
+test/scenario policy construction. With `akbsm_draft_proposals_enabled=True`
+and `source="AKBSMAssociationProbe"`, the provider may return temporary
+metadata-only `AKBSMAssociationProposal` objects. It remains unconnected from
+normal runtime, behavior, scoring, guards, Mode C, writers, and storage.
 
 This document remains design-only for behavior and AKBSM writes.
 
 `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` decides the first
-future enabled experiment as design-only: `AKBSMAssociationProbe` is the only
-proposal source, AKBSMAssociationField is deferred, all behavior, pressure,
-scoring, action, value, Mode C, ExpSM, and memory writer sources are forbidden,
-the experiment is not implemented, default runtime is unchanged, and AKBSM
-writes remain blocked.
+controlled enabled experiment: `AKBSMAssociationProbe` is the only proposal
+source, AKBSMAssociationField is deferred, all behavior, pressure, scoring,
+action, value, Mode C, ExpSM, and memory writer sources are forbidden, default
+runtime is unchanged, and AKBSM writes remain blocked.
 
 ## Design goal
 
@@ -54,7 +61,7 @@ graph operation.
 
 - Implement AKBSM writes.
 - Enable AKBSM writes.
-- Enable runtime AKBSM proposal creation.
+- Enable normal runtime AKBSM proposal creation.
 - Persist runtime AKBSM proposals.
 - Connect any module to AKBSM writers.
 - Change default behavior.
@@ -154,8 +161,9 @@ Future proposal validation must require:
 - `reason` is non-empty.
 - `commit_allowed` is `False` by default.
 
-Current scaffold validation requires confidence within `0.0..1.0` and rejects
-`commit_allowed=True`.
+Current scaffold validation requires non-empty string metadata for source,
+subject, relation type, object, and reason; requires non-empty evidence;
+requires confidence within `0.0..1.0`; and rejects `commit_allowed=True`.
 
 ## Confidence/evidence policy
 
@@ -208,16 +216,22 @@ Every future proposal must record:
 
 - no permanent AKBSM write
 - proposal disabled by default
-- current scaffold provider is no-op
+- current scaffold provider is no-op by default
+- explicit test/scenario-only probe proposal creation may be verified without
+  connecting normal runtime
 
 `draft_only`:
 
 - draft proposal creation remains disabled by default
 - no permanent AKBSM write
+- explicit test/scenario-only probe proposal creation may return temporary
+  metadata with `commit_allowed=False`
 
 `mutating_memory`:
 
 - draft proposal creation remains disabled by default
+- explicit test/scenario-only proposal creation still cannot enable AKBSM
+  writes
 - permanent AKBSM write still forbidden without separate ADR
 
 ## Required future verifiers

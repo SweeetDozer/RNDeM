@@ -2,37 +2,37 @@
 
 ## Status
 
-Proposed / design-only.
+Accepted / controlled test-scenario experiment implemented.
 
-This ADR does not implement enabled proposal creation, enable AKBSM draft
-proposals, enable AKBSM writes, change runtime behavior, connect proposals to
-behavior modules, connect `PolicyPressureReview` to AKBSM proposals, enable
-Mode C, or add marker 36.
+This ADR now has a narrow implementation: explicit test/scenario-only provider
+proposal creation from `AKBSMAssociationProbe`. It does not enable normal
+runtime proposal creation, enable AKBSM writes, change runtime behavior,
+connect proposals to behavior modules, connect `PolicyPressureReview` to AKBSM
+proposals, enable Mode C, or add marker 36.
 
 ## Context
 
 `v0.0.4` marks the disabled AKBSM draft proposal scaffold checkpoint.
 `AKBSMAssociationProposal` and `AKBSMDraftProposalProvider` exist, but
 `akbsm_draft_proposals_enabled` defaults to `False`, the provider remains
-no-op, disabled proposal scenarios pass, no proposal commit path exists, and
-AKBSM writes remain blocked.
+no-op by default, disabled proposal scenarios pass, no proposal commit path
+exists, and AKBSM writes remain blocked.
 
-The next risky design question is the first future experiment that may create
-temporary draft proposal metadata when explicitly enabled by scenario/test
-policy. This ADR decides that future source and its boundaries before any
-implementation pass.
+The first controlled experiment can create temporary draft proposal metadata
+when explicitly enabled by scenario/test policy. This ADR decides that source
+and its boundaries before any storage or write path exists.
 
 ## Decision
 
-The first future enabled AKBSM draft proposal experiment may use
+The first controlled enabled AKBSM draft proposal experiment may use
 `AKBSMAssociationProbe` as the only proposal source.
 
 AKBSMAssociationField is deferred.
 
-The experiment remains disabled by default and is not implemented by this ADR.
-It may be enabled only by an explicit scenario/test policy flag in a future
-implementation pass. It must not be enabled in normal runtime and must not be
-enabled by `safe_demo`, `draft_only`, or `mutating_memory` defaults.
+The experiment remains disabled by default. It may be enabled only by an
+explicit scenario/test policy flag. It must not be enabled in normal runtime
+and must not be enabled by `safe_demo`, `draft_only`, or `mutating_memory`
+defaults.
 
 ## First Enabled Source
 
@@ -141,9 +141,27 @@ The future experiment must not:
 - connect `PolicyPressureReview` to memory gates
 - add marker 36
 
+## Implemented Experiment Boundary
+
+The controlled provider experiment exists in
+`clc/runtime/akbsm_draft_proposal.py`.
+
+It is enabled only by explicit test/scenario policy construction:
+
+- `akbsm_draft_proposals_enabled=True`
+- `source="AKBSMAssociationProbe"`
+
+Normal runtime remains disabled and does not wire the provider into
+`CLCRuntime`, `_run_tick()`, scoring, selection, guards, Mode C, writers, or
+storage.
+
+Generated proposals are temporary metadata-only
+`AKBSMAssociationProposal` objects with `commit_allowed=False`.
+`commit_allowed=True` is rejected.
+
 ## Required Future Implementation Constraints
 
-A future implementation pass must:
+Any future implementation pass must:
 
 - remain disabled by default
 - require an explicit scenario/test policy flag
@@ -198,6 +216,8 @@ Future verifier expectations:
 - verify no behavior/scoring/guard/Mode C integration
 - verify marker 36 absent
 - verify memory hashes unchanged
+- verify provider remains no-op by default
+- verify no proposal commit path exists
 
 ## Memory Safety Requirements
 

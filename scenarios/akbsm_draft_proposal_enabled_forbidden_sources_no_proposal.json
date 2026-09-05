@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "akbsm_draft_proposal_enabled_forbidden_sources_no_proposal",
+  "description": "Scenario metadata for forbidden AKBSM draft proposal sources staying no-op.",
+  "runtime": {
+    "profile": "draft_only",
+    "memory_is_temporary": true,
+    "max_ticks": 0
+  },
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "akbsm_draft_proposal_experiment": {
+      "test_only": true,
+      "explicit_enabled_flag": true,
+      "normal_runtime_disabled": true,
+      "source": "AKBSMAssociationProbe",
+      "forbidden_sources_no_proposal": [
+        "AKBSMAssociationField",
+        "PolicyPressureReview",
+        "Mode C",
+        "DecisionSelector",
+        "ActionScoring",
+        "ActionProposer",
+        "ModeActionGuard",
+        "ValueFeedback",
+        "ExpSM",
+        "memory writers"
+      ],
+      "temporary_metadata_only": true,
+      "commit_allowed": false,
+      "akbsm_write_forbidden": true,
+      "expsm_write_forbidden": true
+    }
+  }
+}

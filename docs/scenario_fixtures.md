@@ -215,6 +215,31 @@ The focused verifier is:
 python tools/verify_akbsm_draft_proposal_disabled_scenarios.py
 ```
 
+## Controlled AKBSM probe draft proposal experiment fixtures
+
+Enabled AKBSM probe draft proposal fixtures are scenario/test-only coverage
+because they verify explicit experiment behavior and no-write safety, not
+canonical phase output.
+
+They live beside the other scenario fixtures:
+
+- `akbsm_draft_proposal_enabled_probe_creates_temp_metadata`
+- `akbsm_draft_proposal_enabled_commit_forbidden`
+- `akbsm_draft_proposal_enabled_probe_no_memory_mutation`
+- `akbsm_draft_proposal_enabled_forbidden_sources_no_proposal`
+- `akbsm_draft_proposal_default_still_disabled_after_enabled_test`
+
+The current scenario runner does not enable AKBSM proposal creation in normal
+runtime. These fixtures carry metadata for the explicit provider experiment,
+while `tools/verify_akbsm_probe_draft_proposal_experiment.py` exercises the
+provider directly and verifies `AKBSMAssociationProbe`-only creation,
+`commit_allowed=False`, `commit_allowed=True` rejection, forbidden-source
+no-op behavior, no proposal commit path, no permanent proposal persistence, no
+AKBSM writes, no ExpSM writes, no relation type creation, no concept creation,
+marker 36 absence, and unchanged real Memory hashes.
+
+The phase regression snapshot set was not expanded for these fixtures.
+
 ## Memory safety
 
 The scenario runner copies `Memory` into a temporary directory and creates

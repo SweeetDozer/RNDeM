@@ -209,6 +209,33 @@ reviews.
   - Seeds policy-pressure review history.
   - Verifies pressure review remains disconnected from AKBSM proposal creation.
 
+## Controlled AKBSM probe draft proposal experiment fixtures
+
+Enabled AKBSM probe draft proposal fixtures are scenario/test-only coverage
+because they verify explicit experiment behavior and no-write safety, not
+canonical phase output.
+
+- `scenarios/akbsm_draft_proposal_enabled_probe_creates_temp_metadata.json`
+  - Documents explicit `AKBSMAssociationProbe` provider creation of temporary
+    metadata-only proposal output.
+
+- `scenarios/akbsm_draft_proposal_enabled_commit_forbidden.json`
+  - Documents that `commit_allowed=True` is rejected and proposals remain
+    `commit_allowed=False`.
+
+- `scenarios/akbsm_draft_proposal_enabled_probe_no_memory_mutation.json`
+  - Documents that the enabled provider path does not mutate AKBSM or ExpSM and
+    does not create relation types or concepts.
+
+- `scenarios/akbsm_draft_proposal_enabled_forbidden_sources_no_proposal.json`
+  - Documents that AKBSMAssociationField, PolicyPressureReview, Mode C,
+    selector, scoring, action, guard, value, ExpSM, and writer sources cannot
+    create proposals.
+
+- `scenarios/akbsm_draft_proposal_default_still_disabled_after_enabled_test.json`
+  - Documents that normal runtime remains disabled after explicit provider
+    tests.
+
 ## Expected observations
 
 The real-input fixtures prefer partial, stable assertions:

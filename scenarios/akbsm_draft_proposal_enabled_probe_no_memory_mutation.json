@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "name": "akbsm_draft_proposal_enabled_probe_no_memory_mutation",
+  "description": "Scenario metadata for enabled probe proposal creation with no real memory mutation.",
+  "runtime": {
+    "profile": "draft_only",
+    "memory_is_temporary": true,
+    "max_ticks": 0
+  },
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "akbsm_draft_proposal_experiment": {
+      "test_only": true,
+      "explicit_enabled_flag": true,
+      "normal_runtime_disabled": true,
+      "source": "AKBSMAssociationProbe",
+      "temporary_metadata_only": true,
+      "commit_allowed": false,
+      "akbsm_write_forbidden": true,
+      "expsm_write_forbidden": true,
+      "no_relation_type_created": true,
+      "no_concept_created": true
+    }
+  }
+}

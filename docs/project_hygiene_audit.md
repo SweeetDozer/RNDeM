@@ -144,11 +144,18 @@ separate gates, verifiers, scenario coverage, auditability, and rollback.
 `docs/post_v0_0_2_safety_architecture_checkpoint.md` summarizes safety
 architecture after v0.0.2. It is the checkpoint documented by tag `v0.0.3`.
 
-`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` is design-only. It
-selects `AKBSMAssociationProbe` as the only first future proposal source,
-defers AKBSMAssociationField, forbids behavior/pressure/scoring/action/value,
-Mode C, ExpSM, and memory writer sources, and leaves default runtime and AKBSM
-writes unchanged.
+`docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` now has a
+controlled test/scenario-only implementation. It selects
+`AKBSMAssociationProbe` as the only proposal source, defers
+AKBSMAssociationField, forbids behavior/pressure/scoring/action/value, Mode C,
+ExpSM, and memory writer sources, and leaves default runtime and AKBSM writes
+unchanged.
+
+`tools/verify_akbsm_probe_draft_proposal_experiment.py` verifies that this
+experiment remains disabled by default, creates temporary metadata only from
+`AKBSMAssociationProbe` when explicitly enabled by test/scenario policy,
+rejects forbidden sources and commit-enabled proposals, avoids storage/wiring,
+and preserves real Memory hashes.
 
 ## Audit output tracking recommendation
 
@@ -169,7 +176,6 @@ in a later packaging pass.
 4. Add `pyproject.toml` and dependency metadata only after current scripts and
    verifier commands are mapped.
 5. Keep regression snapshots tracked as reviewable baselines.
-6. Keep AKBSM proposal scaffolding disabled by default until a later explicit
-   implementation pass adds proposal creation verifiers and scenarios.
-7. Keep first enabled AKBSM draft proposal work design-only until a later
-   explicit implementation pass is approved.
+6. Keep AKBSM proposal scaffolding disabled by default in normal runtime.
+7. Keep the first enabled AKBSM draft proposal experiment test/scenario-only
+   until a later explicit pass approves any storage or wiring.

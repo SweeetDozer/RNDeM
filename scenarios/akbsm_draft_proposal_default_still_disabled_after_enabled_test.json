@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "name": "akbsm_draft_proposal_default_still_disabled_after_enabled_test",
+  "description": "Scenario metadata proving normal runtime remains disabled after explicit provider tests.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 0
+  },
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "akbsm_draft_proposal_experiment": {
+      "test_only": true,
+      "explicit_enabled_flag": false,
+      "normal_runtime_disabled": true,
+      "source": "AKBSMAssociationProbe",
+      "no_proposals_by_default": true,
+      "temporary_metadata_only": true,
+      "commit_allowed": false,
+      "akbsm_write_forbidden": true,
+      "expsm_write_forbidden": true
+    }
+  }
+}

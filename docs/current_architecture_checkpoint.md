@@ -80,6 +80,9 @@ reflection/pressure influence are not implemented.
 - `AKBSMAssociationProbe` and `AKBSMAssociationFieldUpdater` produce and project
   runtime association evidence.
 - `AKBSMAssociationField` is a runtime field, not a direct AKBSM write path.
+- Controlled AKBSM draft proposal creation exists only as an explicit
+  test/scenario provider path from `AKBSMAssociationProbe`; normal runtime
+  remains disabled and unconnected.
 
 `clc/expsm/`
 
@@ -265,11 +268,11 @@ proposal storage, commit path, relation type creation, concept creation, or
 AKBSM mutation is implemented.
 
 `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md` documents the first
-future enabled draft proposal experiment as design-only. The future source is
+controlled enabled draft proposal experiment. The source is
 `AKBSMAssociationProbe` only; AKBSMAssociationField is deferred. Behavior,
 pressure, scoring, action, value, Mode C, ExpSM, and memory writer sources are
-forbidden. The experiment is not implemented, default runtime is unchanged, and
-AKBSM writes remain blocked.
+forbidden. The provider path is test/scenario-only, default runtime is
+unchanged, and AKBSM writes remain blocked.
 
 ## Reflection and pressure chain
 
@@ -384,10 +387,10 @@ proposal/no-effect safety rather than canonical phase output.
   `AKBSMDraftProposalProvider` exist, but proposal creation is disabled/no-op by
   default and no proposal storage, writer connection, relation type creation,
   concept creation, or AKBSM mutation is implemented.
-- Treat the first enabled AKBSM draft proposal experiment ADR as design-only.
-  Do not implement proposal creation until a later pass explicitly approves the
-  `AKBSMAssociationProbe`-only source, keeps AKBSMAssociationField deferred,
-  and adds the required scenario and verifier coverage.
+- Treat the first enabled AKBSM draft proposal experiment as test/scenario-only.
+  Do not add proposal storage or runtime wiring until a later pass explicitly
+  approves it, keeps AKBSMAssociationField deferred, and adds the required
+  scenario and verifier coverage.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -419,6 +422,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_draft_proposal_scaffold.py` | AKBSM proposal scaffold remains disabled/no-op by default, metadata-only, disconnected from behavior/writers/storage, marker 36 absent, and real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_draft_proposal_disabled_scenarios.py` | disabled AKBSM draft proposal fixtures exist, pass scenario runner, keep proposal provider no-op, prevent proposal wiring/writes, keep marker 36 absent, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_first_enabled_draft_proposal_adr.py` | first enabled AKBSM draft proposal experiment ADR exists, documents `AKBSMAssociationProbe` as the only future source, defers `AKBSMAssociationField`, forbids behavior/pressure/scoring/action/value/writer sources, and keeps current safety verifiers passing |
+| `tools/verify_akbsm_probe_draft_proposal_experiment.py` | controlled test/scenario-only AKBSM probe proposal experiment creates temporary metadata only when explicitly enabled, stays disabled by default, rejects forbidden sources and `commit_allowed=True`, has no commit/storage path, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -453,9 +457,10 @@ proposal/no-effect safety rather than canonical phase output.
 - Draft-only AKBSM association proposal scaffold exists, but the provider is
   disabled/no-op by default and no proposal storage or commit path is
   implemented.
-- First enabled AKBSM draft proposal experiment is design-only. The selected
-  future source is `AKBSMAssociationProbe` only, while AKBSMAssociationField
-  and behavior/pressure/scoring/action/value/writer sources are deferred or
+- First enabled AKBSM draft proposal experiment is implemented only as a
+  test/scenario provider path. The selected source is
+  `AKBSMAssociationProbe` only, while AKBSMAssociationField and
+  behavior/pressure/scoring/action/value/writer sources are deferred or
   forbidden.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include

@@ -52,7 +52,7 @@ def main() -> int:
         "scenario runner passes": all(scenario_results.values()),
         "scaffold verifier passes": _run_verifier("tools/verify_akbsm_draft_proposal_scaffold.py"),
         "provider no-op by default": _provider_noop_by_default(),
-        "provider no-op when enabled": _provider_noop_when_enabled(),
+        "provider no-op without probe evidence when enabled": _provider_noop_when_enabled(),
         "provider does not write ContextMemory": _provider_does_not_write_context_memory(),
         "no forbidden wiring": _no_forbidden_wiring(),
         "AKBSM writes blocked by policy": _akbsm_writes_blocked_by_policy(),

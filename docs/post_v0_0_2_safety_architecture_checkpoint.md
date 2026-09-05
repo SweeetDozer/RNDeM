@@ -37,7 +37,8 @@ memory gates, connect any module to AKBSM writers, or add marker 36.
 - AKBSM writes blocked
 - draft proposal scaffold exists
 - draft proposal scaffold disabled by default
-- draft proposal provider is no-op
+- draft proposal provider is no-op by default
+- controlled draft proposal experiment is test/scenario-only
 - `PolicyPressureReview` observational/disconnected
 - marker 36 absent
 - ExpSM/AKBSM memory hashes unchanged
@@ -111,6 +112,10 @@ AKBSM proposal creation disabled by default.
 
 `AKBSMDraftProposalProvider` is no-op by default.
 
+When explicitly constructed with `akbsm_draft_proposals_enabled=True` in a
+test/scenario-only path, the provider may return temporary metadata-only
+proposals from `AKBSMAssociationProbe` evidence.
+
 No AKBSM writes exist.
 
 No permanent AKBSM mutation path exists.
@@ -119,11 +124,11 @@ The draft proposal design remains design-only for behavior and writes. It does
 not approve proposal storage, commit behavior, relation type creation, concept
 creation, or writer calls.
 
-The first enabled draft proposal experiment ADR remains design-only. It selects
-`AKBSMAssociationProbe` as the only future proposal source, defers
-AKBSMAssociationField, forbids behavior, pressure, scoring, action, value,
-Mode C, ExpSM, and memory writer sources, keeps the experiment unimplemented,
-leaves default runtime unchanged, and keeps AKBSM writes blocked.
+The first enabled draft proposal experiment is implemented only as an explicit
+test/scenario provider path. It selects `AKBSMAssociationProbe` as the only
+source, defers AKBSMAssociationField, forbids behavior, pressure, scoring,
+action, value, Mode C, ExpSM, and memory writer sources, leaves default runtime
+unchanged, and keeps AKBSM writes blocked.
 
 ## Scenario coverage
 
@@ -224,9 +229,10 @@ commit AKBSM writes.
 ## Known limitations
 
 - Mode C scaffold exists but is not wired to behavior.
-- AKBSM proposal behavior is design-only; disabled scaffold exists.
-- First enabled AKBSM draft proposal experiment is design-only; it selects
-  `AKBSMAssociationProbe` only and defers AKBSMAssociationField.
+- AKBSM proposal behavior is disabled in normal runtime; the controlled
+  provider experiment is test/scenario-only.
+- First enabled AKBSM draft proposal experiment selects `AKBSMAssociationProbe`
+  only and defers AKBSMAssociationField.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.
