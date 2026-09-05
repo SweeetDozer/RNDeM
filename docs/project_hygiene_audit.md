@@ -132,6 +132,7 @@ high-level ADRs include:
 - `docs/adr_behavior_influence_modes.md`
 - `docs/adr_akbsm_write_policy.md`
 - `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md`
+- `docs/adr_akbsm_draft_proposal_review_lifecycle.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 
 `docs/adr_behavior_influence_modes.md` is proposed / discussion-only. It
@@ -157,6 +158,17 @@ experiment remains disabled by default, creates temporary metadata only from
 rejects forbidden sources and commit-enabled proposals, avoids storage/wiring,
 and preserves real Memory hashes.
 
+`docs/adr_akbsm_draft_proposal_review_lifecycle.md` defines a design-only
+future lifecycle for temporary AKBSM draft proposals. Lifecycle states are
+metadata-only, no lifecycle state means commit/write/persist, review means
+classification only, `accepted_for_observation` is not AKBSM write approval,
+implementation is not added, and runtime behavior remains unchanged.
+
+`tools/verify_akbsm_draft_proposal_review_lifecycle_adr.py` verifies the
+lifecycle ADR text, metadata-only state/transition vocabulary, forbidden
+write-like states and transitions, storage policy, doc references, and existing
+AKBSM proposal safety verifiers.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -179,3 +191,5 @@ in a later packaging pass.
 6. Keep AKBSM proposal scaffolding disabled by default in normal runtime.
 7. Keep the first enabled AKBSM draft proposal experiment test/scenario-only
    until a later explicit pass approves any storage or wiring.
+8. Review `docs/adr_akbsm_draft_proposal_review_lifecycle.md` before any
+   proposal lifecycle implementation, storage, commit, persistence, or wiring.

@@ -159,6 +159,13 @@ Generated proposals are temporary metadata-only
 `AKBSMAssociationProposal` objects with `commit_allowed=False`.
 `commit_allowed=True` is rejected.
 
+`docs/adr_akbsm_draft_proposal_review_lifecycle.md` defines a design-only
+future review lifecycle for these proposals. Its lifecycle states are
+metadata-only; no lifecycle state means commit, write, or persist; review means
+classification only; and `accepted_for_observation` is not AKBSM write
+approval. This ADR does not add that lifecycle implementation and normal
+runtime behavior remains unchanged.
+
 ## Required Future Implementation Constraints
 
 Any future implementation pass must:

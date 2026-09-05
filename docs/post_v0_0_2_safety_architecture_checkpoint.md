@@ -102,6 +102,10 @@ First enabled draft proposal experiment ADR exists:
 
 - `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md`
 
+Draft proposal review lifecycle ADR exists:
+
+- `docs/adr_akbsm_draft_proposal_review_lifecycle.md`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -129,6 +133,12 @@ test/scenario provider path. It selects `AKBSMAssociationProbe` as the only
 source, defers AKBSMAssociationField, forbids behavior, pressure, scoring,
 action, value, Mode C, ExpSM, and memory writer sources, leaves default runtime
 unchanged, and keeps AKBSM writes blocked.
+
+The proposal review lifecycle ADR is design-only. Lifecycle states are
+metadata-only, no lifecycle state means commit/write/persist, review means
+classification only, `accepted_for_observation` is not AKBSM write approval,
+implementation is not added, runtime behavior remains unchanged, and no
+proposal storage is added.
 
 ## Scenario coverage
 
@@ -233,6 +243,8 @@ commit AKBSM writes.
   provider experiment is test/scenario-only.
 - First enabled AKBSM draft proposal experiment selects `AKBSMAssociationProbe`
   only and defers AKBSMAssociationField.
+- AKBSM draft proposal review lifecycle is design-only and does not implement
+  storage, commits, writes, persistence, or behavior changes.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.
@@ -247,6 +259,10 @@ Option C: create a design-only ADR for the first enabled AKBSM draft proposal
 experiment.
 
 Option D: prepare v0.0.3 safety checkpoint tag only after explicit approval.
+
+Option E: review
+`docs/adr_akbsm_draft_proposal_review_lifecycle.md` before any proposal
+lifecycle implementation.
 
 ## Release/tag policy
 

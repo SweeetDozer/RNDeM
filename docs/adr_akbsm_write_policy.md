@@ -72,6 +72,12 @@ Disabled scaffold for this mode exists in `clc/runtime/akbsm_draft_proposal.py`.
 `AKBSMDraftProposalProvider` is no-op by default. Proposal creation still
 requires an explicit test/scenario policy flag and scenario coverage.
 
+`docs/adr_akbsm_draft_proposal_review_lifecycle.md` defines a future
+temporary proposal review lifecycle as design-only. Lifecycle states are
+metadata-only, no lifecycle state means commit/write/persist, review means
+classification only, `accepted_for_observation` is not AKBSM write approval,
+implementation is not added, and runtime behavior remains unchanged.
+
 ### Mode 2: Temporary-Session AKBSM Association
 
 Runtime may create an association in temporary session memory only. It must not

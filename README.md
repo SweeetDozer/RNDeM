@@ -12,6 +12,7 @@ Start with:
 - `docs/adr_akbsm_write_policy.md`
 - `docs/design_akbsm_draft_association_proposal.md`
 - `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md`
+- `docs/adr_akbsm_draft_proposal_review_lifecycle.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -33,6 +34,7 @@ python tools/verify_akbsm_draft_proposal_scaffold.py
 python tools/verify_akbsm_draft_proposal_disabled_scenarios.py
 python tools/verify_akbsm_first_enabled_draft_proposal_adr.py
 python tools/verify_akbsm_probe_draft_proposal_experiment.py
+python tools/verify_akbsm_draft_proposal_review_lifecycle_adr.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -59,10 +61,15 @@ controlled test/scenario-only provider path: the enabled source is
 pressure, scoring, action, value, Mode C, ExpSM, and memory writer sources
 remain forbidden, proposal creation remains disabled in normal runtime, and
 AKBSM writes remain blocked.
+The proposal review lifecycle is design-only in
+`docs/adr_akbsm_draft_proposal_review_lifecycle.md`. Lifecycle states are
+metadata-only, no lifecycle state means commit/write/persist, review means
+classification only, `accepted_for_observation` is not AKBSM write approval,
+implementation is not added, and runtime behavior remains unchanged.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
 
 Git is configured for this prototype. `main` contains the current baseline and
-tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, and `v0.0.5`; architecture/design branches should be
+tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, `v0.0.5`, and `v0.0.6`; architecture/design branches should be
 reviewed and merged manually.

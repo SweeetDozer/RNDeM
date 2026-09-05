@@ -274,6 +274,12 @@ pressure, scoring, action, value, Mode C, ExpSM, and memory writer sources are
 forbidden. The provider path is test/scenario-only, default runtime is
 unchanged, and AKBSM writes remain blocked.
 
+`docs/adr_akbsm_draft_proposal_review_lifecycle.md` defines a design-only
+future lifecycle for temporary AKBSM draft proposal review. Lifecycle states
+are metadata-only, no lifecycle state means commit/write/persist, review means
+classification only, `accepted_for_observation` is not AKBSM write approval,
+implementation is not added, and runtime behavior remains unchanged.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -391,6 +397,10 @@ proposal/no-effect safety rather than canonical phase output.
   Do not add proposal storage or runtime wiring until a later pass explicitly
   approves it, keeps AKBSMAssociationField deferred, and adds the required
   scenario and verifier coverage.
+- Treat the AKBSM draft proposal review lifecycle ADR as design-only. Do not
+  implement lifecycle storage, lifecycle runtime wiring, proposal commit,
+  proposal persistence, behavior influence, Mode C influence, or AKBSM mutation
+  until a later explicit implementation pass adds scenarios and verifiers.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -423,6 +433,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_draft_proposal_disabled_scenarios.py` | disabled AKBSM draft proposal fixtures exist, pass scenario runner, keep proposal provider no-op, prevent proposal wiring/writes, keep marker 36 absent, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_first_enabled_draft_proposal_adr.py` | first enabled AKBSM draft proposal experiment ADR exists, documents `AKBSMAssociationProbe` as the only future source, defers `AKBSMAssociationField`, forbids behavior/pressure/scoring/action/value/writer sources, and keeps current safety verifiers passing |
 | `tools/verify_akbsm_probe_draft_proposal_experiment.py` | controlled test/scenario-only AKBSM probe proposal experiment creates temporary metadata only when explicitly enabled, stays disabled by default, rejects forbidden sources and `commit_allowed=True`, has no commit/storage path, and leaves real ExpSM/AKBSM hashes unchanged |
+| `tools/verify_akbsm_draft_proposal_review_lifecycle_adr.py` | draft proposal review lifecycle ADR exists, documents metadata-only states/transitions, forbids write-like states and commit/apply/save/write/persist/mutate paths, documents storage policy, and keeps existing AKBSM proposal safety verifiers passing |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -462,6 +473,10 @@ proposal/no-effect safety rather than canonical phase output.
   `AKBSMAssociationProbe` only, while AKBSMAssociationField and
   behavior/pressure/scoring/action/value/writer sources are deferred or
   forbidden.
+- AKBSM draft proposal review lifecycle is design-only. Its states are
+  metadata-only; `accepted_for_observation` is not AKBSM write approval; and no
+  lifecycle implementation, storage, commit path, or runtime behavior change is
+  added.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.

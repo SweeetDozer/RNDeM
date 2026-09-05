@@ -43,6 +43,12 @@ source, AKBSMAssociationField is deferred, all behavior, pressure, scoring,
 action, value, Mode C, ExpSM, and memory writer sources are forbidden, default
 runtime is unchanged, and AKBSM writes remain blocked.
 
+`docs/adr_akbsm_draft_proposal_review_lifecycle.md` defines the future review
+lifecycle as design-only. Lifecycle states are metadata-only, no lifecycle
+state means commit/write/persist, review means classification only,
+`accepted_for_observation` is not AKBSM write approval, implementation is not
+added, and runtime behavior remains unchanged.
+
 ## Design goal
 
 `AKBSMAssociationProposal` should mean:
