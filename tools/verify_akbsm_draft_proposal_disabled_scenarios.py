@@ -35,6 +35,7 @@ EXPECTED_FIXTURES = (
 
 ALLOWED_CLC_REFERENCES = {
     Path("clc/runtime/akbsm_draft_proposal.py"),
+    Path("clc/runtime/akbsm_proposal_lifecycle.py"),
     Path("clc/runtime/memory_mutation_policy.py"),
 }
 

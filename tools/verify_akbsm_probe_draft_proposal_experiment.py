@@ -58,6 +58,7 @@ FORBIDDEN_WIRING_NAMES = (
 
 ALLOWED_CLC_REFERENCES = {
     Path("clc/runtime/akbsm_draft_proposal.py"),
+    Path("clc/runtime/akbsm_proposal_lifecycle.py"),
 }
 
 FORBIDDEN_PROPOSAL_METHODS = (

@@ -4,15 +4,17 @@
 
 Implementation plan only.
 
-No runtime lifecycle implementation is added by this pass.
+No runtime lifecycle implementation beyond a metadata-only state/record/result
+scaffold is added by this pass.
 No proposal storage is added by this pass.
 No AKBSM write path is added by this pass.
 
 This document plans a future temporary metadata-only review lifecycle for AKBSM
-draft proposals. It does not add runtime lifecycle classes, proposal lifecycle
-state objects in code, proposal persistence, AKBSM writes, ExpSM writes,
-behavior influence, Mode C integration, PolicyPressureReview integration, or
-marker 36.
+draft proposals. The first state/record/result scaffold exists in
+`clc/runtime/akbsm_proposal_lifecycle.py`, but this document does not add a
+review controller/service, transition execution, proposal storage, proposal
+persistence, AKBSM writes, ExpSM writes, behavior influence, Mode C integration,
+PolicyPressureReview integration, or marker 36.
 
 ## Context
 
@@ -40,9 +42,8 @@ future implementation shape without approving implementation.
 
 ## Non-goals
 
-- Implement proposal review lifecycle.
-- Add runtime lifecycle classes.
-- Add proposal lifecycle state objects in code.
+- Implement proposal review controller/service behavior.
+- Implement lifecycle transition execution.
 - Implement proposal storage or persistence.
 - Implement or enable AKBSM writes.
 - Modify AKBSM or ExpSM.
@@ -55,12 +56,15 @@ future implementation shape without approving implementation.
 
 ## Proposed future components
 
-Tentative component names:
+Implemented metadata-only scaffold:
 
 - `AKBSMProposalLifecycleState`
 - `AKBSMProposalReviewRecord`
-- `AKBSMProposalReviewController`
 - `AKBSMProposalTransitionResult`
+
+Tentative future component names:
+
+- `AKBSMProposalReviewController`
 
 If these names conflict with existing project naming, a future implementation
 pass should rename them before adding code.
@@ -76,7 +80,7 @@ Required properties:
 
 ## Proposal lifecycle record
 
-A future `AKBSMProposalReviewRecord` should be metadata-only.
+`AKBSMProposalReviewRecord` is metadata-only.
 
 Suggested fields:
 
@@ -97,6 +101,8 @@ Rules:
 - `accepted_for_observation` is not approval to write.
 - expired/rejected proposals cannot be committed.
 - `commit_allowed` remains `False`.
+- no proposal storage, transition execution, controller/service, or normal
+  runtime wiring is added by this scaffold.
 
 ## Review controller/service
 
@@ -230,6 +236,10 @@ prepare, or authorize commit/apply/save/write/persist/mutate behavior.
 
 ## Verifier plan
 
+Current verifier:
+
+- `verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
+
 Future verifiers:
 
 - `verify_akbsm_draft_proposal_lifecycle_state_model.py`
@@ -276,7 +286,7 @@ Future scenarios:
 
 Future implementation order:
 
-1. Add metadata-only lifecycle state/record objects.
+1. Add metadata-only lifecycle state/record objects. Done as isolated scaffold.
 2. Add controller/service with allowed transition table.
 3. Add verifier for state model and forbidden states.
 4. Add verifier for transition table and forbidden transitions.

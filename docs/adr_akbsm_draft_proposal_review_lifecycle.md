@@ -4,11 +4,12 @@
 
 Proposed / design-only.
 
-This ADR defines a future lifecycle for temporary AKBSM draft proposals. It
-does not implement proposal review lifecycle, proposal storage, AKBSM writes,
-proposal persistence, permanent associations, relation type creation, concept
-creation, behavior influence, Mode C behavior, PolicyPressureReview influence,
-or marker 36.
+This ADR defines a future lifecycle for temporary AKBSM draft proposals. A
+metadata-only state/record/result scaffold now exists, but it does not
+implement proposal review controller/service behavior, lifecycle transition
+execution, proposal storage, AKBSM writes, proposal persistence, permanent
+associations, relation type creation, concept creation, behavior influence,
+Mode C behavior, PolicyPressureReview influence, or marker 36.
 
 ## Context
 
@@ -214,11 +215,12 @@ or with code changes, and must still keep write-like behavior forbidden unless
 a later ADR explicitly changes AKBSM write policy.
 
 `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md` is the
-design-only implementation plan for this lifecycle. Lifecycle implementation is
-still not added, the first future implementation should be metadata-only and
-scenario/test-only, test-local provider/controller return values are preferred
-before ContextMemory metadata, no storage/writes/commit path exists yet, and
-AKBSM writes remain blocked.
+design-only implementation plan for this lifecycle. No runtime lifecycle
+implementation beyond the metadata-only state/record/result scaffold is added,
+the first future controller/storage implementation should be scenario/test-only,
+test-local provider/controller return values are preferred before ContextMemory
+metadata, no storage/writes/commit path exists yet, and AKBSM writes remain
+blocked.
 
 ## Next steps
 

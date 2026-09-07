@@ -182,6 +182,18 @@ the design-only status, tentative future components, transition plan,
 forbidden authorities, storage strategy, implementation sequence, doc
 references, and existing AKBSM proposal safety verifiers.
 
+`clc/runtime/akbsm_proposal_lifecycle.py` adds the isolated metadata-only
+AKBSM proposal lifecycle state/record/result scaffold. It defines the allowed
+state vocabulary and transition table, but does not add a review
+controller/service, transition execution, storage, normal runtime wiring,
+proposal commit/apply/save/write/persist/mutate path, or AKBSM writes.
+
+`tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py` verifies the
+state/record/result scaffold, exact allowed states/transitions, forbidden
+write-like state names, absent transition execution/controller/storage/wiring,
+marker 36 absence, unchanged real Memory hashes, and existing AKBSM proposal
+safety verifiers.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -207,4 +219,5 @@ in a later packaging pass.
 8. Review `docs/adr_akbsm_draft_proposal_review_lifecycle.md` before any
    proposal lifecycle implementation, storage, commit, persistence, or wiring.
 9. Review `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`
-   before adding lifecycle state/record/controller code.
+   before adding transition execution, review controller/service code, storage,
+   runtime wiring, or proposal commit behavior.

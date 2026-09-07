@@ -110,6 +110,11 @@ Draft proposal review lifecycle implementation plan exists:
 
 - `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`
 
+Draft proposal lifecycle state/record/result scaffold exists:
+
+- `clc/runtime/akbsm_proposal_lifecycle.py`
+- `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -140,15 +145,16 @@ unchanged, and keeps AKBSM writes blocked.
 
 The proposal review lifecycle ADR is design-only. Lifecycle states are
 metadata-only, no lifecycle state means commit/write/persist, review means
-classification only, `accepted_for_observation` is not AKBSM write approval,
-implementation is not added, runtime behavior remains unchanged, and no
-proposal storage is added.
+classification only, and `accepted_for_observation` is not AKBSM write
+approval.
 
 The proposal review lifecycle implementation plan is design-only. Lifecycle
-implementation is still not added, the first future implementation should be
+implementation beyond the metadata-only state/record/result scaffold is still
+not added, the first future controller/storage implementation should be
 metadata-only and scenario/test-only, test-local provider/controller return
 values are preferred before ContextMemory metadata, no storage/writes/commit
-path exists yet, and AKBSM writes remain blocked.
+path exists yet, normal runtime remains unchanged, proposal creation remains
+test/scenario-only, and AKBSM writes remain blocked.
 
 ## Scenario coverage
 
@@ -203,6 +209,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_draft_proposal_scaffold.py`
 - `tools/verify_akbsm_draft_proposal_disabled_scenarios.py`
 - `tools/verify_akbsm_first_enabled_draft_proposal_adr.py`
+- `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
 
 Existing core guards:
 
@@ -255,8 +262,9 @@ commit AKBSM writes.
   only and defers AKBSMAssociationField.
 - AKBSM draft proposal review lifecycle is design-only and does not implement
   storage, commits, writes, persistence, or behavior changes.
-- AKBSM draft proposal review lifecycle implementation plan is design-only and
-  does not add runtime lifecycle state/record/controller code.
+- AKBSM draft proposal lifecycle state/record/result scaffold exists as
+  metadata-only code, but transition execution, review controller/service,
+  storage, runtime wiring, commit behavior, and AKBSM mutation are not added.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

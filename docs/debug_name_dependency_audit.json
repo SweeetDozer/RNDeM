@@ -6806,7 +6806,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 90,
+      "line": 91,
       "path": "tools/verify_akbsm_draft_proposal_disabled_scenarios.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
@@ -6817,7 +6817,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 185,
+      "line": 186,
       "path": "tools/verify_akbsm_draft_proposal_disabled_scenarios.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
@@ -6828,7 +6828,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 192,
+      "line": 193,
       "path": "tools/verify_akbsm_draft_proposal_disabled_scenarios.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
@@ -6839,7 +6839,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 124,
+      "line": 125,
       "path": "tools/verify_akbsm_probe_draft_proposal_experiment.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
