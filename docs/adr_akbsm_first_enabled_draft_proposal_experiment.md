@@ -166,6 +166,13 @@ classification only; and `accepted_for_observation` is not AKBSM write
 approval. This ADR does not add that lifecycle implementation and normal
 runtime behavior remains unchanged.
 
+`docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md` is a
+design-only implementation plan. Lifecycle implementation is still not added;
+the first future implementation should be metadata-only and scenario/test-only;
+test-local provider/controller return values are preferred before ContextMemory
+metadata; no storage/writes/commit path exists yet; and AKBSM writes remain
+blocked.
+
 ## Required Future Implementation Constraints
 
 Any future implementation pass must:

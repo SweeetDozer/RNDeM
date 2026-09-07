@@ -1,0 +1,327 @@
+# Design: AKBSM Draft Proposal Review Lifecycle Implementation Plan
+
+## Status
+
+Implementation plan only.
+
+No runtime lifecycle implementation is added by this pass.
+No proposal storage is added by this pass.
+No AKBSM write path is added by this pass.
+
+This document plans a future temporary metadata-only review lifecycle for AKBSM
+draft proposals. It does not add runtime lifecycle classes, proposal lifecycle
+state objects in code, proposal persistence, AKBSM writes, ExpSM writes,
+behavior influence, Mode C integration, PolicyPressureReview integration, or
+marker 36.
+
+## Context
+
+`v0.0.7` marks the AKBSM draft proposal review lifecycle ADR checkpoint.
+Current `main` has a controlled AKBSM probe draft proposal experiment:
+`AKBSMAssociationProbe` can create temporary metadata-only proposals only
+through an explicit test/scenario enabled provider path. Normal runtime remains
+disabled/no-op, proposal review lifecycle is design-only, no proposal storage
+exists, no proposal commit path exists, and AKBSM writes remain blocked.
+
+The lifecycle ADR defines the allowed state vocabulary. This plan defines a
+future implementation shape without approving implementation.
+
+## Design goals
+
+- Keep lifecycle records metadata-only.
+- Keep proposal review temporary.
+- Keep proposal creation scenario/test-only at first.
+- Keep `AKBSMAssociationProposal` as the proposal payload.
+- Keep `commit_allowed=False`.
+- Reject write-like states, transitions, methods, and authorities.
+- Preserve normal runtime behavior, tick order, retention timing, and memory
+  writer behavior.
+- Preserve real ExpSM and AKBSM memory hashes in safety checks.
+
+## Non-goals
+
+- Implement proposal review lifecycle.
+- Add runtime lifecycle classes.
+- Add proposal lifecycle state objects in code.
+- Implement proposal storage or persistence.
+- Implement or enable AKBSM writes.
+- Modify AKBSM or ExpSM.
+- Commit AKBSM proposals.
+- Create permanent AKBSM associations.
+- Create relation types or concepts.
+- Connect proposals to behavior, scoring, guards, Mode C, writers, or storage.
+- Connect PolicyPressureReview to AKBSM proposals or memory gates.
+- Add marker 36.
+
+## Proposed future components
+
+Tentative component names:
+
+- `AKBSMProposalLifecycleState`
+- `AKBSMProposalReviewRecord`
+- `AKBSMProposalReviewController`
+- `AKBSMProposalTransitionResult`
+
+If these names conflict with existing project naming, a future implementation
+pass should rename them before adding code.
+
+Required properties:
+
+- metadata-only
+- temporary
+- no commit/write/persist/apply/mutate methods
+- no AKBSM write access
+- no ExpSM write access
+- no behavior/scoring/guard/Mode C integration
+
+## Proposal lifecycle record
+
+A future `AKBSMProposalReviewRecord` should be metadata-only.
+
+Suggested fields:
+
+- `proposal`
+- `state`
+- `created_tick`
+- `updated_tick`
+- `expires_at_tick` or `ttl_ticks`
+- `review_reason`
+- `review_notes`
+- `transition_history`
+
+Rules:
+
+- `proposal` remains `AKBSMAssociationProposal`.
+- `state` is metadata-only.
+- `transition_history` is metadata-only.
+- `accepted_for_observation` is not approval to write.
+- expired/rejected proposals cannot be committed.
+- `commit_allowed` remains `False`.
+
+## Review controller/service
+
+A future `AKBSMProposalReviewController` should:
+
+- accept an `AKBSMAssociationProposal`
+- create a temporary review record
+- apply allowed metadata-only transitions
+- reject forbidden transitions
+- expire stale records
+- return review metadata to test/scenario/debug output
+
+Forbidden behavior:
+
+- no AKBSM writes
+- no ExpSM writes
+- no permanent persistence
+- no relation type creation
+- no concept creation
+- no behavior/scoring/guard influence
+- no Mode C integration
+- no PolicyPressureReview integration
+
+## Allowed state transitions
+
+Allowed transitions:
+
+- `created -> review_pending`
+- `review_pending -> accepted_for_observation`
+- `review_pending -> deferred`
+- `review_pending -> rejected`
+- `review_pending -> expired`
+- `accepted_for_observation -> expired`
+- `deferred -> review_pending`
+- `deferred -> expired`
+- `rejected -> expired`
+
+All transitions are metadata-only.
+
+## Forbidden state transitions
+
+Forbidden transitions:
+
+- `any state -> AKBSM write`
+- `any state -> commit`
+- `any state -> apply`
+- `any state -> save`
+- `any state -> write`
+- `any state -> persist`
+- `any state -> mutate`
+- `accepted_for_observation -> AKBSM write`
+- `deferred -> AKBSM write`
+- `rejected -> AKBSM write`
+- `expired -> AKBSM write`
+
+## Review authority
+
+Allowed first implementation authority:
+
+- explicit test/scenario harness only
+
+Forbidden authorities:
+
+- PolicyPressureReview
+- Mode C
+- DecisionSelector
+- ActionScoring
+- ActionProposer
+- ModeActionGuard
+- ValueFeedback
+- ExpSM writers/update paths
+- memory writers
+- AKBSM writers/save paths
+- normal runtime default path
+
+## Temporary storage strategy
+
+Preferred first implementation storage:
+
+- test-local provider/controller return values first
+
+Allowed later temporary storage only if separately approved:
+
+- temporary ContextMemory metadata
+- scenario/debug output
+
+Forbidden storage:
+
+- `Memory/AKBSM/*`
+- `Memory/ExpSM/*`
+- `semantic_core.json`
+- `technical_feedback_patterns.json`
+- permanent proposal files
+- permanent proposal queues
+- permanent association files
+
+## Expiration strategy
+
+Future implementation must include bounded lifetime.
+
+Preferred first strategy:
+
+- `ttl_ticks` in review record
+
+Required behavior:
+
+- expired proposals cannot transition to `accepted_for_observation`
+- expired proposals cannot be revived into writes
+- expired proposals cannot be persisted
+- expired proposals may only remain in temporary debug/test output
+
+## Scenario-only enablement strategy
+
+The first lifecycle implementation must remain scenario/test-only:
+
+- normal runtime disabled
+- safe_demo default disabled
+- draft_only default disabled
+- mutating_memory default disabled
+- explicit scenario/test flag required
+
+## No-write safety model
+
+The lifecycle should classify temporary proposal metadata only. It must not be
+used as a memory write gate, behavior pressure source, scoring input, guard
+input, Mode C advisory input, PolicyPressureReview input, ExpSM update source,
+or AKBSM writer input.
+
+No lifecycle state should imply approval to write. No transition should call,
+prepare, or authorize commit/apply/save/write/persist/mutate behavior.
+
+## Verifier plan
+
+Future verifiers:
+
+- `verify_akbsm_draft_proposal_lifecycle_state_model.py`
+- `verify_akbsm_draft_proposal_lifecycle_transitions.py`
+- `verify_akbsm_draft_proposal_lifecycle_no_write.py`
+- `verify_akbsm_draft_proposal_lifecycle_scenarios.py`
+
+They must verify:
+
+- allowed states only
+- forbidden write-like states absent
+- allowed transitions only
+- forbidden transitions rejected
+- `accepted_for_observation` is not write approval
+- no commit/apply/save/write/persist/mutate methods
+- no permanent proposal persistence
+- no AKBSM mutation
+- no ExpSM mutation
+- no behavior/scoring/guard/Mode C integration
+- marker 36 absent
+- memory hashes unchanged
+
+## Scenario plan
+
+Future scenarios:
+
+- proposal enters `review_pending`
+- `review_pending -> accepted_for_observation`
+- `review_pending -> deferred`
+- `review_pending -> rejected`
+- `review_pending -> expired`
+- `accepted_for_observation -> expired`
+- `deferred -> review_pending`
+- `deferred -> expired`
+- `rejected -> expired`
+- forbidden transition to write is rejected
+- expired proposal cannot be accepted
+- rejected proposal cannot be accepted
+- normal runtime still creates no lifecycle records
+- disabled proposal fixtures still pass
+- controlled probe proposal experiment still passes
+
+## Implementation sequence
+
+Future implementation order:
+
+1. Add metadata-only lifecycle state/record objects.
+2. Add controller/service with allowed transition table.
+3. Add verifier for state model and forbidden states.
+4. Add verifier for transition table and forbidden transitions.
+5. Add scenario fixtures for created/review_pending/accepted_for_observation/deferred/rejected/expired.
+6. Add expiration verifier.
+7. Add docs/checkpoint.
+8. Only after merge decide whether to tag.
+
+This sequence does not include permanent AKBSM write implementation.
+
+## Rollback/cleanup strategy
+
+The first implementation should be easy to remove:
+
+- keep lifecycle code isolated from runtime wiring
+- keep scenario/test enablement explicit
+- keep review records as return values before any ContextMemory metadata
+- keep no permanent files for proposals
+- delete temporary records at scenario/session end
+- keep memory hashes unchanged after safety checks
+
+## Rejected implementation shapes
+
+- persistent proposal queue
+- automatic lifecycle records in normal runtime
+- `accepted_for_observation` enabling writes
+- review controller calling AKBSM writer
+- review controller calling ExpSM writer
+- PolicyPressureReview-controlled lifecycle
+- Mode C-controlled lifecycle
+- DecisionSelector/ActionScoring-controlled lifecycle
+- using marker 36
+
+These shapes are rejected because they introduce persistence, normal-runtime
+behavior, write authority, behavior pressure, or marker semantics before the
+lifecycle has isolated scenario/test coverage.
+
+## Open questions
+
+- Should the first lifecycle implementation use an enum-like state object or
+  string constants?
+- Should `ttl_ticks` be mandatory, or should `expires_at_tick` be derived from
+  proposal tick plus TTL?
+- Should review notes be free-form strings only, or structured reason codes?
+- Should temporary ContextMemory metadata remain a later phase after
+  test-local provider/controller return values?
+- What minimal scenario set should become part of phase regression snapshots,
+  if any?

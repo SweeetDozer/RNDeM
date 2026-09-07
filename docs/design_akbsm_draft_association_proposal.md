@@ -49,6 +49,12 @@ state means commit/write/persist, review means classification only,
 `accepted_for_observation` is not AKBSM write approval, implementation is not
 added, and runtime behavior remains unchanged.
 
+`docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md` plans a
+future implementation without adding it. The first future implementation should
+be metadata-only and scenario/test-only, test-local provider/controller return
+values are preferred before ContextMemory metadata, no storage/writes/commit
+path exists yet, and AKBSM writes remain blocked.
+
 ## Design goal
 
 `AKBSMAssociationProposal` should mean:

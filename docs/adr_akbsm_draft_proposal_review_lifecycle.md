@@ -213,6 +213,13 @@ Any future lifecycle implementation must update scenarios and verifiers before
 or with code changes, and must still keep write-like behavior forbidden unless
 a later ADR explicitly changes AKBSM write policy.
 
+`docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md` is the
+design-only implementation plan for this lifecycle. Lifecycle implementation is
+still not added, the first future implementation should be metadata-only and
+scenario/test-only, test-local provider/controller return values are preferred
+before ContextMemory metadata, no storage/writes/commit path exists yet, and
+AKBSM writes remain blocked.
+
 ## Next steps
 
 Review this ADR before any lifecycle implementation pass.

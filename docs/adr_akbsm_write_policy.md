@@ -78,6 +78,13 @@ metadata-only, no lifecycle state means commit/write/persist, review means
 classification only, `accepted_for_observation` is not AKBSM write approval,
 implementation is not added, and runtime behavior remains unchanged.
 
+`docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md` is a
+design-only implementation plan. Lifecycle implementation is still not added;
+the first future implementation should be metadata-only and scenario/test-only;
+test-local provider/controller return values are preferred before ContextMemory
+metadata; no storage/writes/commit path exists yet; and AKBSM writes remain
+blocked.
+
 ### Mode 2: Temporary-Session AKBSM Association
 
 Runtime may create an association in temporary session memory only. It must not

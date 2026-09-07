@@ -13,6 +13,7 @@ Start with:
 - `docs/design_akbsm_draft_association_proposal.md`
 - `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md`
 - `docs/adr_akbsm_draft_proposal_review_lifecycle.md`
+- `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -35,6 +36,7 @@ python tools/verify_akbsm_draft_proposal_disabled_scenarios.py
 python tools/verify_akbsm_first_enabled_draft_proposal_adr.py
 python tools/verify_akbsm_probe_draft_proposal_experiment.py
 python tools/verify_akbsm_draft_proposal_review_lifecycle_adr.py
+python tools/verify_akbsm_draft_proposal_lifecycle_implementation_plan.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -66,10 +68,16 @@ The proposal review lifecycle is design-only in
 metadata-only, no lifecycle state means commit/write/persist, review means
 classification only, `accepted_for_observation` is not AKBSM write approval,
 implementation is not added, and runtime behavior remains unchanged.
+The lifecycle implementation plan is design-only in
+`docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`.
+Lifecycle implementation is still not added, the first future implementation
+should be metadata-only and scenario/test-only, test-local provider/controller
+return values are preferred before ContextMemory metadata, no
+storage/writes/commit path exists yet, and AKBSM writes remain blocked.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
 
 Git is configured for this prototype. `main` contains the current baseline and
-tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, `v0.0.5`, and `v0.0.6`; architecture/design branches should be
+tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, `v0.0.5`, `v0.0.6`, and `v0.0.7`; architecture/design branches should be
 reviewed and merged manually.

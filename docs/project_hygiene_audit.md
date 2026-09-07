@@ -133,6 +133,7 @@ high-level ADRs include:
 - `docs/adr_akbsm_write_policy.md`
 - `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md`
 - `docs/adr_akbsm_draft_proposal_review_lifecycle.md`
+- `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 
 `docs/adr_behavior_influence_modes.md` is proposed / discussion-only. It
@@ -169,6 +170,18 @@ lifecycle ADR text, metadata-only state/transition vocabulary, forbidden
 write-like states and transitions, storage policy, doc references, and existing
 AKBSM proposal safety verifiers.
 
+`docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md` is a
+design-only implementation plan. Lifecycle implementation is still not added,
+the first future implementation should be metadata-only and scenario/test-only,
+test-local provider/controller return values are preferred before ContextMemory
+metadata, no storage/writes/commit path exists yet, and AKBSM writes remain
+blocked.
+
+`tools/verify_akbsm_draft_proposal_lifecycle_implementation_plan.py` verifies
+the design-only status, tentative future components, transition plan,
+forbidden authorities, storage strategy, implementation sequence, doc
+references, and existing AKBSM proposal safety verifiers.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -193,3 +206,5 @@ in a later packaging pass.
    until a later explicit pass approves any storage or wiring.
 8. Review `docs/adr_akbsm_draft_proposal_review_lifecycle.md` before any
    proposal lifecycle implementation, storage, commit, persistence, or wiring.
+9. Review `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`
+   before adding lifecycle state/record/controller code.

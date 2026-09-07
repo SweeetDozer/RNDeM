@@ -106,6 +106,10 @@ Draft proposal review lifecycle ADR exists:
 
 - `docs/adr_akbsm_draft_proposal_review_lifecycle.md`
 
+Draft proposal review lifecycle implementation plan exists:
+
+- `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -139,6 +143,12 @@ metadata-only, no lifecycle state means commit/write/persist, review means
 classification only, `accepted_for_observation` is not AKBSM write approval,
 implementation is not added, runtime behavior remains unchanged, and no
 proposal storage is added.
+
+The proposal review lifecycle implementation plan is design-only. Lifecycle
+implementation is still not added, the first future implementation should be
+metadata-only and scenario/test-only, test-local provider/controller return
+values are preferred before ContextMemory metadata, no storage/writes/commit
+path exists yet, and AKBSM writes remain blocked.
 
 ## Scenario coverage
 
@@ -245,6 +255,8 @@ commit AKBSM writes.
   only and defers AKBSMAssociationField.
 - AKBSM draft proposal review lifecycle is design-only and does not implement
   storage, commits, writes, persistence, or behavior changes.
+- AKBSM draft proposal review lifecycle implementation plan is design-only and
+  does not add runtime lifecycle state/record/controller code.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.
