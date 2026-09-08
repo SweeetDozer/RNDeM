@@ -4,17 +4,18 @@
 
 Implementation plan only.
 
-No runtime lifecycle implementation beyond a metadata-only state/record/result
-scaffold is added by this pass.
+Runtime lifecycle implementation is limited to a metadata-only
+state/record/result scaffold plus a metadata-only transition controller
+scaffold.
 No proposal storage is added by this pass.
 No AKBSM write path is added by this pass.
 
 This document plans a future temporary metadata-only review lifecycle for AKBSM
-draft proposals. The first state/record/result scaffold exists in
-`clc/runtime/akbsm_proposal_lifecycle.py`, but this document does not add a
-review controller/service, transition execution, proposal storage, proposal
-persistence, AKBSM writes, ExpSM writes, behavior influence, Mode C integration,
-PolicyPressureReview integration, or marker 36.
+draft proposals. The first state/record/result scaffold and test/scenario-only
+transition controller scaffold exist in `clc/runtime/akbsm_proposal_lifecycle.py`,
+but this document does not add review service behavior, transition execution,
+proposal storage, proposal persistence, AKBSM writes, ExpSM writes, behavior
+influence, Mode C integration, PolicyPressureReview integration, or marker 36.
 
 ## Context
 
@@ -42,7 +43,7 @@ future implementation shape without approving implementation.
 
 ## Non-goals
 
-- Implement proposal review controller/service behavior.
+- Implement proposal review service behavior.
 - Implement lifecycle transition execution.
 - Implement proposal storage or persistence.
 - Implement or enable AKBSM writes.
@@ -61,13 +62,11 @@ Implemented metadata-only scaffold:
 - `AKBSMProposalLifecycleState`
 - `AKBSMProposalReviewRecord`
 - `AKBSMProposalTransitionResult`
-
-Tentative future component names:
-
 - `AKBSMProposalReviewController`
 
-If these names conflict with existing project naming, a future implementation
-pass should rename them before adding code.
+The controller is test/scenario-only, requires explicit harness authority, and
+returns transition result metadata plus a new immutable review record copy only
+for allowed transitions.
 
 Required properties:
 
@@ -101,19 +100,21 @@ Rules:
 - `accepted_for_observation` is not approval to write.
 - expired/rejected proposals cannot be committed.
 - `commit_allowed` remains `False`.
-- no proposal storage, transition execution, controller/service, or normal
+- no proposal storage, transition execution, service behavior, or normal
   runtime wiring is added by this scaffold.
 
 ## Review controller/service
 
-A future `AKBSMProposalReviewController` should:
+`AKBSMProposalReviewController`:
 
-- accept an `AKBSMAssociationProposal`
-- create a temporary review record
-- apply allowed metadata-only transitions
+- accepts an existing temporary `AKBSMProposalReviewRecord`
+- requests allowed metadata-only transitions
 - reject forbidden transitions
-- expire stale records
-- return review metadata to test/scenario/debug output
+- returns transition metadata to test/scenario callers
+- returns a new immutable record copy only when allowed
+- leaves the original record unchanged
+
+A future service layer remains unimplemented.
 
 Forbidden behavior:
 

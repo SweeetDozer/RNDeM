@@ -58,7 +58,6 @@ EXPECTED_TRANSITIONS = {
     ("rejected", "expired"),
 }
 FORBIDDEN_RUNTIME_NAMES = (
-    "AKBSMProposalReviewController",
     "AKBSMProposalReviewService",
     "execute_transition",
     "apply_transition",

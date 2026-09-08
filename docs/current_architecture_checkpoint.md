@@ -281,17 +281,17 @@ classification only, and `accepted_for_observation` is not AKBSM write
 approval.
 
 `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md` is a
-design-only implementation plan. No runtime lifecycle implementation beyond the
-metadata-only state/record/result scaffold in
-`clc/runtime/akbsm_proposal_lifecycle.py` is added. Transition execution,
-review controller/service, proposal storage, normal runtime wiring, and
-storage/writes/commit paths are still not added; proposal creation remains
+design-only implementation plan. Runtime lifecycle implementation is limited to
+the metadata-only state/record/result scaffold and test/scenario-only transition
+controller scaffold in `clc/runtime/akbsm_proposal_lifecycle.py`. Transition
+execution, review service behavior, proposal storage, normal runtime wiring,
+and storage/writes/commit paths are still not added; proposal creation remains
 test/scenario-only and AKBSM writes remain blocked.
 
 `docs/adr_akbsm_draft_proposal_transition_controller_experiment.md` is a
 design-only ADR for the first metadata-only transition controller experiment.
-The controller is not implemented, transition execution is not implemented, the
-first future controller must be metadata-only and test/scenario-only, allowed
+The metadata-only transition controller scaffold is implemented, transition
+execution is not implemented, the controller is test/scenario-only, allowed
 first storage is test-local controller return values only, no proposal
 storage/writes/commit path exists, and AKBSM writes remain blocked.
 
@@ -454,8 +454,9 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_probe_draft_proposal_experiment.py` | controlled test/scenario-only AKBSM probe proposal experiment creates temporary metadata only when explicitly enabled, stays disabled by default, rejects forbidden sources and `commit_allowed=True`, has no commit/storage path, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_draft_proposal_review_lifecycle_adr.py` | draft proposal review lifecycle ADR exists, documents metadata-only states/transitions, forbids write-like states and commit/apply/save/write/persist/mutate paths, documents storage policy, and keeps existing AKBSM proposal safety verifiers passing |
 | `tools/verify_akbsm_draft_proposal_lifecycle_implementation_plan.py` | draft proposal lifecycle implementation plan exists, stays design-only, documents tentative metadata-only components, allowed transitions, forbidden authorities, temporary storage strategy, future sequence, and keeps existing safety verifiers passing |
-| `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py` | isolated lifecycle state/record/result scaffold exists as immutable metadata only, allowed states/transitions are exact, transition execution/controller/storage/wiring are absent, and real ExpSM/AKBSM hashes remain unchanged |
+| `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py` | isolated lifecycle state/record/result scaffold exists as immutable metadata only, allowed states/transitions are exact, transition execution/service/storage/wiring are absent, and real ExpSM/AKBSM hashes remain unchanged |
 | `tools/verify_akbsm_draft_proposal_transition_controller_adr.py` | transition controller experiment ADR exists, stays design-only, documents metadata-only test/scenario authority, transition semantics, storage limits, forbidden authorities, and keeps existing safety verifiers passing |
+| `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py` | transition controller scaffold exists, requires explicit test/scenario authority, accepts only allowed metadata transitions, rejects forbidden/write-like targets, has no storage/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -503,9 +504,10 @@ proposal/no-effect safety rather than canonical phase output.
   metadata-only code. The first future controller/storage implementation should
   use scenario/test-only records and test-local provider/controller return
   values before any ContextMemory metadata.
-- AKBSM draft proposal transition controller experiment ADR is design-only; the
-  controller and transition execution are not implemented, and first storage is
-  limited to test-local controller return values only.
+- AKBSM draft proposal transition controller scaffold is implemented as
+  metadata-only and test/scenario-only. Transition execution, storage, runtime
+  wiring, and first storage beyond test-local controller return values are not
+  implemented.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.

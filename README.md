@@ -40,6 +40,7 @@ python tools/verify_akbsm_draft_proposal_review_lifecycle_adr.py
 python tools/verify_akbsm_draft_proposal_lifecycle_implementation_plan.py
 python tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py
 python tools/verify_akbsm_draft_proposal_transition_controller_adr.py
+python tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -73,15 +74,15 @@ classification only, and `accepted_for_observation` is not AKBSM write
 approval.
 The lifecycle implementation plan is design-only in
 `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`.
-No runtime lifecycle implementation beyond the metadata-only state/record/result
-scaffold in `clc/runtime/akbsm_proposal_lifecycle.py` exists. Transition
-execution, review controller/service, proposal storage, normal runtime wiring,
-and storage/writes/commit paths are still not added; proposal creation remains
-test/scenario-only and AKBSM writes remain blocked.
+Runtime lifecycle implementation is limited to the metadata-only
+state/record/result scaffold in `clc/runtime/akbsm_proposal_lifecycle.py`.
+Transition execution, review service behavior, proposal storage, normal runtime
+wiring, and storage/writes/commit paths are still not added; proposal creation
+remains test/scenario-only and AKBSM writes remain blocked.
 The first metadata-only transition controller experiment is design-only in
 `docs/adr_akbsm_draft_proposal_transition_controller_experiment.md`. The
-controller is not implemented, transition execution is not implemented, the
-first future controller must be metadata-only and test/scenario-only, allowed
+metadata-only transition controller scaffold exists, transition execution is
+not implemented, the controller is metadata-only and test/scenario-only, allowed
 first storage is test-local controller return values only, no proposal
 storage/writes/commit path exists, and AKBSM writes remain blocked.
 Post-v0.0.2 safety architecture is summarized in

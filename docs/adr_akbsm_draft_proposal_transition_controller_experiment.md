@@ -2,9 +2,9 @@
 
 ## Status
 
-This ADR is design-only.
+This ADR is design-only for storage, runtime wiring, and enabled behavior.
 
-No transition controller is implemented by this pass.
+A metadata-only transition controller scaffold is implemented by this pass.
 No transition execution is implemented by this pass.
 No proposal storage is added by this pass.
 No AKBSM write path is added by this pass.
@@ -14,10 +14,12 @@ No AKBSM write path is added by this pass.
 `v0.0.9` marks the AKBSM proposal lifecycle state scaffold checkpoint.
 `AKBSMProposalLifecycleState`, `AKBSMProposalReviewRecord`, and
 `AKBSMProposalTransitionResult` exist as metadata-only runtime scaffold.
-Allowed transitions exist as metadata only. Transition execution, review
-controller/service behavior, proposal storage, proposal persistence, AKBSM
-writes, ExpSM writes, behavior influence, Mode C integration, and
-PolicyPressureReview integration are not implemented.
+Allowed transitions exist as metadata only. A metadata-only, test/scenario-only
+review controller scaffold can classify requested transitions and return
+temporary metadata results. Transition execution, review service behavior,
+proposal storage, proposal persistence, AKBSM writes, ExpSM writes, behavior
+influence, Mode C integration, and PolicyPressureReview integration are not
+implemented.
 
 Current proposal creation remains limited to the explicit test/scenario enabled
 `AKBSMAssociationProbe` provider path. Normal runtime does not create proposals
@@ -25,10 +27,10 @@ by default, and AKBSM writes remain blocked.
 
 ## Decision
 
-The first future transition controller experiment may only be metadata-only and
+The first transition controller experiment may only be metadata-only and
 test/scenario-only.
 
-The controller may only classify/request/apply allowed lifecycle transitions by
+The controller may only classify/request allowed lifecycle transitions by
 returning new temporary metadata objects. The controller must not mutate
 existing records in place. The controller must not persist records. The
 controller must not write AKBSM or ExpSM.
@@ -62,8 +64,9 @@ PolicyPressureReview behavior.
 
 ## Controller Responsibility
 
-A future controller may:
+The scaffold controller may:
 
+- require explicit test/scenario harness authority
 - check whether requested transition is in the allowed transition table
 - reject forbidden transitions
 - create transition result metadata
@@ -278,15 +281,17 @@ influence, hidden persistence, or permanent memory mutation.
 
 ## Consequences
 
-This ADR approves only a future experiment shape. It does not add a controller,
-transition execution, storage, proposal persistence, write approval, or runtime
-wiring. A later implementation pass must add verifier and scenario coverage
-before or with any controller code.
+This ADR approves only a metadata-only experiment shape. It adds a
+test/scenario-only controller scaffold, but does not add transition execution,
+storage, proposal persistence, write approval, or runtime wiring. A later
+implementation pass must add verifier and scenario coverage before or with any
+storage, ContextMemory metadata, runtime wiring, or enabled behavior.
 
 ## Next Steps
 
-Review this ADR before any transition controller implementation pass.
+Review this ADR before any transition controller storage or runtime integration
+pass.
 
-Stop before controller implementation, transition execution, proposal storage,
-writer wiring, behavior wiring, Mode C wiring, PolicyPressureReview lifecycle
-integration, or permanent AKBSM mutation.
+Stop before transition execution, proposal storage, writer wiring, behavior
+wiring, Mode C wiring, PolicyPressureReview lifecycle integration, or permanent
+AKBSM mutation.

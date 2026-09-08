@@ -53,6 +53,8 @@ AKBSM_PROPOSAL_FORBIDDEN_WRITE_LIKE_STATE_NAMES = frozenset(
     )
 )
 
+AKBSM_PROPOSAL_REVIEW_TEST_SCENARIO_AUTHORITY = "explicit_test_scenario_harness"
+
 
 @dataclass(frozen=True)
 class AKBSMProposalReviewRecord:
@@ -114,6 +116,102 @@ class AKBSMProposalTransitionResult:
         object.__setattr__(self, "allowed", bool(self.allowed))
         object.__setattr__(self, "reason", str(self.reason))
         object.__setattr__(self, "tick", _non_negative_int(self.tick, "tick"))
+
+
+class AKBSMProposalReviewController:
+    """Metadata-only lifecycle transition controller for isolated scenarios."""
+
+    def is_transition_allowed(
+        self,
+        from_state: AKBSMProposalLifecycleState | str,
+        to_state: AKBSMProposalLifecycleState | str,
+    ) -> bool:
+        try:
+            source_state = _coerce_state(from_state)
+            target_state = _coerce_state(to_state)
+        except ValueError:
+            return False
+        return target_state in AKBSM_PROPOSAL_ALLOWED_TRANSITIONS[source_state]
+
+    def request_transition(
+        self,
+        record: AKBSMProposalReviewRecord,
+        target_state: AKBSMProposalLifecycleState | str,
+        *,
+        authority: str,
+        tick: int,
+        reason: str = "",
+        notes: str = "",
+    ) -> tuple[AKBSMProposalTransitionResult, AKBSMProposalReviewRecord | None]:
+        if not isinstance(record, AKBSMProposalReviewRecord):
+            raise TypeError("record must be AKBSMProposalReviewRecord metadata")
+        request_tick = _non_negative_int(tick, "tick")
+        if str(authority) != AKBSM_PROPOSAL_REVIEW_TEST_SCENARIO_AUTHORITY:
+            return self._rejected(record, record.state, request_tick, "unauthorized_transition")
+        try:
+            target = _coerce_state(target_state)
+        except ValueError:
+            return self._rejected(record, record.state, request_tick, "invalid_target_state")
+        if target.value in AKBSM_PROPOSAL_FORBIDDEN_WRITE_LIKE_STATE_NAMES:
+            return self._rejected(record, record.state, request_tick, "write_like_target_state")
+        if not self.is_transition_allowed(record.state, target):
+            return self._rejected(record, target, request_tick, "transition_not_allowed")
+        transition_reason = str(reason or f"{record.state.value}->{target.value}")
+        result = AKBSMProposalTransitionResult(
+            proposal=record.proposal,
+            from_state=record.state,
+            to_state=target,
+            allowed=True,
+            reason=transition_reason,
+            tick=request_tick,
+        )
+        next_record = AKBSMProposalReviewRecord(
+            proposal=record.proposal,
+            state=target,
+            created_tick=record.created_tick,
+            updated_tick=request_tick,
+            ttl_ticks=record.ttl_ticks,
+            review_reason=transition_reason,
+            review_notes=str(notes),
+            transition_history=record.transition_history
+            + (f"{record.state.value}->{target.value}@{request_tick}",),
+        )
+        return result, next_record
+
+    def request_expiration(
+        self,
+        record: AKBSMProposalReviewRecord,
+        *,
+        authority: str,
+        tick: int,
+        reason: str = "expired",
+        notes: str = "",
+    ) -> tuple[AKBSMProposalTransitionResult, AKBSMProposalReviewRecord | None]:
+        return self.request_transition(
+            record,
+            AKBSMProposalLifecycleState.EXPIRED,
+            authority=authority,
+            tick=tick,
+            reason=reason,
+            notes=notes,
+        )
+
+    def _rejected(
+        self,
+        record: AKBSMProposalReviewRecord,
+        target_state: AKBSMProposalLifecycleState,
+        tick: int,
+        reason: str,
+    ) -> tuple[AKBSMProposalTransitionResult, None]:
+        result = AKBSMProposalTransitionResult(
+            proposal=record.proposal,
+            from_state=record.state,
+            to_state=target_state,
+            allowed=False,
+            reason=reason,
+            tick=tick,
+        )
+        return result, None
 
 
 def _coerce_state(value: AKBSMProposalLifecycleState | str) -> AKBSMProposalLifecycleState:

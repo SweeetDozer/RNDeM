@@ -20,7 +20,7 @@ DOC_REFERENCE_PATHS = (
 
 STATUS_TERMS = (
     "implementation plan only",
-    "No runtime lifecycle implementation",
+    "Runtime lifecycle implementation is limited to a metadata-only",
     "No proposal storage",
     "No AKBSM write path",
 )
@@ -78,7 +78,7 @@ SEQUENCE_TERMS = (
 
 DOC_REFERENCE_TERMS = (
     "design_akbsm_draft_proposal_review_lifecycle_implementation.md",
-    "lifecycle implementation is still not added",
+    "lifecycle implementation is limited to",
     "metadata-only and scenario/test-only",
     "test-local provider/controller return values",
     "no storage/writes/commit path exists yet",

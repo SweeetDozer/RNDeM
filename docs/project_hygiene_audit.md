@@ -184,20 +184,21 @@ references, and existing AKBSM proposal safety verifiers.
 
 `clc/runtime/akbsm_proposal_lifecycle.py` adds the isolated metadata-only
 AKBSM proposal lifecycle state/record/result scaffold. It defines the allowed
-state vocabulary and transition table, but does not add a review
-controller/service, transition execution, storage, normal runtime wiring,
-proposal commit/apply/save/write/persist/mutate path, or AKBSM writes.
+state vocabulary, transition table, and test/scenario-only transition
+controller scaffold, but does not add review service behavior, transition
+execution, storage, normal runtime wiring, proposal
+commit/apply/save/write/persist/mutate path, or AKBSM writes.
 
 `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py` verifies the
 state/record/result scaffold, exact allowed states/transitions, forbidden
-write-like state names, absent transition execution/controller/storage/wiring,
+write-like state names, absent transition execution/service/storage/wiring,
 marker 36 absence, unchanged real Memory hashes, and existing AKBSM proposal
 safety verifiers.
 
 `docs/adr_akbsm_draft_proposal_transition_controller_experiment.md` defines a
 design-only first metadata-only transition controller experiment. The
-controller is not implemented, transition execution is not implemented, the
-first future controller must be metadata-only and test/scenario-only, allowed
+metadata-only transition controller scaffold is implemented, transition
+execution is not implemented, the controller is test/scenario-only, allowed
 first storage is test-local controller return values only, no proposal
 storage/writes/commit path exists, and AKBSM writes remain blocked.
 
@@ -205,6 +206,13 @@ storage/writes/commit path exists, and AKBSM writes remain blocked.
 transition controller ADR text, design-only status, controller shape, allowed
 authority, forbidden authorities, transition semantics, storage policy, doc
 references, and existing AKBSM proposal safety verifiers.
+
+`tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py` verifies
+the transition controller scaffold, explicit test/scenario authority, exact
+allowed transition behavior, forbidden/write-like transition rejection,
+immutable record copy behavior, absent storage/runtime wiring, marker 36
+absence, unchanged real Memory hashes, and existing AKBSM proposal safety
+verifiers.
 
 ## Audit output tracking recommendation
 

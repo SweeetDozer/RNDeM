@@ -120,6 +120,11 @@ Draft proposal transition controller experiment ADR exists:
 - `docs/adr_akbsm_draft_proposal_transition_controller_experiment.md`
 - `tools/verify_akbsm_draft_proposal_transition_controller_adr.py`
 
+Draft proposal transition controller scaffold exists:
+
+- `AKBSMProposalReviewController`
+- `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -153,19 +158,19 @@ metadata-only, no lifecycle state means commit/write/persist, review means
 classification only, and `accepted_for_observation` is not AKBSM write
 approval.
 
-The proposal review lifecycle implementation plan is design-only. Lifecycle
-implementation beyond the metadata-only state/record/result scaffold is still
-not added, the first future controller/storage implementation should be
-metadata-only and scenario/test-only, test-local provider/controller return
-values are preferred before ContextMemory metadata, no storage/writes/commit
-path exists yet, normal runtime remains unchanged, proposal creation remains
-test/scenario-only, and AKBSM writes remain blocked.
+The proposal review lifecycle implementation plan is design-only for storage
+and runtime wiring. Lifecycle implementation is limited to metadata-only
+state/record/result and transition controller scaffolds, the controller is
+scenario/test-only, test-local provider/controller return values are preferred
+before ContextMemory metadata, no storage/writes/commit path exists yet, normal
+runtime remains unchanged, proposal creation remains test/scenario-only, and
+AKBSM writes remain blocked.
 
-The transition controller experiment ADR is design-only. The controller is not
-implemented, transition execution is not implemented, the first future
-controller must be metadata-only and test/scenario-only, allowed first storage
-is test-local controller return values only, no proposal storage/writes/commit
-path exists, and AKBSM writes remain blocked.
+The transition controller experiment ADR is design-only for storage and runtime
+wiring. The metadata-only transition controller scaffold is implemented,
+transition execution is not implemented, the controller is test/scenario-only,
+allowed first storage is test-local controller return values only, no proposal
+storage/writes/commit path exists, and AKBSM writes remain blocked.
 
 ## Scenario coverage
 
@@ -222,6 +227,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_first_enabled_draft_proposal_adr.py`
 - `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
 - `tools/verify_akbsm_draft_proposal_transition_controller_adr.py`
+- `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py`
 
 Existing core guards:
 

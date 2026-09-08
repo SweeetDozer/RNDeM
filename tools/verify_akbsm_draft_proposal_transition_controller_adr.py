@@ -18,7 +18,7 @@ DOC_REFERENCE_PATHS = (
 
 STATUS_TERMS = (
     "design-only",
-    "No transition controller is implemented",
+    "metadata-only transition controller scaffold is implemented",
     "No transition execution is implemented",
     "No proposal storage",
     "No AKBSM write path",
@@ -83,7 +83,7 @@ STORAGE_TERMS = (
 
 DOC_REFERENCE_TERMS = (
     "adr_akbsm_draft_proposal_transition_controller_experiment.md",
-    "controller is not implemented",
+    "metadata-only transition controller scaffold",
     "transition execution is not implemented",
     "metadata-only and test/scenario-only",
     "test-local controller return values only",
