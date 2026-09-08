@@ -225,6 +225,13 @@ The first lifecycle implementation must remain scenario/test-only:
 - mutating_memory default disabled
 - explicit scenario/test flag required
 
+Transition controller scenario coverage exists as metadata-only fixture data in
+`scenarios/akbsm_transition_controller_metadata_coverage.json`, verified by
+`tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py`. The
+coverage proves allowed and forbidden transition behavior while adding no
+proposal storage, no ContextMemory storage, no normal runtime wiring, and no
+proposal commit/apply/save/write/persist/mutate path.
+
 ## No-write safety model
 
 The lifecycle should classify temporary proposal metadata only. It must not be
@@ -241,6 +248,7 @@ Current verifier:
 
 - `verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
 - `verify_akbsm_draft_proposal_transition_controller_adr.py`
+- `verify_akbsm_draft_proposal_transition_controller_scenarios.py`
 
 Future verifiers:
 
@@ -341,8 +349,9 @@ lifecycle has isolated scenario/test coverage.
 ## Transition Controller Experiment ADR
 
 `docs/adr_akbsm_draft_proposal_transition_controller_experiment.md` defines the
-first future metadata-only transition controller experiment. It is design-only:
-the controller is not implemented, transition execution is not implemented, the
-first future controller must be metadata-only and test/scenario-only, allowed
-first storage is test-local controller return values only, no proposal
-storage/writes/commit path exists, and AKBSM writes remain blocked.
+first metadata-only transition controller experiment. It is design-only for
+storage and runtime wiring: the metadata-only controller scaffold is
+implemented, transition execution is not implemented, the controller remains
+test/scenario-only, allowed first storage is test-local controller return
+values only, no proposal storage/writes/commit path exists, and AKBSM writes
+remain blocked.

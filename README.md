@@ -41,6 +41,7 @@ python tools/verify_akbsm_draft_proposal_lifecycle_implementation_plan.py
 python tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py
 python tools/verify_akbsm_draft_proposal_transition_controller_adr.py
 python tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py
+python tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -85,11 +86,15 @@ metadata-only transition controller scaffold exists, transition execution is
 not implemented, the controller is metadata-only and test/scenario-only, allowed
 first storage is test-local controller return values only, no proposal
 storage/writes/commit path exists, and AKBSM writes remain blocked.
+Transition controller scenario coverage exists in
+`scenarios/akbsm_transition_controller_metadata_coverage.json`; it is
+metadata-only, test/scenario-only, adds no storage or runtime wiring, and keeps
+proposal commit/apply/save/write/persist/mutate paths absent.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
 
 Git is configured for this prototype. `main` contains the current baseline and
 tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, `v0.0.5`, `v0.0.6`, `v0.0.7`,
-`v0.0.8`, and `v0.0.9`; architecture/design branches should be reviewed and
-merged manually.
+`v0.0.8`, `v0.0.9`, `v0.0.10`, and `v0.0.11`; architecture/design branches
+should be reviewed and merged manually.

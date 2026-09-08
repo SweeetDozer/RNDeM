@@ -214,6 +214,14 @@ immutable record copy behavior, absent storage/runtime wiring, marker 36
 absence, unchanged real Memory hashes, and existing AKBSM proposal safety
 verifiers.
 
+`scenarios/akbsm_transition_controller_metadata_coverage.json` and
+`tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py` add
+metadata-only scenario coverage for the transition controller. The coverage
+proves allowed transitions, forbidden transitions, write-like target rejection,
+immutable record copy behavior, unchanged proposals, metadata-only expiration,
+absent proposal storage, absent ContextMemory storage, absent normal runtime
+wiring, marker 36 absence, and unchanged real Memory hashes.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and

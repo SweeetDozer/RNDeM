@@ -237,6 +237,18 @@ Future scenarios required before or with implementation:
 - disabled proposal scenarios still pass
 - controlled probe proposal experiment still passes
 
+Implemented scenario coverage:
+
+- `scenarios/akbsm_transition_controller_metadata_coverage.json`
+- `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py`
+
+The coverage is metadata-only and test/scenario-only. It verifies allowed
+transition requests, forbidden transition rejection, write-like target
+rejection, immutable record copy behavior, unchanged original records,
+unchanged proposal payloads, metadata-only expiration, absent proposal storage,
+absent ContextMemory storage, absent normal runtime wiring, unchanged real
+ExpSM/AKBSM hashes, and marker 36 absence.
+
 ## Required Future Verifier Coverage
 
 Future verifier expectations:
@@ -257,6 +269,7 @@ Future verifier expectations:
 - verify no behavior/scoring/guard/Mode C integration
 - verify marker 36 absent
 - verify memory hashes unchanged
+- verify controller transition scenario coverage
 
 ## Rejected Alternatives
 

@@ -295,6 +295,14 @@ execution is not implemented, the controller is test/scenario-only, allowed
 first storage is test-local controller return values only, no proposal
 storage/writes/commit path exists, and AKBSM writes remain blocked.
 
+Transition controller scenario coverage exists in
+`scenarios/akbsm_transition_controller_metadata_coverage.json` and
+`tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py`. It is
+metadata-only/test-scenario-only coverage for allowed transitions, forbidden
+transitions, write-like target rejection, immutable copy behavior, metadata-only
+expiration, absent storage, absent ContextMemory storage, absent normal runtime
+wiring, unchanged real ExpSM/AKBSM hashes, and marker 36 absence.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -457,6 +465,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py` | isolated lifecycle state/record/result scaffold exists as immutable metadata only, allowed states/transitions are exact, transition execution/service/storage/wiring are absent, and real ExpSM/AKBSM hashes remain unchanged |
 | `tools/verify_akbsm_draft_proposal_transition_controller_adr.py` | transition controller experiment ADR exists, stays design-only, documents metadata-only test/scenario authority, transition semantics, storage limits, forbidden authorities, and keeps existing safety verifiers passing |
 | `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py` | transition controller scaffold exists, requires explicit test/scenario authority, accepts only allowed metadata transitions, rejects forbidden/write-like targets, has no storage/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
+| `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py` | transition controller scenario fixture coverage exists, covers allowed/forbidden/write-like transitions, immutable copy behavior, metadata-only expiration, no storage/runtime wiring, and unchanged real ExpSM/AKBSM hashes |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -508,6 +517,10 @@ proposal/no-effect safety rather than canonical phase output.
   metadata-only and test/scenario-only. Transition execution, storage, runtime
   wiring, and first storage beyond test-local controller return values are not
   implemented.
+- AKBSM draft proposal transition controller scenario coverage exists as
+  metadata-only fixture data and verifier checks. It does not add proposal
+  storage, ContextMemory storage, runtime wiring, or commit/apply/save/write/
+  persist/mutate paths.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.

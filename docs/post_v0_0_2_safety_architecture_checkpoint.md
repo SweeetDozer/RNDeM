@@ -125,6 +125,11 @@ Draft proposal transition controller scaffold exists:
 - `AKBSMProposalReviewController`
 - `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py`
 
+Draft proposal transition controller scenario coverage exists:
+
+- `scenarios/akbsm_transition_controller_metadata_coverage.json`
+- `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -171,6 +176,11 @@ wiring. The metadata-only transition controller scaffold is implemented,
 transition execution is not implemented, the controller is test/scenario-only,
 allowed first storage is test-local controller return values only, no proposal
 storage/writes/commit path exists, and AKBSM writes remain blocked.
+
+Transition controller scenario coverage is metadata-only and test/scenario-only.
+It adds no proposal storage, no ContextMemory storage, no normal runtime wiring,
+and no proposal commit/apply/save/write/persist/mutate path. AKBSM writes
+remain blocked.
 
 ## Scenario coverage
 
@@ -228,6 +238,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
 - `tools/verify_akbsm_draft_proposal_transition_controller_adr.py`
 - `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py`
+- `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py`
 
 Existing core guards:
 
@@ -283,9 +294,13 @@ commit AKBSM writes.
 - AKBSM draft proposal lifecycle state/record/result scaffold exists as
   metadata-only code, but transition execution, review controller/service,
   storage, runtime wiring, commit behavior, and AKBSM mutation are not added.
-- AKBSM draft proposal transition controller experiment is design-only; the
-  controller and transition execution are not implemented, and first storage is
-  limited to test-local controller return values only.
+- AKBSM draft proposal transition controller scaffold is implemented as
+  metadata-only and test/scenario-only. Transition execution is not
+  implemented, and first storage is limited to test-local controller return
+  values only.
+- AKBSM draft proposal transition controller scenario coverage exists and keeps
+  controller checks metadata-only, test/scenario-only, storage-free, and
+  disconnected from normal runtime.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.
