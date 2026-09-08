@@ -239,6 +239,7 @@ prepare, or authorize commit/apply/save/write/persist/mutate behavior.
 Current verifier:
 
 - `verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
+- `verify_akbsm_draft_proposal_transition_controller_adr.py`
 
 Future verifiers:
 
@@ -335,3 +336,12 @@ lifecycle has isolated scenario/test coverage.
   test-local provider/controller return values?
 - What minimal scenario set should become part of phase regression snapshots,
   if any?
+
+## Transition Controller Experiment ADR
+
+`docs/adr_akbsm_draft_proposal_transition_controller_experiment.md` defines the
+first future metadata-only transition controller experiment. It is design-only:
+the controller is not implemented, transition execution is not implemented, the
+first future controller must be metadata-only and test/scenario-only, allowed
+first storage is test-local controller return values only, no proposal
+storage/writes/commit path exists, and AKBSM writes remain blocked.

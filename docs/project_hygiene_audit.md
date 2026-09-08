@@ -194,6 +194,18 @@ write-like state names, absent transition execution/controller/storage/wiring,
 marker 36 absence, unchanged real Memory hashes, and existing AKBSM proposal
 safety verifiers.
 
+`docs/adr_akbsm_draft_proposal_transition_controller_experiment.md` defines a
+design-only first metadata-only transition controller experiment. The
+controller is not implemented, transition execution is not implemented, the
+first future controller must be metadata-only and test/scenario-only, allowed
+first storage is test-local controller return values only, no proposal
+storage/writes/commit path exists, and AKBSM writes remain blocked.
+
+`tools/verify_akbsm_draft_proposal_transition_controller_adr.py` verifies the
+transition controller ADR text, design-only status, controller shape, allowed
+authority, forbidden authorities, transition semantics, storage policy, doc
+references, and existing AKBSM proposal safety verifiers.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and

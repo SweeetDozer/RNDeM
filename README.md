@@ -14,6 +14,7 @@ Start with:
 - `docs/adr_akbsm_first_enabled_draft_proposal_experiment.md`
 - `docs/adr_akbsm_draft_proposal_review_lifecycle.md`
 - `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`
+- `docs/adr_akbsm_draft_proposal_transition_controller_experiment.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -38,6 +39,7 @@ python tools/verify_akbsm_probe_draft_proposal_experiment.py
 python tools/verify_akbsm_draft_proposal_review_lifecycle_adr.py
 python tools/verify_akbsm_draft_proposal_lifecycle_implementation_plan.py
 python tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py
+python tools/verify_akbsm_draft_proposal_transition_controller_adr.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -76,10 +78,17 @@ scaffold in `clc/runtime/akbsm_proposal_lifecycle.py` exists. Transition
 execution, review controller/service, proposal storage, normal runtime wiring,
 and storage/writes/commit paths are still not added; proposal creation remains
 test/scenario-only and AKBSM writes remain blocked.
+The first metadata-only transition controller experiment is design-only in
+`docs/adr_akbsm_draft_proposal_transition_controller_experiment.md`. The
+controller is not implemented, transition execution is not implemented, the
+first future controller must be metadata-only and test/scenario-only, allowed
+first storage is test-local controller return values only, no proposal
+storage/writes/commit path exists, and AKBSM writes remain blocked.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
 
 Git is configured for this prototype. `main` contains the current baseline and
-tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, `v0.0.5`, `v0.0.6`, `v0.0.7`, and
-`v0.0.8`; architecture/design branches should be reviewed and merged manually.
+tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, `v0.0.5`, `v0.0.6`, `v0.0.7`,
+`v0.0.8`, and `v0.0.9`; architecture/design branches should be reviewed and
+merged manually.

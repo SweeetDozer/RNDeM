@@ -115,6 +115,11 @@ Draft proposal lifecycle state/record/result scaffold exists:
 - `clc/runtime/akbsm_proposal_lifecycle.py`
 - `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
 
+Draft proposal transition controller experiment ADR exists:
+
+- `docs/adr_akbsm_draft_proposal_transition_controller_experiment.md`
+- `tools/verify_akbsm_draft_proposal_transition_controller_adr.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -155,6 +160,12 @@ metadata-only and scenario/test-only, test-local provider/controller return
 values are preferred before ContextMemory metadata, no storage/writes/commit
 path exists yet, normal runtime remains unchanged, proposal creation remains
 test/scenario-only, and AKBSM writes remain blocked.
+
+The transition controller experiment ADR is design-only. The controller is not
+implemented, transition execution is not implemented, the first future
+controller must be metadata-only and test/scenario-only, allowed first storage
+is test-local controller return values only, no proposal storage/writes/commit
+path exists, and AKBSM writes remain blocked.
 
 ## Scenario coverage
 
@@ -210,6 +221,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_draft_proposal_disabled_scenarios.py`
 - `tools/verify_akbsm_first_enabled_draft_proposal_adr.py`
 - `tools/verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
+- `tools/verify_akbsm_draft_proposal_transition_controller_adr.py`
 
 Existing core guards:
 
@@ -265,6 +277,9 @@ commit AKBSM writes.
 - AKBSM draft proposal lifecycle state/record/result scaffold exists as
   metadata-only code, but transition execution, review controller/service,
   storage, runtime wiring, commit behavior, and AKBSM mutation are not added.
+- AKBSM draft proposal transition controller experiment is design-only; the
+  controller and transition execution are not implemented, and first storage is
+  limited to test-local controller return values only.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

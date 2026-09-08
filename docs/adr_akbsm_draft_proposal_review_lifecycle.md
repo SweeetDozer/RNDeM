@@ -226,5 +226,12 @@ blocked.
 
 Review this ADR before any lifecycle implementation pass.
 
+Review `docs/adr_akbsm_draft_proposal_transition_controller_experiment.md`
+before any transition controller implementation. That ADR is design-only: the
+controller is not implemented, transition execution is not implemented, the
+first future controller must be metadata-only and test/scenario-only, allowed
+first storage is test-local controller return values only, no proposal
+storage/writes/commit path exists, and AKBSM writes remain blocked.
+
 Stop before proposal storage, proposal review lifecycle implementation, writer
 wiring, behavior wiring, Mode C wiring, or permanent AKBSM mutation.
