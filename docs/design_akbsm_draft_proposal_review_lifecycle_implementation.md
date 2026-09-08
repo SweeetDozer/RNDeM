@@ -232,6 +232,12 @@ coverage proves allowed and forbidden transition behavior while adding no
 proposal storage, no ContextMemory storage, no normal runtime wiring, and no
 proposal commit/apply/save/write/persist/mutate path.
 
+Temporary ContextMemory metadata integration is covered by the design-only ADR
+`docs/adr_akbsm_proposal_contextmemory_metadata_integration.md`. That ADR
+allows only a future scenario/test-only temporary metadata copy of proposal
+review records; it does not implement ContextMemory integration, proposal
+storage, review record persistence, normal runtime wiring, or AKBSM writes.
+
 ## No-write safety model
 
 The lifecycle should classify temporary proposal metadata only. It must not be
@@ -249,6 +255,7 @@ Current verifier:
 - `verify_akbsm_draft_proposal_lifecycle_state_scaffold.py`
 - `verify_akbsm_draft_proposal_transition_controller_adr.py`
 - `verify_akbsm_draft_proposal_transition_controller_scenarios.py`
+- `verify_akbsm_proposal_contextmemory_metadata_adr.py`
 
 Future verifiers:
 
@@ -256,6 +263,8 @@ Future verifiers:
 - `verify_akbsm_draft_proposal_lifecycle_transitions.py`
 - `verify_akbsm_draft_proposal_lifecycle_no_write.py`
 - `verify_akbsm_draft_proposal_lifecycle_scenarios.py`
+- `verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
+- `verify_akbsm_proposal_contextmemory_metadata_scenarios.py`
 
 They must verify:
 
@@ -269,6 +278,7 @@ They must verify:
 - no AKBSM mutation
 - no ExpSM mutation
 - no behavior/scoring/guard/Mode C integration
+- no ContextMemory metadata outside explicit scenario/test-only authority
 - marker 36 absent
 - memory hashes unchanged
 

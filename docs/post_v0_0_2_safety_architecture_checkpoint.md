@@ -130,6 +130,11 @@ Draft proposal transition controller scenario coverage exists:
 - `scenarios/akbsm_transition_controller_metadata_coverage.json`
 - `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py`
 
+Draft proposal ContextMemory metadata integration ADR exists:
+
+- `docs/adr_akbsm_proposal_contextmemory_metadata_integration.md`
+- `tools/verify_akbsm_proposal_contextmemory_metadata_adr.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -181,6 +186,12 @@ Transition controller scenario coverage is metadata-only and test/scenario-only.
 It adds no proposal storage, no ContextMemory storage, no normal runtime wiring,
 and no proposal commit/apply/save/write/persist/mutate path. AKBSM writes
 remain blocked.
+
+The ContextMemory metadata integration ADR is design-only. No ContextMemory
+integration is implemented, no proposal storage is added, no review record
+persistence is added, normal runtime remains disconnected, and AKBSM writes
+remain blocked. Any first future integration may only store temporary
+scenario/test-only metadata copies of AKBSM proposal review records.
 
 ## Scenario coverage
 
@@ -239,6 +250,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_draft_proposal_transition_controller_adr.py`
 - `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py`
 - `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py`
+- `tools/verify_akbsm_proposal_contextmemory_metadata_adr.py`
 
 Existing core guards:
 
@@ -301,6 +313,9 @@ commit AKBSM writes.
 - AKBSM draft proposal transition controller scenario coverage exists and keeps
   controller checks metadata-only, test/scenario-only, storage-free, and
   disconnected from normal runtime.
+- AKBSM proposal ContextMemory metadata integration is design-only. No
+  ContextMemory integration, review record persistence, proposal storage,
+  normal runtime wiring, or AKBSM write path is implemented.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.
@@ -319,6 +334,10 @@ Option D: prepare v0.0.3 safety checkpoint tag only after explicit approval.
 Option E: review
 `docs/adr_akbsm_draft_proposal_review_lifecycle.md` before any proposal
 lifecycle implementation.
+
+Option F: review
+`docs/adr_akbsm_proposal_contextmemory_metadata_integration.md` before any
+temporary ContextMemory proposal metadata implementation.
 
 ## Release/tag policy
 

@@ -185,6 +185,11 @@ Allowed later only with separate approval:
 - temporary ContextMemory metadata
 - scenario/debug output
 
+Temporary ContextMemory metadata storage now has a separate design-only ADR:
+`docs/adr_akbsm_proposal_contextmemory_metadata_integration.md`. That ADR does
+not implement ContextMemory integration, proposal storage, review record
+persistence, normal runtime wiring, or AKBSM writes.
+
 Forbidden storage:
 
 - `Memory/AKBSM/*`
@@ -270,6 +275,8 @@ Future verifier expectations:
 - verify marker 36 absent
 - verify memory hashes unchanged
 - verify controller transition scenario coverage
+- verify temporary ContextMemory metadata integration remains design-only until
+  a later explicit implementation pass
 
 ## Rejected Alternatives
 

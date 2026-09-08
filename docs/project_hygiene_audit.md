@@ -222,6 +222,18 @@ immutable record copy behavior, unchanged proposals, metadata-only expiration,
 absent proposal storage, absent ContextMemory storage, absent normal runtime
 wiring, marker 36 absence, and unchanged real Memory hashes.
 
+`docs/adr_akbsm_proposal_contextmemory_metadata_integration.md` defines a
+design-only future temporary ContextMemory metadata integration. It allows only
+scenario/test-only temporary metadata copies of AKBSM proposal review records
+in a later explicit pass and forbids proposal storage, review record
+persistence, permanent proposal queues, normal runtime wiring, behavior/scoring
+influence, Mode C/PolicyPressureReview control, and AKBSM/ExpSM writes.
+
+`tools/verify_akbsm_proposal_contextmemory_metadata_adr.py` verifies the ADR
+text, design-only status, allowed temporary metadata shape, forbidden
+data/instructions, forbidden authorities, TTL/retention requirements, rejected
+alternatives, doc references, and existing AKBSM proposal safety verifiers.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -249,3 +261,5 @@ in a later packaging pass.
 9. Review `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`
    before adding transition execution, review controller/service code, storage,
    runtime wiring, or proposal commit behavior.
+10. Review `docs/adr_akbsm_proposal_contextmemory_metadata_integration.md`
+    before adding any temporary ContextMemory proposal metadata integration.

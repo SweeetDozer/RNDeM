@@ -303,6 +303,14 @@ transitions, write-like target rejection, immutable copy behavior, metadata-only
 expiration, absent storage, absent ContextMemory storage, absent normal runtime
 wiring, unchanged real ExpSM/AKBSM hashes, and marker 36 absence.
 
+`docs/adr_akbsm_proposal_contextmemory_metadata_integration.md` is a
+design-only ADR for a possible future temporary ContextMemory metadata
+integration. No ContextMemory integration is implemented, no proposal storage is
+added, no review record persistence is added, normal runtime remains
+disconnected, and AKBSM writes remain blocked. Any first future integration must
+be scenario/test-only and may only store temporary metadata copies of proposal
+review records.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -428,6 +436,11 @@ proposal/no-effect safety rather than canonical phase output.
   design-only. The metadata-only state/record/result scaffold may exist, but do
   not add transition execution, review controller/service code, proposal
   storage, or runtime wiring until a later explicit implementation pass.
+- Treat future AKBSM proposal ContextMemory metadata integration as design-only.
+  Do not add ContextMemory storage, review record persistence, permanent
+  proposal queues, normal runtime wiring, or AKBSM writes until a later explicit
+  implementation pass adds temporary scenario/test-only metadata coverage and
+  verifiers.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -466,6 +479,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_draft_proposal_transition_controller_adr.py` | transition controller experiment ADR exists, stays design-only, documents metadata-only test/scenario authority, transition semantics, storage limits, forbidden authorities, and keeps existing safety verifiers passing |
 | `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py` | transition controller scaffold exists, requires explicit test/scenario authority, accepts only allowed metadata transitions, rejects forbidden/write-like targets, has no storage/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py` | transition controller scenario fixture coverage exists, covers allowed/forbidden/write-like transitions, immutable copy behavior, metadata-only expiration, no storage/runtime wiring, and unchanged real ExpSM/AKBSM hashes |
+| `tools/verify_akbsm_proposal_contextmemory_metadata_adr.py` | future temporary ContextMemory proposal metadata ADR exists, stays design-only, allows only scenario/test-only temporary metadata copies, forbids persistence/storage/writes/runtime wiring, and keeps existing safety verifiers passing |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -521,6 +535,10 @@ proposal/no-effect safety rather than canonical phase output.
   metadata-only fixture data and verifier checks. It does not add proposal
   storage, ContextMemory storage, runtime wiring, or commit/apply/save/write/
   persist/mutate paths.
+- Future AKBSM proposal ContextMemory metadata integration is design-only. No
+  ContextMemory integration is implemented; any future first integration must
+  be temporary scenario/test-only metadata copies and must not create proposal
+  storage, review record persistence, normal runtime wiring, or AKBSM writes.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.
