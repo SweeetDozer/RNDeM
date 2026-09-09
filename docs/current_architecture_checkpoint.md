@@ -330,6 +330,13 @@ ContextMemory. It requires explicit scenario/test authority, adds no proposal
 storage or review record persistence, creates no permanent proposal queues, and
 does not add behavior influence.
 
+`docs/adr_contextmemory_temporary_metadata_placement_api.md` defines the
+design-only future safe temporary ContextMemory metadata placement API. The API
+is not implemented yet, current AKBSM proposal ContextMemory integration
+remains Shape B/deferred boundary, real ContextMemory placement is still
+deferred, no proposal storage exists, no normal runtime wiring exists, and
+AKBSM writes remain blocked.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -467,6 +474,11 @@ proposal/no-effect safety rather than canonical phase output.
   scenario/test-only deferred boundary. It returns temporary metadata only; it
   is not permanent storage, not review record persistence, not behavior
   influence, not normal runtime wiring, and not AKBSM write approval.
+- Treat the temporary ContextMemory metadata placement API ADR as design-only.
+  The API is not implemented yet; current AKBSM proposal ContextMemory
+  integration remains Shape B/deferred boundary, real ContextMemory placement
+  is still deferred, no proposal storage exists, no normal runtime wiring
+  exists, and AKBSM writes remain blocked.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -508,6 +520,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_proposal_contextmemory_metadata_adr.py` | future temporary ContextMemory proposal metadata ADR exists, stays design-only, allows only scenario/test-only temporary metadata copies, forbids persistence/storage/writes/runtime wiring, and keeps existing safety verifiers passing |
 | `tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py` | ContextMemory-compatible proposal metadata payload scaffold exists, requires explicit scenario/test authority, creates immutable temporary metadata only, forbids storage/writes/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py` | ContextMemory proposal metadata integration boundary scaffold exists, requires explicit scenario/test authority, returns temporary deferred metadata only, forbids ContextMemory placement/storage/writes/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
+| `tools/verify_contextmemory_temporary_metadata_placement_api_adr.py` | temporary ContextMemory metadata placement API ADR exists, stays design-only, requires future scenario/test-only authority and TTL/expiration, forbids storage/writes/runtime wiring/behavior influence, and keeps existing safety verifiers passing |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -575,6 +588,11 @@ proposal/no-effect safety rather than canonical phase output.
   a deferred boundary result only. It does not place review records in
   ContextMemory, create permanent proposal storage, persist review records, or
   add normal runtime wiring.
+- Temporary ContextMemory metadata placement API ADR exists, but the API is not
+  implemented yet. Current AKBSM proposal ContextMemory integration remains
+  Shape B/deferred boundary, real ContextMemory placement is still deferred, no
+  proposal storage exists, no normal runtime wiring exists, and AKBSM writes
+  remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.

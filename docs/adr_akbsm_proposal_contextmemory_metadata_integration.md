@@ -290,3 +290,11 @@ The next implementation, if explicitly approved later, should add only a
 scenario/test-only temporary ContextMemory metadata scaffold and matching
 scenario/verifier coverage. Stop before permanent proposal queues, review record
 persistence, normal runtime wiring, behavior influence, or AKBSM writes.
+
+Before real placement, review
+`docs/adr_contextmemory_temporary_metadata_placement_api.md`. That temporary
+ContextMemory metadata placement API ADR exists as design-only guidance: the
+API is not implemented yet, current AKBSM proposal ContextMemory integration
+remains Shape B/deferred boundary, real ContextMemory placement is still
+deferred, no proposal storage exists, no normal runtime wiring exists, and
+AKBSM writes remain blocked.

@@ -252,6 +252,14 @@ records into ContextMemory, calls no `ContextMemoryManager`, creates no
 permanent proposal storage or review record persistence, keeps normal runtime
 unwired, and keeps AKBSM writes blocked.
 
+`docs/adr_contextmemory_temporary_metadata_placement_api.md` and
+`tools/verify_contextmemory_temporary_metadata_placement_api_adr.py` add a
+design-only ADR for a safe temporary ContextMemory metadata placement API. The
+API is not implemented yet, current AKBSM proposal ContextMemory integration
+remains Shape B/deferred boundary, real ContextMemory placement is still
+deferred, no proposal storage exists, no normal runtime wiring exists, and
+AKBSM writes remain blocked.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -281,3 +289,5 @@ in a later packaging pass.
    runtime wiring, or proposal commit behavior.
 10. Review `docs/adr_akbsm_proposal_contextmemory_metadata_integration.md`
     before adding any temporary ContextMemory proposal metadata integration.
+11. Review `docs/adr_contextmemory_temporary_metadata_placement_api.md` before
+    implementing any safe temporary ContextMemory metadata placement API.

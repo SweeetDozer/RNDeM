@@ -252,6 +252,13 @@ yet. It does not write review records into ContextMemory, does not create
 permanent proposal storage or permanent review record persistence, and does not
 wire the lifecycle into normal runtime.
 
+The temporary ContextMemory metadata placement API ADR exists in
+`docs/adr_contextmemory_temporary_metadata_placement_api.md`. The API is not
+implemented yet, current AKBSM proposal ContextMemory integration remains Shape
+B/deferred boundary, real ContextMemory placement is still deferred, no
+proposal storage exists, no normal runtime wiring exists, and AKBSM writes
+remain blocked.
+
 ## No-write safety model
 
 The lifecycle should classify temporary proposal metadata only. It must not be
@@ -272,6 +279,7 @@ Current verifier:
 - `verify_akbsm_proposal_contextmemory_metadata_adr.py`
 - `verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
 - `verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
+- `verify_contextmemory_temporary_metadata_placement_api_adr.py`
 
 Future verifiers:
 

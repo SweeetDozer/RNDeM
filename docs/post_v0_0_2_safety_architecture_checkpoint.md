@@ -147,6 +147,11 @@ Draft proposal ContextMemory metadata integration boundary scaffold exists:
 - `tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
 - `scenarios/akbsm_proposal_contextmemory_metadata_integration_scaffold.json`
 
+Temporary ContextMemory metadata placement API ADR exists:
+
+- `docs/adr_contextmemory_temporary_metadata_placement_api.md`
+- `tools/verify_contextmemory_temporary_metadata_placement_api_adr.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -217,6 +222,12 @@ payloads only. It does not write into ContextMemory, does not call
 `ContextMemoryManager`, does not persist review records, does not add proposal
 storage, and does not add normal runtime wiring.
 
+The temporary ContextMemory metadata placement API ADR is design-only. The API
+is not implemented yet, current AKBSM proposal ContextMemory integration
+remains Shape B/deferred boundary, real ContextMemory placement is still
+deferred, no proposal storage exists, no normal runtime wiring exists, and
+AKBSM writes remain blocked.
+
 ## Scenario coverage
 
 Scenario-only coverage groups:
@@ -277,6 +288,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_proposal_contextmemory_metadata_adr.py`
 - `tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
 - `tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
+- `tools/verify_contextmemory_temporary_metadata_placement_api_adr.py`
 
 Existing core guards:
 
@@ -350,6 +362,11 @@ commit AKBSM writes.
   scenario/test-only deferred metadata. It writes no review records into
   ContextMemory, calls no `ContextMemoryManager`, creates no permanent proposal
   storage or review record persistence, and adds no normal runtime wiring.
+- Temporary ContextMemory metadata placement API ADR exists, but the API is not
+  implemented yet. Current AKBSM proposal ContextMemory integration remains
+  Shape B/deferred boundary, real ContextMemory placement is still deferred, no
+  proposal storage exists, no normal runtime wiring exists, and AKBSM writes
+  remain blocked.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.
@@ -372,6 +389,10 @@ lifecycle implementation.
 Option F: review
 `docs/adr_akbsm_proposal_contextmemory_metadata_integration.md` before any
 temporary ContextMemory proposal metadata implementation.
+
+Option G: review
+`docs/adr_contextmemory_temporary_metadata_placement_api.md` before implementing
+any safe temporary ContextMemory metadata placement API.
 
 ## Release/tag policy
 
