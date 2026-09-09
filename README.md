@@ -47,6 +47,7 @@ python tools/verify_akbsm_proposal_contextmemory_metadata_adr.py
 python tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py
 python tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py
 python tools/verify_contextmemory_temporary_metadata_placement_api_adr.py
+python tools/verify_contextmemory_temporary_metadata_placement_scaffold.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -118,6 +119,11 @@ Shape B/deferred boundary, real ContextMemory placement is still deferred, no
 proposal storage exists, no normal runtime wiring exists, and AKBSM writes
 remain blocked.
 Current AKBSM proposal ContextMemory integration remains Shape B/deferred boundary.
+The scenario/test-only ContextMemory temporary metadata placement scaffold
+exists in `clc/runtime/context_temporary_metadata.py`; it requires explicit
+authority and TTL/expiration, accepts metadata-only temporary entries, rejects
+write-like metadata, is not wired into normal runtime, creates no permanent
+storage/queues, and keeps AKBSM proposal metadata non-authoritative for writes.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

@@ -298,3 +298,10 @@ API is not implemented yet, current AKBSM proposal ContextMemory integration
 remains Shape B/deferred boundary, real ContextMemory placement is still
 deferred, no proposal storage exists, no normal runtime wiring exists, and
 AKBSM writes remain blocked.
+
+`clc/runtime/context_temporary_metadata.py` now provides a scenario/test-only
+ContextMemory temporary metadata placement scaffold. It requires explicit
+authority and TTL/expiration, accepts metadata-only temporary entries, rejects
+write-like metadata, remains local-only, is not wired into normal runtime, does
+not create permanent storage/queues, and does not make AKBSM proposal metadata
+authoritative for writes.

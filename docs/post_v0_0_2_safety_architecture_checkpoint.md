@@ -152,6 +152,12 @@ Temporary ContextMemory metadata placement API ADR exists:
 - `docs/adr_contextmemory_temporary_metadata_placement_api.md`
 - `tools/verify_contextmemory_temporary_metadata_placement_api_adr.py`
 
+ContextMemory temporary metadata placement scaffold exists:
+
+- `clc/runtime/context_temporary_metadata.py`
+- `tools/verify_contextmemory_temporary_metadata_placement_scaffold.py`
+- `scenarios/contextmemory_temporary_metadata_placement_scaffold.json`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -228,6 +234,12 @@ remains Shape B/deferred boundary, real ContextMemory placement is still
 deferred, no proposal storage exists, no normal runtime wiring exists, and
 AKBSM writes remain blocked.
 
+The ContextMemory temporary metadata placement scaffold is scenario/test-only.
+It requires explicit authority, requires TTL/expiration, accepts metadata-only
+temporary entries, rejects write-like metadata, is not wired into normal
+runtime, does not create permanent storage/queues, keeps AKBSM proposal metadata
+non-authoritative for writes, and keeps AKBSM writes blocked.
+
 ## Scenario coverage
 
 Scenario-only coverage groups:
@@ -289,6 +301,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
 - `tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
 - `tools/verify_contextmemory_temporary_metadata_placement_api_adr.py`
+- `tools/verify_contextmemory_temporary_metadata_placement_scaffold.py`
 
 Existing core guards:
 
@@ -367,6 +380,11 @@ commit AKBSM writes.
   Shape B/deferred boundary, real ContextMemory placement is still deferred, no
   proposal storage exists, no normal runtime wiring exists, and AKBSM writes
   remain blocked.
+- ContextMemory temporary metadata placement scaffold exists, but it is
+  scenario/test-only, requires explicit authority and TTL/expiration, accepts
+  metadata-only temporary entries, rejects write-like metadata, is not wired
+  into normal runtime, does not create permanent storage/queues, and keeps
+  AKBSM proposal metadata non-authoritative for writes.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

@@ -271,6 +271,16 @@ integration as Shape B/deferred boundary. Real ContextMemory placement is still
 deferred. No proposal storage exists. No normal runtime wiring exists. AKBSM
 writes remain blocked.
 
+A later implementation scaffold adds
+`clc/runtime/context_temporary_metadata.py` as a scenario/test-only local
+temporary metadata placement object. ContextMemory temporary metadata placement
+scaffold exists, scaffold is scenario/test-only, scaffold requires explicit
+authority, scaffold requires TTL/expiration, scaffold accepts metadata-only
+temporary entries, scaffold rejects write-like metadata, scaffold is not wired
+into normal runtime, scaffold does not create permanent storage/queues, AKBSM
+proposal metadata remains non-authoritative for writes, and AKBSM writes remain
+blocked.
+
 ## Next Steps
 
 Review this ADR before any implementation pass.

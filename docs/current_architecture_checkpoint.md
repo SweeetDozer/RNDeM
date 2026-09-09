@@ -337,6 +337,14 @@ remains Shape B/deferred boundary, real ContextMemory placement is still
 deferred, no proposal storage exists, no normal runtime wiring exists, and
 AKBSM writes remain blocked.
 
+`clc/runtime/context_temporary_metadata.py` adds the scenario/test-only
+ContextMemory temporary metadata placement scaffold. The scaffold requires
+explicit authority, requires TTL/expiration, accepts metadata-only temporary
+entries, rejects write-like metadata, keeps entries local to an explicitly
+created placement object, is not wired into normal runtime, does not create
+permanent storage/queues, keeps AKBSM proposal metadata non-authoritative for
+writes, and keeps AKBSM writes blocked.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -479,6 +487,11 @@ proposal/no-effect safety rather than canonical phase output.
   integration remains Shape B/deferred boundary, real ContextMemory placement
   is still deferred, no proposal storage exists, no normal runtime wiring
   exists, and AKBSM writes remain blocked.
+- Treat the ContextMemory temporary metadata placement scaffold as
+  scenario/test-only local metadata infrastructure. It requires explicit
+  authority and TTL/expiration, rejects write-like metadata, is not normal
+  runtime wiring, does not create permanent storage/queues, and does not make
+  AKBSM proposal metadata authoritative for writes.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -521,6 +534,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py` | ContextMemory-compatible proposal metadata payload scaffold exists, requires explicit scenario/test authority, creates immutable temporary metadata only, forbids storage/writes/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py` | ContextMemory proposal metadata integration boundary scaffold exists, requires explicit scenario/test authority, returns temporary deferred metadata only, forbids ContextMemory placement/storage/writes/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_contextmemory_temporary_metadata_placement_api_adr.py` | temporary ContextMemory metadata placement API ADR exists, stays design-only, requires future scenario/test-only authority and TTL/expiration, forbids storage/writes/runtime wiring/behavior influence, and keeps existing safety verifiers passing |
+| `tools/verify_contextmemory_temporary_metadata_placement_scaffold.py` | ContextMemory temporary metadata placement scaffold exists, requires explicit scenario/test authority and TTL/expiration, rejects write-like metadata, stays local-only/unwired, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -593,6 +607,11 @@ proposal/no-effect safety rather than canonical phase output.
   Shape B/deferred boundary, real ContextMemory placement is still deferred, no
   proposal storage exists, no normal runtime wiring exists, and AKBSM writes
   remain blocked.
+- ContextMemory temporary metadata placement scaffold exists, but it is
+  scenario/test-only, requires explicit authority and TTL/expiration, accepts
+  metadata-only temporary entries, rejects write-like metadata, is not wired
+  into normal runtime, does not create permanent storage/queues, and keeps
+  AKBSM proposal metadata non-authoritative for writes.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.

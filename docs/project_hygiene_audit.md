@@ -260,6 +260,16 @@ remains Shape B/deferred boundary, real ContextMemory placement is still
 deferred, no proposal storage exists, no normal runtime wiring exists, and
 AKBSM writes remain blocked.
 
+`clc/runtime/context_temporary_metadata.py`,
+`scenarios/contextmemory_temporary_metadata_placement_scaffold.json`, and
+`tools/verify_contextmemory_temporary_metadata_placement_scaffold.py` add
+scenario/test-only ContextMemory temporary metadata placement scaffold coverage.
+The scaffold requires explicit authority, requires TTL/expiration, accepts
+metadata-only temporary entries, rejects write-like metadata, remains local to
+an explicitly created placement object, is not wired into normal runtime, does
+not create permanent storage/queues, keeps AKBSM proposal metadata
+non-authoritative for writes, and keeps AKBSM writes blocked.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -291,3 +301,5 @@ in a later packaging pass.
     before adding any temporary ContextMemory proposal metadata integration.
 11. Review `docs/adr_contextmemory_temporary_metadata_placement_api.md` before
     implementing any safe temporary ContextMemory metadata placement API.
+12. Keep ContextMemory temporary metadata placement scenario/test-only until a
+    later explicit pass approves real placement semantics.
