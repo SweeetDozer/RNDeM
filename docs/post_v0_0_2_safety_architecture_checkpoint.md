@@ -141,6 +141,12 @@ Draft proposal ContextMemory metadata payload scaffold exists:
 - `tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
 - `scenarios/akbsm_proposal_contextmemory_metadata_scaffold.json`
 
+Draft proposal ContextMemory metadata integration boundary scaffold exists:
+
+- `clc/runtime/akbsm_proposal_contextmemory_metadata.py`
+- `tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
+- `scenarios/akbsm_proposal_contextmemory_metadata_integration_scaffold.json`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -198,6 +204,13 @@ integration is implemented, no proposal storage is added, no review record
 persistence is added, normal runtime remains disconnected, and AKBSM writes
 remain blocked. Any first future integration may only store temporary
 scenario/test-only metadata copies of AKBSM proposal review records.
+
+The current ContextMemory metadata integration scaffold is a scenario/test-only
+deferred boundary result, not real ContextMemory placement. It requires
+explicit scenario/test authority, returns temporary metadata only, writes no
+review records into ContextMemory, calls no `ContextMemoryManager`, creates no
+permanent proposal storage, creates no permanent review record persistence, and
+adds no proposal commit/apply/save/write/persist/mutate path.
 
 The ContextMemory-compatible metadata scaffold creates immutable temporary
 payloads only. It does not write into ContextMemory, does not call
@@ -263,6 +276,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py`
 - `tools/verify_akbsm_proposal_contextmemory_metadata_adr.py`
 - `tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
+- `tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
 
 Existing core guards:
 
@@ -332,6 +346,10 @@ commit AKBSM writes.
   it is scenario/test-only, writes nothing into ContextMemory, calls no
   `ContextMemoryManager`, and creates no commit/apply/save/write/persist/mutate
   path.
+- AKBSM proposal ContextMemory metadata integration scaffold exists, but it is
+  scenario/test-only deferred metadata. It writes no review records into
+  ContextMemory, calls no `ContextMemoryManager`, creates no permanent proposal
+  storage or review record persistence, and adds no normal runtime wiring.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

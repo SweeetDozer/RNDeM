@@ -7,6 +7,9 @@ This ADR is design-only.
 The scenario/test-only ContextMemory-compatible metadata payload scaffold is
 implemented. It is not actual ContextMemory integration.
 
+The scenario/test-only integration boundary scaffold is implemented as a
+temporary metadata-only deferred result. It is not actual ContextMemory
+placement and it does not write review records into ContextMemory.
 No ContextMemory integration is implemented by this pass.
 No proposal storage is added by this pass.
 No review record persistence is added by this pass.
@@ -52,6 +55,14 @@ only after a later explicit implementation pass.
 The current scaffold creates immutable temporary metadata payload objects only.
 It does not write into ContextMemory, does not call `ContextMemoryManager`, and
 does not create proposal storage or review record persistence.
+
+Because current `ContextMemory` conventions do not expose a dedicated safe
+temporary metadata placement API for proposal review records, the first
+integration scaffold is a scenario/test-only boundary object that returns a
+temporary metadata-only deferred-placement result. It requires explicit
+scenario/test authority, treats `accepted_for_observation` as observation-only,
+keeps `deferred` out of pending-commit semantics, and rejects missing or
+unknown authority. Real ContextMemory placement remains deferred.
 
 The integration must not change normal runtime behavior, tick order, retention
 timing, `ContextMemoryManager.apply_pending()` placement, scoring, selection,
@@ -223,6 +234,7 @@ Future verifiers:
 
 - `verify_akbsm_proposal_contextmemory_metadata_adr.py`
 - `verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
+- `verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
 - `verify_akbsm_proposal_contextmemory_metadata_scenarios.py`
 
 They must verify:

@@ -243,6 +243,15 @@ into ContextMemory, does not call `ContextMemoryManager`, does not persist
 review records, adds no proposal storage, keeps normal runtime unwired, and
 keeps AKBSM writes blocked.
 
+`clc/runtime/akbsm_proposal_contextmemory_metadata.py`,
+`scenarios/akbsm_proposal_contextmemory_metadata_integration_scaffold.json`,
+and `tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
+add scenario/test-only ContextMemory metadata integration boundary coverage.
+The boundary returns temporary metadata-only deferred results, writes no review
+records into ContextMemory, calls no `ContextMemoryManager`, creates no
+permanent proposal storage or review record persistence, keeps normal runtime
+unwired, and keeps AKBSM writes blocked.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and

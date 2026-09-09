@@ -15,8 +15,13 @@ from clc.runtime.akbsm_proposal_lifecycle import (
 AKBSM_PROPOSAL_CONTEXT_METADATA_TEST_SCENARIO_AUTHORITY = (
     AKBSM_PROPOSAL_REVIEW_TEST_SCENARIO_AUTHORITY
 )
+AKBSM_PROPOSAL_CONTEXT_METADATA_INTEGRATION_TEST_SCENARIO_AUTHORITY = (
+    AKBSM_PROPOSAL_REVIEW_TEST_SCENARIO_AUTHORITY
+)
 AKBSM_PROPOSAL_CONTEXT_METADATA_SOURCE = "akbsm_proposal_lifecycle"
 AKBSM_PROPOSAL_CONTEXT_METADATA_STORAGE_KIND = "metadata_only"
+AKBSM_PROPOSAL_CONTEXT_METADATA_INTEGRATION_KIND = "temporary_metadata_boundary"
+AKBSM_PROPOSAL_CONTEXT_METADATA_PLACEMENT = "deferred"
 
 
 @dataclass(frozen=True)
@@ -162,6 +167,109 @@ class AKBSMProposalContextMemoryMetadataBuilder:
             transition_history=record.transition_history,
             controller_result=controller_result,
         )
+
+
+@dataclass(frozen=True)
+class AKBSMProposalContextMemoryMetadataIntegrationResult:
+    """Scenario/test-only result for deferred temporary metadata placement."""
+
+    metadata: AKBSMProposalContextMemoryMetadata
+    integration_kind: str = AKBSM_PROPOSAL_CONTEXT_METADATA_INTEGRATION_KIND
+    placement: str = AKBSM_PROPOSAL_CONTEXT_METADATA_PLACEMENT
+    temporary: bool = True
+    metadata_only: bool = True
+    observation_only: bool = True
+    behavior_influence: bool = False
+    normal_runtime_wiring: bool = False
+    contextmemory_written: bool = False
+    contextmemory_manager_called: bool = False
+    proposal_storage_added: bool = False
+    review_record_persistence_added: bool = False
+    pending_commit: bool = False
+    akbsm_write_approved: bool = False
+    write_authorized: bool = False
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.metadata, AKBSMProposalContextMemoryMetadata):
+            raise TypeError("metadata must be AKBSMProposalContextMemoryMetadata")
+        payload = self.metadata.as_payload()
+        if payload["temporary"] is not True or payload["storage_kind"] != "metadata_only":
+            raise ValueError("integration accepts temporary metadata-only payloads")
+        if payload["observation_only"] is not True:
+            raise ValueError("integration accepts observation-only metadata")
+        if payload["pending_commit"] or payload["akbsm_write_approved"] or payload["write_authorized"]:
+            raise ValueError("integration cannot authorize mutation")
+        if self.integration_kind != AKBSM_PROPOSAL_CONTEXT_METADATA_INTEGRATION_KIND:
+            raise ValueError("integration_kind must remain temporary metadata boundary")
+        if self.placement != AKBSM_PROPOSAL_CONTEXT_METADATA_PLACEMENT:
+            raise ValueError("placement must remain deferred")
+        if self.temporary is not True or self.metadata_only is not True:
+            raise ValueError("integration result must remain temporary metadata only")
+        if self.observation_only is not True:
+            raise ValueError("integration result must remain observation-only")
+        if self.behavior_influence or self.normal_runtime_wiring:
+            raise ValueError("integration result cannot affect behavior or normal runtime")
+        if (
+            self.contextmemory_written
+            or self.contextmemory_manager_called
+            or self.proposal_storage_added
+            or self.review_record_persistence_added
+        ):
+            raise ValueError("integration result cannot create placement or storage")
+        if self.pending_commit or self.akbsm_write_approved or self.write_authorized:
+            raise ValueError("integration result cannot authorize mutation")
+
+    def as_context_metadata(self) -> MappingProxyType[str, Any]:
+        return MappingProxyType(
+            {
+                "proposal_metadata": self.metadata.as_payload(),
+                "integration_kind": self.integration_kind,
+                "placement": self.placement,
+                "temporary": self.temporary,
+                "metadata_only": self.metadata_only,
+                "observation_only": self.observation_only,
+                "behavior_influence": self.behavior_influence,
+                "normal_runtime_wiring": self.normal_runtime_wiring,
+                "contextmemory_written": self.contextmemory_written,
+                "contextmemory_manager_called": self.contextmemory_manager_called,
+                "proposal_storage_added": self.proposal_storage_added,
+                "review_record_persistence_added": self.review_record_persistence_added,
+                "pending_commit": self.pending_commit,
+                "akbsm_write_approved": self.akbsm_write_approved,
+                "write_authorized": self.write_authorized,
+            }
+        )
+
+    def as_payload(self) -> MappingProxyType[str, Any]:
+        return self.as_context_metadata()
+
+
+@dataclass(frozen=True)
+class AKBSMProposalContextMemoryMetadataIntegration:
+    """Authority-gated scenario/test-only temporary metadata boundary."""
+
+    authority: str | None = None
+
+    def integrate_metadata(
+        self,
+        metadata: AKBSMProposalContextMemoryMetadata,
+        *,
+        authority: str | None = None,
+    ) -> AKBSMProposalContextMemoryMetadataIntegrationResult | None:
+        active_authority = authority if authority is not None else self.authority
+        if active_authority != AKBSM_PROPOSAL_CONTEXT_METADATA_INTEGRATION_TEST_SCENARIO_AUTHORITY:
+            return None
+        return self.build_integration_result(metadata, authority=active_authority)
+
+    def build_integration_result(
+        self,
+        metadata: AKBSMProposalContextMemoryMetadata,
+        *,
+        authority: str | None = None,
+    ) -> AKBSMProposalContextMemoryMetadataIntegrationResult | None:
+        if authority != AKBSM_PROPOSAL_CONTEXT_METADATA_INTEGRATION_TEST_SCENARIO_AUTHORITY:
+            return None
+        return AKBSMProposalContextMemoryMetadataIntegrationResult(metadata=metadata)
 
 
 def build_metadata(

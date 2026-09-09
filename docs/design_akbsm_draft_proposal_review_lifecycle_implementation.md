@@ -245,6 +245,13 @@ for scenario/test use only. It does not write into ContextMemory, call
 `ContextMemoryManager`, persist review records, add proposal storage, or wire
 the lifecycle into normal runtime.
 
+The same module now includes a scenario/test-only ContextMemory metadata
+integration boundary scaffold. It returns a temporary metadata-only deferred
+result because no dedicated safe temporary ContextMemory placement API exists
+yet. It does not write review records into ContextMemory, does not create
+permanent proposal storage or permanent review record persistence, and does not
+wire the lifecycle into normal runtime.
+
 ## No-write safety model
 
 The lifecycle should classify temporary proposal metadata only. It must not be
@@ -264,6 +271,7 @@ Current verifier:
 - `verify_akbsm_draft_proposal_transition_controller_scenarios.py`
 - `verify_akbsm_proposal_contextmemory_metadata_adr.py`
 - `verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
+- `verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
 
 Future verifiers:
 
@@ -272,6 +280,7 @@ Future verifiers:
 - `verify_akbsm_draft_proposal_lifecycle_no_write.py`
 - `verify_akbsm_draft_proposal_lifecycle_scenarios.py`
 - `verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
+- `verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
 - `verify_akbsm_proposal_contextmemory_metadata_scenarios.py`
 
 They must verify:

@@ -45,6 +45,7 @@ python tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py
 python tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py
 python tools/verify_akbsm_proposal_contextmemory_metadata_adr.py
 python tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py
+python tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -102,6 +103,13 @@ in `clc/runtime/akbsm_proposal_contextmemory_metadata.py`; it creates immutable
 temporary metadata payloads only, does not write into ContextMemory, does not
 call `ContextMemoryManager`, adds no proposal storage or review record
 persistence, and has no normal runtime wiring.
+The scenario/test-only ContextMemory metadata integration scaffold also exists
+in `clc/runtime/akbsm_proposal_contextmemory_metadata.py`; because no safe
+temporary ContextMemory placement API exists yet, it returns a temporary
+metadata-only deferred-boundary result instead of writing review records into
+ContextMemory. It adds no permanent proposal storage, no permanent review
+record persistence, no proposal commit/apply/save/write/persist/mutate path,
+and no normal runtime wiring.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
