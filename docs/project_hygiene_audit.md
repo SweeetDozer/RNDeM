@@ -234,6 +234,15 @@ text, design-only status, allowed temporary metadata shape, forbidden
 data/instructions, forbidden authorities, TTL/retention requirements, rejected
 alternatives, doc references, and existing AKBSM proposal safety verifiers.
 
+`clc/runtime/akbsm_proposal_contextmemory_metadata.py`,
+`scenarios/akbsm_proposal_contextmemory_metadata_scaffold.json`, and
+`tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py` add
+scenario/test-only ContextMemory-compatible metadata payload scaffold coverage.
+The scaffold builds immutable temporary metadata payloads only, does not write
+into ContextMemory, does not call `ContextMemoryManager`, does not persist
+review records, adds no proposal storage, keeps normal runtime unwired, and
+keeps AKBSM writes blocked.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and

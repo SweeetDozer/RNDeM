@@ -238,6 +238,13 @@ allows only a future scenario/test-only temporary metadata copy of proposal
 review records; it does not implement ContextMemory integration, proposal
 storage, review record persistence, normal runtime wiring, or AKBSM writes.
 
+The current ContextMemory-compatible metadata scaffold lives in
+`clc/runtime/akbsm_proposal_contextmemory_metadata.py`. It creates immutable
+temporary metadata payloads from review records and optional transition results
+for scenario/test use only. It does not write into ContextMemory, call
+`ContextMemoryManager`, persist review records, add proposal storage, or wire
+the lifecycle into normal runtime.
+
 ## No-write safety model
 
 The lifecycle should classify temporary proposal metadata only. It must not be
@@ -256,6 +263,7 @@ Current verifier:
 - `verify_akbsm_draft_proposal_transition_controller_adr.py`
 - `verify_akbsm_draft_proposal_transition_controller_scenarios.py`
 - `verify_akbsm_proposal_contextmemory_metadata_adr.py`
+- `verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
 
 Future verifiers:
 

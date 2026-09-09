@@ -4,6 +4,9 @@
 
 This ADR is design-only.
 
+The scenario/test-only ContextMemory-compatible metadata payload scaffold is
+implemented. It is not actual ContextMemory integration.
+
 No ContextMemory integration is implemented by this pass.
 No proposal storage is added by this pass.
 No review record persistence is added by this pass.
@@ -45,6 +48,10 @@ The first integration scope is limited to scenario/test harnesses that already
 create temporary proposal review records and transition controller results.
 Those harnesses may copy review metadata into temporary ContextMemory metadata
 only after a later explicit implementation pass.
+
+The current scaffold creates immutable temporary metadata payload objects only.
+It does not write into ContextMemory, does not call `ContextMemoryManager`, and
+does not create proposal storage or review record persistence.
 
 The integration must not change normal runtime behavior, tick order, retention
 timing, `ContextMemoryManager.apply_pending()` placement, scoring, selection,

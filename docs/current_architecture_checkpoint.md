@@ -28,6 +28,9 @@ reflection/pressure influence are not implemented.
 - `akbsm_draft_proposal.py` defines disabled-by-default AKBSM draft proposal
   payload/provider scaffold. It is metadata-only and not wired into AKBSM
   writers, behavior modules, or storage.
+- `akbsm_proposal_contextmemory_metadata.py` defines scenario/test-only
+  ContextMemory-compatible AKBSM proposal metadata payload scaffold. It creates
+  immutable temporary metadata only and does not write into ContextMemory.
 
 `clc/context/`
 
@@ -311,6 +314,13 @@ disconnected, and AKBSM writes remain blocked. Any first future integration must
 be scenario/test-only and may only store temporary metadata copies of proposal
 review records.
 
+`clc/runtime/akbsm_proposal_contextmemory_metadata.py` adds an isolated
+scenario/test-only ContextMemory-compatible metadata payload scaffold. It builds
+immutable temporary metadata payloads from proposal review records and optional
+transition results, but does not call `ContextMemoryManager`, does not write
+into ContextMemory, does not persist files, and does not add normal runtime
+wiring.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -441,6 +451,9 @@ proposal/no-effect safety rather than canonical phase output.
   proposal queues, normal runtime wiring, or AKBSM writes until a later explicit
   implementation pass adds temporary scenario/test-only metadata coverage and
   verifiers.
+- Treat the AKBSM proposal ContextMemory metadata scaffold as payload-only
+  scenario/test infrastructure. It is not ContextMemory storage, not AKBSM write
+  approval, and not a proposal commit/apply/save/write/persist/mutate path.
 - Do not add marker 36 without an explicit marker ADR.
 - Preserve PatternRegistry semantics: debug-name strings are not semantic
   control signals.
@@ -480,6 +493,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py` | transition controller scaffold exists, requires explicit test/scenario authority, accepts only allowed metadata transitions, rejects forbidden/write-like targets, has no storage/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py` | transition controller scenario fixture coverage exists, covers allowed/forbidden/write-like transitions, immutable copy behavior, metadata-only expiration, no storage/runtime wiring, and unchanged real ExpSM/AKBSM hashes |
 | `tools/verify_akbsm_proposal_contextmemory_metadata_adr.py` | future temporary ContextMemory proposal metadata ADR exists, stays design-only, allows only scenario/test-only temporary metadata copies, forbids persistence/storage/writes/runtime wiring, and keeps existing safety verifiers passing |
+| `tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py` | ContextMemory-compatible proposal metadata payload scaffold exists, requires explicit scenario/test authority, creates immutable temporary metadata only, forbids storage/writes/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -539,6 +553,10 @@ proposal/no-effect safety rather than canonical phase output.
   ContextMemory integration is implemented; any future first integration must
   be temporary scenario/test-only metadata copies and must not create proposal
   storage, review record persistence, normal runtime wiring, or AKBSM writes.
+- AKBSM proposal ContextMemory metadata scaffold exists, but it only creates
+  temporary metadata payloads for scenario/test use. It does not write into
+  ContextMemory, call `ContextMemoryManager`, persist review records, or create
+  normal runtime wiring.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.

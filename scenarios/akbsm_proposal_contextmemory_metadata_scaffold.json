@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "name": "akbsm_proposal_contextmemory_metadata_scaffold",
+  "description": "Scenario metadata for test-only AKBSM proposal ContextMemory-compatible metadata scaffold coverage.",
+  "runtime": {
+    "profile": "draft_only",
+    "memory_is_temporary": true,
+    "max_ticks": 0
+  },
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "akbsm_contextmemory_metadata_scaffold": {
+      "test_only": true,
+      "authority": "explicit_test_scenario_harness",
+      "metadata_only": true,
+      "contextmemory_compatible": true,
+      "contextmemory_written": false,
+      "contextmemory_manager_called": false,
+      "storage_added": false,
+      "normal_runtime_wiring": false,
+      "states_covered": [
+        "review_pending",
+        "accepted_for_observation",
+        "deferred",
+        "rejected",
+        "expired"
+      ],
+      "allowed_metadata_fields": [
+        "proposal_id",
+        "proposal_reference",
+        "lifecycle_state",
+        "created_tick",
+        "updated_tick",
+        "ttl_ticks",
+        "expires_at_tick",
+        "review_reason",
+        "review_notes",
+        "transition_history",
+        "controller_result",
+        "source",
+        "temporary",
+        "storage_kind"
+      ],
+      "safety": {
+        "temporary": true,
+        "storage_kind": "metadata_only",
+        "source": "akbsm_proposal_lifecycle",
+        "accepted_for_observation_observation_only": true,
+        "deferred_pending_commit": false,
+        "rejected_authorizes_write": false,
+        "expired_authorizes_write": false,
+        "transition_result_metadata_allowed": true,
+        "missing_authority_rejected": true,
+        "unknown_authority_rejected": true,
+        "normal_runtime_default_metadata": false,
+        "storage_files_created": false,
+        "akbsm_write_forbidden": true,
+        "expsm_write_forbidden": true,
+        "marker_36_absent": true
+      },
+      "forbidden_payload_content": [
+        "full AKBSM association writes",
+        "new relation types",
+        "new concepts",
+        "ExpSM records",
+        "writer commands",
+        "commit/apply/save/write/persist/mutate instructions",
+        "behavior instructions",
+        "scoring instructions",
+        "guard instructions",
+        "Mode C instructions",
+        "PolicyPressureReview instructions"
+      ]
+    }
+  }
+}

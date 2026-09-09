@@ -135,6 +135,12 @@ Draft proposal ContextMemory metadata integration ADR exists:
 - `docs/adr_akbsm_proposal_contextmemory_metadata_integration.md`
 - `tools/verify_akbsm_proposal_contextmemory_metadata_adr.py`
 
+Draft proposal ContextMemory metadata payload scaffold exists:
+
+- `clc/runtime/akbsm_proposal_contextmemory_metadata.py`
+- `tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
+- `scenarios/akbsm_proposal_contextmemory_metadata_scaffold.json`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -192,6 +198,11 @@ integration is implemented, no proposal storage is added, no review record
 persistence is added, normal runtime remains disconnected, and AKBSM writes
 remain blocked. Any first future integration may only store temporary
 scenario/test-only metadata copies of AKBSM proposal review records.
+
+The ContextMemory-compatible metadata scaffold creates immutable temporary
+payloads only. It does not write into ContextMemory, does not call
+`ContextMemoryManager`, does not persist review records, does not add proposal
+storage, and does not add normal runtime wiring.
 
 ## Scenario coverage
 
@@ -251,6 +262,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_draft_proposal_transition_controller_scaffold.py`
 - `tools/verify_akbsm_draft_proposal_transition_controller_scenarios.py`
 - `tools/verify_akbsm_proposal_contextmemory_metadata_adr.py`
+- `tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py`
 
 Existing core guards:
 
@@ -316,6 +328,10 @@ commit AKBSM writes.
 - AKBSM proposal ContextMemory metadata integration is design-only. No
   ContextMemory integration, review record persistence, proposal storage,
   normal runtime wiring, or AKBSM write path is implemented.
+- AKBSM proposal ContextMemory-compatible metadata payload scaffold exists, but
+  it is scenario/test-only, writes nothing into ContextMemory, calls no
+  `ContextMemoryManager`, and creates no commit/apply/save/write/persist/mutate
+  path.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.
