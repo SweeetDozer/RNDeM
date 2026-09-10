@@ -281,6 +281,13 @@ into normal runtime, scaffold does not create permanent storage/queues, AKBSM
 proposal metadata remains non-authoritative for writes, and AKBSM writes remain
 blocked.
 
+A scenario/test-only AKBSM proposal adapter now targets that generic scaffold.
+It converts proposal review metadata to local temporary metadata only when
+explicit authority and TTL/expiration are present. It does not call
+`ContextMemoryManager`, does not write into real ContextMemory, does not create
+proposal storage or review record persistence, and does not add normal runtime
+wiring.
+
 ## Next Steps
 
 Review this ADR before any implementation pass.

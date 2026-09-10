@@ -158,6 +158,12 @@ ContextMemory temporary metadata placement scaffold exists:
 - `tools/verify_contextmemory_temporary_metadata_placement_scaffold.py`
 - `scenarios/contextmemory_temporary_metadata_placement_scaffold.json`
 
+AKBSM proposal temporary metadata placement adapter exists:
+
+- `clc/runtime/akbsm_proposal_contextmemory_metadata.py`
+- `tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py`
+- `scenarios/akbsm_proposal_temporary_metadata_placement_adapter.json`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -302,6 +308,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
 - `tools/verify_contextmemory_temporary_metadata_placement_api_adr.py`
 - `tools/verify_contextmemory_temporary_metadata_placement_scaffold.py`
+- `tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py`
 
 Existing core guards:
 
@@ -385,6 +392,11 @@ commit AKBSM writes.
   metadata-only temporary entries, rejects write-like metadata, is not wired
   into normal runtime, does not create permanent storage/queues, and keeps
   AKBSM proposal metadata non-authoritative for writes.
+- AKBSM proposal temporary metadata placement adapter exists, but it only
+  targets the generic local temporary metadata scaffold under explicit
+  scenario/test authority and TTL/expiration; it calls no
+  `ContextMemoryManager`, creates no real ContextMemory placement, and adds no
+  normal runtime wiring.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

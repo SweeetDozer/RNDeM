@@ -305,3 +305,10 @@ authority and TTL/expiration, accepts metadata-only temporary entries, rejects
 write-like metadata, remains local-only, is not wired into normal runtime, does
 not create permanent storage/queues, and does not make AKBSM proposal metadata
 authoritative for writes.
+
+`clc/runtime/akbsm_proposal_contextmemory_metadata.py` now includes a
+scenario/test-only adapter that can place AKBSM proposal review metadata into
+the generic local temporary metadata scaffold. The adapter requires explicit
+scenario/test authority and TTL/expiration, remains no-op without authority,
+rejects write-like metadata through the generic scaffold, calls no
+`ContextMemoryManager`, creates no storage, and adds no normal runtime wiring.

@@ -48,6 +48,7 @@ python tools/verify_akbsm_proposal_contextmemory_metadata_scaffold.py
 python tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py
 python tools/verify_contextmemory_temporary_metadata_placement_api_adr.py
 python tools/verify_contextmemory_temporary_metadata_placement_scaffold.py
+python tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -124,6 +125,12 @@ exists in `clc/runtime/context_temporary_metadata.py`; it requires explicit
 authority and TTL/expiration, accepts metadata-only temporary entries, rejects
 write-like metadata, is not wired into normal runtime, creates no permanent
 storage/queues, and keeps AKBSM proposal metadata non-authoritative for writes.
+The AKBSM proposal temporary metadata placement adapter exists in
+`clc/runtime/akbsm_proposal_contextmemory_metadata.py`; it converts proposal
+review metadata into the generic local temporary metadata scaffold only under
+explicit scenario/test authority with TTL/expiration, remains no-op without
+that authority, rejects write-like metadata, and does not call
+`ContextMemoryManager` or wire into normal runtime.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

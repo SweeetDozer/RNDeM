@@ -270,6 +270,15 @@ an explicitly created placement object, is not wired into normal runtime, does
 not create permanent storage/queues, keeps AKBSM proposal metadata
 non-authoritative for writes, and keeps AKBSM writes blocked.
 
+`clc/runtime/akbsm_proposal_contextmemory_metadata.py`,
+`scenarios/akbsm_proposal_temporary_metadata_placement_adapter.json`, and
+`tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py` add
+scenario/test-only adapter coverage from AKBSM proposal review metadata into
+the generic local temporary metadata placement scaffold. The adapter requires
+explicit authority and TTL/expiration, remains no-op without authority, rejects
+write-like metadata, does not call `ContextMemoryManager`, creates no storage,
+keeps normal runtime unwired, and keeps AKBSM writes blocked.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and

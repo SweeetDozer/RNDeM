@@ -266,6 +266,13 @@ temporary entries, rejects write-like metadata, remains local-only and unwired,
 does not create permanent storage/queues, and keeps AKBSM proposal metadata
 non-authoritative for writes.
 
+The AKBSM proposal temporary metadata placement adapter now exists in
+`clc/runtime/akbsm_proposal_contextmemory_metadata.py` for scenario/test use
+only. It converts proposal review metadata into the generic local temporary
+metadata scaffold only under explicit authority with TTL/expiration, rejects
+write-like metadata, does not call `ContextMemoryManager`, does not add
+proposal storage, and does not wire the lifecycle into normal runtime.
+
 ## No-write safety model
 
 The lifecycle should classify temporary proposal metadata only. It must not be
@@ -288,6 +295,7 @@ Current verifier:
 - `verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.py`
 - `verify_contextmemory_temporary_metadata_placement_api_adr.py`
 - `verify_contextmemory_temporary_metadata_placement_scaffold.py`
+- `verify_akbsm_proposal_temporary_metadata_placement_adapter.py`
 
 Future verifiers:
 

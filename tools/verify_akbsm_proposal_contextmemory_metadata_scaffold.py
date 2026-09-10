@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from dataclasses import FrozenInstanceError
@@ -426,8 +427,17 @@ def _case_marker_36_absent() -> bool:
 
 
 def _run_core_verifiers() -> bool:
+    if os.environ.get("RNDEM_VERIFIER_SHALLOW") == "1":
+        return True
+    env = os.environ.copy()
+    env["RNDEM_VERIFIER_SHALLOW"] = "1"
     for relative_path in CORE_VERIFIERS:
-        result = subprocess.run([sys.executable, "-B", relative_path], cwd=ROOT, check=False)
+        result = subprocess.run(
+            [sys.executable, "-B", relative_path],
+            cwd=ROOT,
+            check=False,
+            env=env,
+        )
         if result.returncode != 0:
             return False
     return True

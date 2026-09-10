@@ -10,6 +10,11 @@ from clc.runtime.akbsm_proposal_lifecycle import (
     AKBSMProposalReviewRecord,
     AKBSMProposalTransitionResult,
 )
+from clc.runtime.context_temporary_metadata import (
+    CONTEXT_TEMPORARY_METADATA_TEST_SCENARIO_AUTHORITY,
+    ContextTemporaryMetadataPlacement,
+    ContextTemporaryMetadataPlacementResult,
+)
 
 
 AKBSM_PROPOSAL_CONTEXT_METADATA_TEST_SCENARIO_AUTHORITY = (
@@ -22,6 +27,8 @@ AKBSM_PROPOSAL_CONTEXT_METADATA_SOURCE = "akbsm_proposal_lifecycle"
 AKBSM_PROPOSAL_CONTEXT_METADATA_STORAGE_KIND = "metadata_only"
 AKBSM_PROPOSAL_CONTEXT_METADATA_INTEGRATION_KIND = "temporary_metadata_boundary"
 AKBSM_PROPOSAL_CONTEXT_METADATA_PLACEMENT = "deferred"
+AKBSM_PROPOSAL_TEMPORARY_METADATA_NAMESPACE = "akbsm_proposal_review"
+AKBSM_PROPOSAL_TEMPORARY_METADATA_KIND = "akbsm_proposal_review_metadata"
 
 
 @dataclass(frozen=True)
@@ -272,6 +279,44 @@ class AKBSMProposalContextMemoryMetadataIntegration:
         return AKBSMProposalContextMemoryMetadataIntegrationResult(metadata=metadata)
 
 
+@dataclass(frozen=True)
+class AKBSMProposalTemporaryMetadataPlacementAdapter:
+    """Scenario/test-only adapter into the local temporary metadata scaffold."""
+
+    authority: str | None = None
+
+    def place_metadata(
+        self,
+        metadata: AKBSMProposalContextMemoryMetadata,
+        placement: ContextTemporaryMetadataPlacement | None = None,
+        *,
+        authority: str | None = None,
+    ) -> ContextTemporaryMetadataPlacementResult | None:
+        active_authority = authority if authority is not None else self.authority
+        if active_authority != AKBSM_PROPOSAL_CONTEXT_METADATA_INTEGRATION_TEST_SCENARIO_AUTHORITY:
+            return None
+        if active_authority != CONTEXT_TEMPORARY_METADATA_TEST_SCENARIO_AUTHORITY:
+            return None
+        if not isinstance(metadata, AKBSMProposalContextMemoryMetadata):
+            raise TypeError("metadata must be AKBSMProposalContextMemoryMetadata")
+        payload = metadata.as_payload()
+        if payload["ttl_ticks"] is None and payload["expires_at_tick"] is None:
+            return None
+        target = placement if placement is not None else ContextTemporaryMetadataPlacement()
+        return target.place_temporary_metadata(
+            _placement_payload(metadata),
+            namespace=AKBSM_PROPOSAL_TEMPORARY_METADATA_NAMESPACE,
+            source=AKBSM_PROPOSAL_CONTEXT_METADATA_SOURCE,
+            authority=active_authority,
+            created_tick=payload["created_tick"],
+            ttl_ticks=payload["ttl_ticks"],
+            expires_at_tick=payload["expires_at_tick"],
+            notes=payload["review_notes"],
+            payload_kind=AKBSM_PROPOSAL_TEMPORARY_METADATA_KIND,
+            payload_reference={"proposal_id": payload["proposal_id"]},
+        )
+
+
 def build_metadata(
     record: AKBSMProposalReviewRecord,
     transition_result: AKBSMProposalTransitionResult | None = None,
@@ -285,6 +330,40 @@ def build_metadata(
         transition_result,
         authority=authority,
         expires_at_tick=expires_at_tick,
+    )
+
+
+def place_akbsm_proposal_temporary_metadata(
+    metadata: AKBSMProposalContextMemoryMetadata,
+    placement: ContextTemporaryMetadataPlacement | None = None,
+    *,
+    authority: str | None = None,
+) -> ContextTemporaryMetadataPlacementResult | None:
+    adapter = AKBSMProposalTemporaryMetadataPlacementAdapter()
+    return adapter.place_metadata(metadata, placement, authority=authority)
+
+
+def _placement_payload(metadata: AKBSMProposalContextMemoryMetadata) -> MappingProxyType[str, Any]:
+    payload = metadata.as_payload()
+    return MappingProxyType(
+        {
+            "proposal_id": payload["proposal_id"],
+            "proposal_reference": payload["proposal_reference"],
+            "lifecycle_state": payload["lifecycle_state"],
+            "created_tick": payload["created_tick"],
+            "updated_tick": payload["updated_tick"],
+            "ttl_ticks": payload["ttl_ticks"],
+            "expires_at_tick": payload["expires_at_tick"],
+            "review_reason": payload["review_reason"],
+            "review_notes": payload["review_notes"],
+            "transition_history": payload["transition_history"],
+            "controller_result": payload["controller_result"],
+            "source": payload["source"],
+            "temporary": True,
+            "storage_kind": AKBSM_PROPOSAL_CONTEXT_METADATA_STORAGE_KIND,
+            "observation_only": True,
+            "placement_adapter": AKBSM_PROPOSAL_TEMPORARY_METADATA_KIND,
+        }
     )
 
 
