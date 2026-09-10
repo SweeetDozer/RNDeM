@@ -256,6 +256,13 @@ no-writer-command reports, no behavior/scoring/guard/Mode C/PolicyPressureReview
 instruction reports, AKBSM proposal metadata remaining non-authoritative for
 writes, and no normal runtime or `_run_tick()` observer calls.
 
+`docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md` now records the
+next possible diagnostic runtime wiring boundary. The diagnostic runtime wiring
+ADR exists as design-only guidance: diagnostic runtime wiring is not
+implemented yet, no `_run_tick()` wiring exists, the observer remains unwired
+from behavior paths, no real ContextMemory reads/writes exist, and AKBSM writes
+remain blocked.
+
 ## Next steps
 
 Review the read-only scenario/test-only ContextMemory temporary metadata

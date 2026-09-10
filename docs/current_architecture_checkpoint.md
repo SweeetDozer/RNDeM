@@ -365,6 +365,12 @@ active-ignore behavior, no-writer-command/no-instruction report shape, AKBSM
 proposal metadata remaining non-authoritative for writes, and no normal runtime
 or `_run_tick()` observer calls.
 
+`docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md` defines the
+design-only future diagnostic runtime wiring boundary. Diagnostic runtime
+wiring is not implemented yet, no `_run_tick()` wiring exists, the observer
+remains unwired from behavior paths, no real ContextMemory reads/writes exist,
+no behavior/scoring/guard influence exists, and AKBSM writes remain blocked.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -560,6 +566,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py` | temporary metadata runtime observation ADR exists, stays design-only, limits future observation to read-only diagnostics, forbids behavior influence/runtime wiring/storage/writes, and keeps existing safety verifiers passing |
 | `tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py` | read-only temporary metadata observation scaffold exists, requires explicit diagnostic authority, ignores expired metadata as active metadata, proves no behavior/scoring/guard/Mode C/PolicyPressureReview/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py` | negative/no-behavior coverage proves observation authority separation, expired metadata active-ignore behavior, no writer commands or behavior/scoring/guard/Mode C/PolicyPressureReview instructions in reports, no runtime wiring, and unchanged real ExpSM/AKBSM hashes |
+| `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py` | diagnostic runtime wiring ADR exists, stays design-only, forbids `_run_tick()` default wiring and behavior influence, requires authority-gated diagnostic-only future wiring, and keeps existing safety verifiers passing |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -659,6 +666,10 @@ proposal/no-effect safety rather than canonical phase output.
   behavior/scoring/guard/Mode C/PolicyPressureReview instructions in reports,
   AKBSM proposal metadata remaining non-authoritative, and no normal runtime
   or `_run_tick()` observer wiring.
+- Diagnostic runtime wiring ADR exists, but it is design-only. Diagnostic
+  runtime wiring is not implemented yet; no `_run_tick()` wiring exists, the
+  observer remains unwired from behavior paths, no real ContextMemory
+  reads/writes exist, and AKBSM writes remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.

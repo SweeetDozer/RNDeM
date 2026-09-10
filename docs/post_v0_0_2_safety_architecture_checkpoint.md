@@ -185,6 +185,11 @@ Temporary metadata runtime observation negative/no-behavior coverage exists:
 - `tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py`
 - `scenarios/contextmemory_temporary_metadata_runtime_observation_negative_no_behavior.json`
 
+Temporary metadata diagnostic runtime wiring ADR exists:
+
+- `docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`
+- `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -334,6 +339,7 @@ New/important safety architecture verifiers:
 - `tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py`
 - `tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py`
 - `tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py`
+- `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py`
 
 Existing core guards:
 
@@ -443,6 +449,11 @@ commit AKBSM writes.
   metadata, reports contain no writer commands or behavior/scoring/guard/Mode
   C/PolicyPressureReview instructions, AKBSM proposal metadata remains
   non-authoritative, and no normal runtime or `_run_tick()` observer calls exist.
+- Temporary metadata diagnostic runtime wiring ADR exists as design-only
+  guidance. Diagnostic runtime wiring is not implemented yet, no `_run_tick()`
+  wiring exists, the observer remains unwired from behavior paths, no real
+  ContextMemory reads/writes exist, no behavior/scoring/guard influence exists,
+  and AKBSM writes remain blocked.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

@@ -302,6 +302,13 @@ active metadata, returns metadata-only diagnostic reports, does not call
 `ContextMemoryManager`, performs no real ContextMemory reads/writes, does not
 wire into normal runtime or `_run_tick()`, and does not authorize AKBSM writes.
 
+Before any diagnostic runtime wiring, review
+`docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`. That
+diagnostic runtime wiring ADR exists as design-only guidance: diagnostic
+runtime wiring is not implemented yet, no `_run_tick()` wiring exists, the
+observer remains unwired from behavior paths, no real ContextMemory reads/writes
+exist, and AKBSM writes remain blocked.
+
 ## Next Steps
 
 Review this ADR before any implementation pass.

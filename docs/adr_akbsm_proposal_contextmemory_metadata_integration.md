@@ -326,3 +326,10 @@ proposal metadata remains metadata-only when observed: `accepted_for_observation
 is not write approval, `deferred` is not pending commit, rejected/expired states
 remain non-authoritative, no proposal storage or review record persistence is
 added, and no normal runtime wiring exists.
+
+`docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md` defines the
+future diagnostic runtime wiring boundary as design-only. Diagnostic runtime
+wiring is not implemented yet, no `_run_tick()` wiring exists, the observer
+remains unwired from behavior paths, no real ContextMemory reads/writes exist,
+AKBSM proposal metadata remains non-authoritative for writes, and AKBSM writes
+remain blocked.

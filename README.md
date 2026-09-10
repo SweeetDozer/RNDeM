@@ -18,6 +18,7 @@ Start with:
 - `docs/adr_akbsm_proposal_contextmemory_metadata_integration.md`
 - `docs/adr_contextmemory_temporary_metadata_placement_api.md`
 - `docs/adr_contextmemory_temporary_metadata_runtime_observation.md`
+- `docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -55,6 +56,7 @@ python tools/verify_contextmemory_temporary_metadata_negative_retention.py
 python tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py
 python tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py
 python tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py
+python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -160,6 +162,11 @@ Negative/no-behavior coverage for that observer exists in
 it covers authority separation, expired metadata active-ignore behavior,
 no-writer-command/no-instruction reports, AKBSM proposal metadata remaining
 non-authoritative, and the observer staying unwired from normal runtime.
+The diagnostic runtime wiring ADR exists in
+`docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`; it is
+design-only, diagnostic runtime wiring is not implemented yet, no `_run_tick()`
+wiring exists, the observer remains unwired from behavior paths, no real
+ContextMemory reads/writes exist, and AKBSM writes remain blocked.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

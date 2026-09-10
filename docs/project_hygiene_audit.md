@@ -317,6 +317,15 @@ C/PolicyPressureReview instructions, AKBSM proposal metadata remains
 non-authoritative for writes, and the observer remains unwired from normal
 runtime and `_run_tick()`.
 
+`docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md` and
+`tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py` add a
+design-only ADR for first controlled diagnostic runtime wiring. Diagnostic
+runtime wiring is not implemented yet, no runtime source code changed, no
+`_run_tick()` wiring exists, the observer remains unwired from behavior paths,
+no real ContextMemory reads/writes exist, no behavior/scoring/guard influence
+exists, AKBSM proposal metadata remains non-authoritative for writes, and AKBSM
+writes remain blocked.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -358,3 +367,5 @@ in a later packaging pass.
     diagnostic wiring with no behavior influence.
 15. Keep observer negative/no-behavior coverage green before considering any
     normal-runtime diagnostic observation wiring.
+16. Review `docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`
+    before adding any diagnostic runtime wiring surface.
