@@ -326,6 +326,16 @@ no real ContextMemory reads/writes exist, no behavior/scoring/guard influence
 exists, AKBSM proposal metadata remains non-authoritative for writes, and AKBSM
 writes remain blocked.
 
+`clc/runtime/context_temporary_metadata_diagnostics.py`,
+`scenarios/contextmemory_temporary_metadata_diagnostic_wiring_scaffold.json`,
+and `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py`
+add the explicit diagnostic runtime-facing scaffold. It is manually
+authority-gated, wraps only the existing local observer, returns read-only
+metadata-only reports, has no normal runtime or `_run_tick()` wiring, calls no
+`ContextMemoryManager`, creates no storage or queues, performs no real
+ContextMemory reads/writes, and includes no-behavior-influence checks in the
+scaffold verifier.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -369,3 +379,6 @@ in a later packaging pass.
     normal-runtime diagnostic observation wiring.
 16. Review `docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`
     before adding any diagnostic runtime wiring surface.
+17. Keep the explicit temporary metadata diagnostic scaffold manual-only until
+    a later approved pass adds any broader diagnostic path with equivalent
+    no-behavior-influence coverage.

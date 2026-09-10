@@ -333,3 +333,10 @@ wiring is not implemented yet, no `_run_tick()` wiring exists, the observer
 remains unwired from behavior paths, no real ContextMemory reads/writes exist,
 AKBSM proposal metadata remains non-authoritative for writes, and AKBSM writes
 remain blocked.
+
+`clc/runtime/context_temporary_metadata_diagnostics.py` now provides the
+explicit diagnostic runtime-facing scaffold for local temporary metadata
+observation. It is authority-gated, metadata-only, read-only, not wired into
+normal runtime or `_run_tick()`, calls no `ContextMemoryManager`, performs no
+real ContextMemory reads/writes, creates no storage or queues, and does not
+turn AKBSM proposal metadata into write approval.

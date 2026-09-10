@@ -298,6 +298,17 @@ behavior paths. No real ContextMemory reads/writes exist. No behavior/scoring/
 guard influence exists. AKBSM proposal metadata remains non-authoritative for
 writes. AKBSM writes remain blocked.
 
+A later implementation scaffold adds
+`clc/runtime/context_temporary_metadata_diagnostics.py` as the explicit
+runtime-facing diagnostic surface named above. The scaffold is still not normal
+runtime wiring: it requires `explicit_runtime_diagnostic_harness`, wraps the
+existing local observer, returns immutable read-only metadata-only diagnostic
+reports, is not called from `_run_tick()`, calls no `ContextMemoryManager`,
+performs no real ContextMemory reads/writes, and cannot authorize storage,
+queues, proposal commits, AKBSM writes, ExpSM writes, or behavior influence.
+The scaffold verifier includes the no-behavior-influence checks that were
+previously listed as a possible separate verifier.
+
 ## Next steps
 
 Review this ADR before any controlled diagnostic runtime observation wiring

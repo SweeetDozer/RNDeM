@@ -57,6 +57,7 @@ python tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py
 python tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py
 python tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py
 python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py
+python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -167,6 +168,16 @@ The diagnostic runtime wiring ADR exists in
 design-only, diagnostic runtime wiring is not implemented yet, no `_run_tick()`
 wiring exists, the observer remains unwired from behavior paths, no real
 ContextMemory reads/writes exist, and AKBSM writes remain blocked.
+The explicit temporary metadata diagnostic wiring scaffold exists in
+`clc/runtime/context_temporary_metadata_diagnostics.py`; it is manually
+authority-gated by `explicit_runtime_diagnostic_harness`, wraps the existing
+local observer as read-only metadata-only diagnostics, is not wired into normal
+runtime or `_run_tick()`, calls no `ContextMemoryManager`, performs no real
+ContextMemory reads/writes, creates no storage or queues, and cannot influence
+behavior, scoring, guards, Mode C, `PolicyPressureReview`, or writers. The
+no-behavior-influence proof is included in
+`tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py`;
+no separate no-behavior verifier file is required for this scaffold.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

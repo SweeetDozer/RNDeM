@@ -263,6 +263,14 @@ implemented yet, no `_run_tick()` wiring exists, the observer remains unwired
 from behavior paths, no real ContextMemory reads/writes exist, and AKBSM writes
 remain blocked.
 
+The later explicit diagnostic wiring scaffold exists in
+`clc/runtime/context_temporary_metadata_diagnostics.py`. It remains outside
+normal runtime and `_run_tick()`, requires
+`explicit_runtime_diagnostic_harness`, observes only the local temporary
+metadata scaffold through the existing observer, and returns read-only
+metadata-only diagnostics with no behavior/scoring/guard/Mode C/
+PolicyPressureReview or writer influence.
+
 ## Next steps
 
 Review the read-only scenario/test-only ContextMemory temporary metadata

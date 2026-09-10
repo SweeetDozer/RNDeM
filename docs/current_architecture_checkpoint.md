@@ -567,6 +567,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py` | read-only temporary metadata observation scaffold exists, requires explicit diagnostic authority, ignores expired metadata as active metadata, proves no behavior/scoring/guard/Mode C/PolicyPressureReview/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py` | negative/no-behavior coverage proves observation authority separation, expired metadata active-ignore behavior, no writer commands or behavior/scoring/guard/Mode C/PolicyPressureReview instructions in reports, no runtime wiring, and unchanged real ExpSM/AKBSM hashes |
 | `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py` | diagnostic runtime wiring ADR exists, stays design-only, forbids `_run_tick()` default wiring and behavior influence, requires authority-gated diagnostic-only future wiring, and keeps existing safety verifiers passing |
+| `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py` | explicit temporary metadata diagnostic wiring scaffold exists, requires runtime diagnostic authority, wraps only the local observer, stays read-only/metadata-only/unwired from normal runtime and `_run_tick()`, includes no-behavior-influence proof, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -668,6 +669,14 @@ proposal/no-effect safety rather than canonical phase output.
   or `_run_tick()` observer wiring.
 - Diagnostic runtime wiring ADR exists, but it is design-only. Diagnostic
   runtime wiring is not implemented yet; no `_run_tick()` wiring exists, the
+  observer remains unwired from behavior paths, no real ContextMemory reads/
+  writes exist, and AKBSM writes remain blocked.
+- Explicit temporary metadata diagnostic wiring scaffold exists, but it is
+  manually authority-gated and diagnostic-only. It wraps the existing local
+  observer, returns read-only metadata-only reports, has no normal runtime or
+  `_run_tick()` wiring, calls no `ContextMemoryManager`, creates no storage or
+  queues, and has no behavior/scoring/guard/Mode C/PolicyPressureReview or
+  writer influence.
   observer remains unwired from behavior paths, no real ContextMemory
   reads/writes exist, and AKBSM writes remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
