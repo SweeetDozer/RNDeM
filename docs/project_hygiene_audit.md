@@ -279,6 +279,14 @@ explicit authority and TTL/expiration, remains no-op without authority, rejects
 write-like metadata, does not call `ContextMemoryManager`, creates no storage,
 keeps normal runtime unwired, and keeps AKBSM writes blocked.
 
+`scenarios/contextmemory_temporary_metadata_negative_retention_coverage.json`
+and `tools/verify_contextmemory_temporary_metadata_negative_retention.py` add
+negative/retention coverage for the generic placement scaffold and AKBSM
+adapter. The coverage verifies authority rejection, TTL/expiration rejection,
+invalid expiration rejection, write-like key/value/nested/instruction
+rejection, local expiration/removal, no runtime wiring, no real ContextMemory
+writes, and unchanged real ExpSM/AKBSM hashes.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and

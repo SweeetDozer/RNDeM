@@ -164,6 +164,11 @@ AKBSM proposal temporary metadata placement adapter exists:
 - `tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py`
 - `scenarios/akbsm_proposal_temporary_metadata_placement_adapter.json`
 
+Temporary metadata negative/retention coverage exists:
+
+- `tools/verify_contextmemory_temporary_metadata_negative_retention.py`
+- `scenarios/contextmemory_temporary_metadata_negative_retention_coverage.json`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -309,6 +314,7 @@ New/important safety architecture verifiers:
 - `tools/verify_contextmemory_temporary_metadata_placement_api_adr.py`
 - `tools/verify_contextmemory_temporary_metadata_placement_scaffold.py`
 - `tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py`
+- `tools/verify_contextmemory_temporary_metadata_negative_retention.py`
 
 Existing core guards:
 
@@ -397,6 +403,10 @@ commit AKBSM writes.
   scenario/test authority and TTL/expiration; it calls no
   `ContextMemoryManager`, creates no real ContextMemory placement, and adds no
   normal runtime wiring.
+- Negative/retention coverage verifies missing/unknown authority rejection,
+  missing/invalid TTL/expiration rejection, write-like key/value/nested and
+  instruction rejection, local expiration/removal, and unchanged real
+  ExpSM/AKBSM memory hashes.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

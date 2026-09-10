@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "name": "contextmemory_temporary_metadata_negative_retention_coverage",
+  "description": "Scenario metadata for negative and retention coverage of temporary ContextMemory metadata placement and AKBSM proposal adapter.",
+  "runtime": {
+    "profile": "draft_only",
+    "memory_is_temporary": true,
+    "max_ticks": 0
+  },
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "contextmemory_temporary_metadata_negative_retention": {
+      "test_only": true,
+      "authority": "explicit_test_scenario_harness",
+      "metadata_only": true,
+      "temporary": true,
+      "local_only": true,
+      "ttl_required": true,
+      "placement_kind": "local_temporary_metadata",
+      "normal_runtime_wiring": false,
+      "contextmemory_manager_called": false,
+      "contextmemory_written": false,
+      "proposal_storage_added": false,
+      "review_record_persistence_added": false,
+      "permanent_files_created": false,
+      "permanent_queues_created": false,
+      "generic_cases": {
+        "missing_authority_rejected": true,
+        "unknown_authority_rejected": true,
+        "missing_ttl_or_expiration_rejected": true,
+        "invalid_ttl_or_expiration_rejected": true,
+        "write_like_payload_keys_rejected": true,
+        "write_like_payload_values_rejected": true,
+        "nested_write_like_payload_rejected": true,
+        "behavior_scoring_guard_mode_policy_instructions_rejected": true,
+        "expired_metadata_removed_or_ignored": true
+      },
+      "akbsm_adapter_cases": {
+        "missing_authority_safe_noop": true,
+        "unknown_authority_safe_noop": true,
+        "missing_ttl_or_expiration_safe_noop": true,
+        "write_like_metadata_rejected": true,
+        "accepted_for_observation_observation_only": true,
+        "deferred_pending_commit": false,
+        "rejected_authorizes_write": false,
+        "expired_authorizes_write": false,
+        "proposal_commit_allowed": false
+      },
+      "boundaries": {
+        "normal_runtime_default_placement": false,
+        "real_contextmemory_write": false,
+        "contextmemory_manager_called": false,
+        "proposal_storage_files_created": false,
+        "permanent_proposal_queue_created": false,
+        "review_record_persistence_added": false,
+        "akbsm_write_forbidden": true,
+        "expsm_write_forbidden": true,
+        "mode_c_disabled": true,
+        "policy_pressure_review_disconnected": true,
+        "marker_36_absent": true
+      },
+      "forbidden_payload_content": [
+        "commit",
+        "apply",
+        "save",
+        "write",
+        "persist",
+        "mutate",
+        "store",
+        "enqueue",
+        "flush",
+        "sync",
+        "akbsm_write",
+        "approved_for_akbsm",
+        "accepted_for_write",
+        "ready_to_write",
+        "behavior_instruction",
+        "scoring_instruction",
+        "guard_instruction",
+        "mode_c_instruction",
+        "policy_pressure_instruction"
+      ]
+    }
+  }
+}

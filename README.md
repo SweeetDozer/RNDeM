@@ -49,6 +49,7 @@ python tools/verify_akbsm_proposal_contextmemory_metadata_integration_scaffold.p
 python tools/verify_contextmemory_temporary_metadata_placement_api_adr.py
 python tools/verify_contextmemory_temporary_metadata_placement_scaffold.py
 python tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py
+python tools/verify_contextmemory_temporary_metadata_negative_retention.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -131,11 +132,18 @@ review metadata into the generic local temporary metadata scaffold only under
 explicit scenario/test authority with TTL/expiration, remains no-op without
 that authority, rejects write-like metadata, and does not call
 `ContextMemoryManager` or wire into normal runtime.
+Negative/retention coverage for the generic placement scaffold and AKBSM
+adapter exists in
+`scenarios/contextmemory_temporary_metadata_negative_retention_coverage.json`;
+it covers authority rejection, TTL/expiration rejection, invalid expiration,
+write-like key/value/nested/instruction rejection, expired metadata removal,
+and preserves the no-runtime-wiring/no-real-ContextMemory-write boundary.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
 
 Git is configured for this prototype. `main` contains the current baseline and
 tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, `v0.0.5`, `v0.0.6`, `v0.0.7`,
-`v0.0.8`, `v0.0.9`, `v0.0.10`, `v0.0.11`, and `v0.1.0`;
+`v0.0.8`, `v0.0.9`, `v0.0.10`, `v0.0.11`, `v0.1.0`, `v0.2.0`, `v0.3.0`,
+and `v0.4.0`;
 architecture/design branches should be reviewed and merged manually.

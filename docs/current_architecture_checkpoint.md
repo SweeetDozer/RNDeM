@@ -536,6 +536,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_contextmemory_temporary_metadata_placement_api_adr.py` | temporary ContextMemory metadata placement API ADR exists, stays design-only, requires future scenario/test-only authority and TTL/expiration, forbids storage/writes/runtime wiring/behavior influence, and keeps existing safety verifiers passing |
 | `tools/verify_contextmemory_temporary_metadata_placement_scaffold.py` | ContextMemory temporary metadata placement scaffold exists, requires explicit scenario/test authority and TTL/expiration, rejects write-like metadata, stays local-only/unwired, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py` | AKBSM proposal temporary metadata placement adapter requires explicit scenario/test authority and TTL/expiration, converts proposal review metadata into the generic local scaffold only, rejects write-like metadata, has no ContextMemoryManager/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
+| `tools/verify_contextmemory_temporary_metadata_negative_retention.py` | negative/retention coverage verifies generic placement and AKBSM adapter reject missing/unknown authority, missing/invalid TTL/expiration, write-like keys/values/nested instructions, expire temporary metadata locally, preserve no runtime wiring, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -617,6 +618,10 @@ proposal/no-effect safety rather than canonical phase output.
   targets the generic local temporary metadata scaffold under explicit
   scenario/test authority and TTL/expiration; it adds no real ContextMemory
   writes or normal runtime wiring.
+- Negative/retention coverage exists for generic temporary metadata placement
+  and the AKBSM adapter, covering authority rejection, TTL/expiration rejection,
+  invalid expiration, write-like metadata rejection, nested instruction
+  rejection, and local expiration/removal without real memory mutation.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.
