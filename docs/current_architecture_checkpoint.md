@@ -351,6 +351,14 @@ observation is implemented, future observation is read-only diagnostic material
 only, no normal runtime wiring exists, observation authority is not placement or
 write authority, and AKBSM writes remain blocked.
 
+`clc/runtime/context_temporary_metadata_observation.py` adds an isolated
+read-only diagnostic observation scaffold for local temporary metadata placement
+state. It requires explicit observation authority, ignores expired metadata as
+active metadata, may include expired entries only as diagnostics, returns
+metadata-only reports, has no normal runtime or `_run_tick()` wiring, performs
+no real ContextMemory writes, and does not influence behavior/scoring/guards/
+Mode C/PolicyPressureReview.
+
 ## Reflection and pressure chain
 
 The runtime-only reflection/pressure chain is:
@@ -544,6 +552,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py` | AKBSM proposal temporary metadata placement adapter requires explicit scenario/test authority and TTL/expiration, converts proposal review metadata into the generic local scaffold only, rejects write-like metadata, has no ContextMemoryManager/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_contextmemory_temporary_metadata_negative_retention.py` | negative/retention coverage verifies generic placement and AKBSM adapter reject missing/unknown authority, missing/invalid TTL/expiration, write-like keys/values/nested instructions, expire temporary metadata locally, preserve no runtime wiring, and leave real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py` | temporary metadata runtime observation ADR exists, stays design-only, limits future observation to read-only diagnostics, forbids behavior influence/runtime wiring/storage/writes, and keeps existing safety verifiers passing |
+| `tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py` | read-only temporary metadata observation scaffold exists, requires explicit diagnostic authority, ignores expired metadata as active metadata, proves no behavior/scoring/guard/Mode C/PolicyPressureReview/runtime wiring, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -633,6 +642,11 @@ proposal/no-effect safety rather than canonical phase output.
   No runtime observation is implemented; future observation is read-only
   diagnostic material only, no normal runtime wiring exists, no behavior
   influence is approved, and AKBSM writes remain blocked.
+- Read-only temporary metadata runtime observation scaffold exists, but it is
+  local/scaffold-only and diagnostic-only. It requires explicit observation
+  authority, ignores expired metadata as active metadata, has no normal runtime
+  or `_run_tick()` wiring, creates no real ContextMemory writes, and does not
+  influence behavior/scoring/guards/Mode C/PolicyPressureReview.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
 - Real-input scenarios are still simple audio/sensor probes, but now include
   mixed, stable, conflict, retention, value/target, and guard-audit coverage.

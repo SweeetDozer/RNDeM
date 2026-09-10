@@ -174,6 +174,12 @@ Temporary metadata runtime observation ADR exists:
 - `docs/adr_contextmemory_temporary_metadata_runtime_observation.md`
 - `tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py`
 
+Read-only temporary metadata runtime observation scaffold exists:
+
+- `clc/runtime/context_temporary_metadata_observation.py`
+- `tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py`
+- `scenarios/contextmemory_temporary_metadata_runtime_observation_scaffold.json`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -321,6 +327,7 @@ New/important safety architecture verifiers:
 - `tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py`
 - `tools/verify_contextmemory_temporary_metadata_negative_retention.py`
 - `tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py`
+- `tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py`
 
 Existing core guards:
 
@@ -418,6 +425,12 @@ commit AKBSM writes.
   read-only diagnostic material, authority-gated, TTL-aware, unwired from
   normal behavior, and unable to approve storage, proposal queues, or AKBSM/
   ExpSM writes.
+- Read-only temporary metadata runtime observation scaffold exists for local
+  placement scaffold state only. It requires explicit diagnostic authority,
+  ignores expired metadata as active metadata, returns metadata-only reports,
+  has no normal runtime or `_run_tick()` wiring, calls no `ContextMemoryManager`,
+  performs no real ContextMemory writes, and cannot influence behavior/scoring/
+  guards/Mode C/PolicyPressureReview.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

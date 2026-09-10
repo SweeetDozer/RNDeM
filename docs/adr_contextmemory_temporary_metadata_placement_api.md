@@ -295,6 +295,13 @@ future observation must be read-only diagnostic material, no normal runtime
 wiring exists, no behavior influence is approved, and AKBSM writes remain
 blocked.
 
+`clc/runtime/context_temporary_metadata_observation.py` now provides an
+isolated read-only observation scaffold over the local placement object. The
+observer requires explicit diagnostic authority, ignores expired metadata as
+active metadata, returns metadata-only diagnostic reports, does not call
+`ContextMemoryManager`, performs no real ContextMemory reads/writes, does not
+wire into normal runtime or `_run_tick()`, and does not authorize AKBSM writes.
+
 ## Next Steps
 
 Review this ADR before any implementation pass.

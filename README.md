@@ -53,6 +53,7 @@ python tools/verify_contextmemory_temporary_metadata_placement_scaffold.py
 python tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py
 python tools/verify_contextmemory_temporary_metadata_negative_retention.py
 python tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py
+python tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -146,6 +147,13 @@ The temporary metadata runtime observation ADR exists in
 design-only, no runtime observation is implemented, future observation is
 limited to read-only diagnostic material, no normal runtime wiring exists, and
 AKBSM writes remain blocked.
+The read-only temporary metadata runtime observation scaffold exists in
+`clc/runtime/context_temporary_metadata_observation.py`; it observes only local
+temporary placement scaffold data under explicit diagnostic authority, ignores
+expired metadata as active metadata, returns metadata-only diagnostic reports,
+is not wired into normal runtime or `_run_tick()`, does not influence behavior,
+scoring, guards, Mode C, or `PolicyPressureReview`, performs no real
+ContextMemory writes, and leaves AKBSM writes blocked.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

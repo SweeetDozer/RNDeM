@@ -239,11 +239,20 @@ AKBSM write path.
 AKBSM writes remain blocked. Mode C remains disabled. `PolicyPressureReview`
 remains disconnected. Marker 36 remains absent.
 
+A later implementation scaffold adds
+`clc/runtime/context_temporary_metadata_observation.py` as an isolated
+read-only diagnostic observation object for local temporary metadata placement
+state. It requires explicit observation authority, ignores expired metadata as
+active metadata, may include expired entries only as diagnostics, returns
+metadata-only reports, is not wired into normal runtime or `_run_tick()`, does
+not call `ContextMemoryManager`, performs no real ContextMemory writes, and
+does not influence behavior/scoring/guards/Mode C/PolicyPressureReview.
+
 ## Next steps
 
-Prepare a scenario/test-only ContextMemory temporary metadata runtime
-observation scaffold only after explicit approval.
+Review the read-only scenario/test-only ContextMemory temporary metadata
+runtime observation scaffold before any normal-runtime wiring is considered.
 
-That future pass must stay read-only, authority-gated, TTL-aware,
-diagnostic-only, unwired from normal behavior, and covered by no-behavior-
-influence scenarios before any broader runtime observation is considered.
+Any future normal-runtime pass must stay read-only, authority-gated, TTL-aware,
+diagnostic-only, and covered by no-behavior-influence scenarios before any
+broader runtime observation is considered.

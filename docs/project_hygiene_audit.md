@@ -296,6 +296,17 @@ scoring, guard, Mode C, `PolicyPressureReview`, memory writer, AKBSM writer,
 storage, queue, and persistence influence, and leaves normal runtime wiring and
 AKBSM writes blocked.
 
+`clc/runtime/context_temporary_metadata_observation.py`,
+`scenarios/contextmemory_temporary_metadata_runtime_observation_scaffold.json`,
+and `tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py`
+add a read-only diagnostic observation scaffold for local temporary metadata
+placement state. The scaffold requires explicit diagnostic authority, keeps
+observation authority separate from placement and write authority, ignores
+expired metadata as active metadata, may report expired entries only as
+diagnostics, returns metadata-only reports, has no normal runtime or
+`_run_tick()` wiring, performs no real ContextMemory writes, and does not
+influence behavior/scoring/guards/Mode C/PolicyPressureReview.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -332,3 +343,6 @@ in a later packaging pass.
 13. Keep ContextMemory temporary metadata runtime observation design-only until
     a later explicit pass adds read-only diagnostic scenarios and no-behavior-
     influence verification.
+14. Keep the ContextMemory temporary metadata runtime observation scaffold
+    local/scaffold-only until a later explicit pass approves normal-runtime
+    diagnostic wiring with no behavior influence.

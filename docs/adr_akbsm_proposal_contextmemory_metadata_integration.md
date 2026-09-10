@@ -319,3 +319,10 @@ observation ADR exists as design-only guidance: no runtime observation is
 implemented, future observation must be read-only diagnostic material only, it
 must not influence behavior/scoring/guards/Mode C/PolicyPressureReview, no
 normal runtime wiring exists, and AKBSM writes remain blocked.
+
+`clc/runtime/context_temporary_metadata_observation.py` now adds the first
+read-only diagnostic observation scaffold for local temporary metadata. AKBSM
+proposal metadata remains metadata-only when observed: `accepted_for_observation`
+is not write approval, `deferred` is not pending commit, rejected/expired states
+remain non-authoritative, no proposal storage or review record persistence is
+added, and no normal runtime wiring exists.
