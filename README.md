@@ -58,6 +58,7 @@ python tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffol
 python tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py
 python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py
 python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py
+python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -178,6 +179,14 @@ behavior, scoring, guards, Mode C, `PolicyPressureReview`, or writers. The
 no-behavior-influence proof is included in
 `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py`;
 no separate no-behavior verifier file is required for this scaffold.
+Diagnostic wiring negative/no-behavior coverage exists in
+`scenarios/contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.json`
+and `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py`.
+It covers diagnostic authority separation, inability to place metadata or
+authorize writes, expired metadata active-ignore behavior, no writer-command or
+behavior/scoring/guard/Mode C/PolicyPressureReview instruction fields, no
+normal runtime or `_run_tick()` calls, no real ContextMemory reads/writes, and
+AKBSM proposal metadata remaining non-authoritative for writes.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

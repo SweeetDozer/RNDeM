@@ -336,6 +336,17 @@ metadata-only reports, has no normal runtime or `_run_tick()` wiring, calls no
 ContextMemory reads/writes, and includes no-behavior-influence checks in the
 scaffold verifier.
 
+`scenarios/contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.json`
+and
+`tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py`
+add negative/no-behavior hardening for the diagnostic wiring scaffold. The
+coverage verifies diagnostic authority separation, no metadata placement or
+write authorization by diagnostic authority, expired metadata active-ignore
+behavior, no writer-command or behavior/scoring/guard/Mode C/
+PolicyPressureReview instruction fields, no normal runtime or `_run_tick()`
+diagnostic calls, no real ContextMemory reads/writes, and AKBSM proposal
+metadata remaining non-authoritative for writes.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -382,3 +393,5 @@ in a later packaging pass.
 17. Keep the explicit temporary metadata diagnostic scaffold manual-only until
     a later approved pass adds any broader diagnostic path with equivalent
     no-behavior-influence coverage.
+18. Keep diagnostic wiring negative/no-behavior coverage green before any
+    `_run_tick()` or normal runtime diagnostic wiring is considered.

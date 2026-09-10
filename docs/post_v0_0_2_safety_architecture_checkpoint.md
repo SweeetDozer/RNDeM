@@ -196,6 +196,11 @@ Temporary metadata diagnostic runtime-facing scaffold exists:
 - `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py`
 - `scenarios/contextmemory_temporary_metadata_diagnostic_wiring_scaffold.json`
 
+Temporary metadata diagnostic wiring negative/no-behavior coverage exists:
+
+- `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py`
+- `scenarios/contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.json`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -347,6 +352,7 @@ New/important safety architecture verifiers:
 - `tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py`
 - `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py`
 - `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py`
+- `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py`
 
 Existing core guards:
 
@@ -462,6 +468,13 @@ commit AKBSM writes.
   `_run_tick()` wiring, calls no `ContextMemoryManager`, performs no real
   ContextMemory reads/writes, creates no storage or queues, and cannot influence
   behavior/scoring/guards/Mode C/PolicyPressureReview or writers.
+- Temporary metadata diagnostic wiring negative/no-behavior coverage verifies
+  diagnostic authority separation, diagnostic authority cannot place metadata
+  or authorize writes, expired metadata active-ignore behavior, no writer
+  commands or behavior/scoring/guard/Mode C/PolicyPressureReview instruction
+  fields in reports, no normal runtime or `_run_tick()` diagnostic calls, no
+  real ContextMemory reads/writes, and AKBSM proposal metadata remaining
+  non-authoritative for writes.
   non-authoritative, and no normal runtime or `_run_tick()` observer calls exist.
 - Temporary metadata diagnostic runtime wiring ADR exists as design-only
   guidance. Diagnostic runtime wiring is not implemented yet, no `_run_tick()`

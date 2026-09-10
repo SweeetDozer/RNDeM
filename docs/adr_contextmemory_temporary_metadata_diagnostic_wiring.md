@@ -309,6 +309,17 @@ queues, proposal commits, AKBSM writes, ExpSM writes, or behavior influence.
 The scaffold verifier includes the no-behavior-influence checks that were
 previously listed as a possible separate verifier.
 
+Negative/no-behavior hardening for that scaffold now exists in
+`scenarios/contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.json`
+and `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py`.
+It verifies diagnostic authority separation, rejects placement/observation
+authority as runtime diagnostic authority, proves diagnostic authority cannot
+place metadata or authorize writes, keeps expired metadata out of active
+metadata, keeps reports free of writer commands and behavior/scoring/guard/
+Mode C/PolicyPressureReview instruction fields, and verifies no normal runtime,
+`_run_tick()`, ContextMemoryManager, real ContextMemory, storage, queue,
+persistence, AKBSM, or ExpSM path is introduced.
+
 ## Next steps
 
 Review this ADR before any controlled diagnostic runtime observation wiring
