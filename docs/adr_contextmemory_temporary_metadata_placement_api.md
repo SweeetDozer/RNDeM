@@ -288,6 +288,13 @@ explicit authority and TTL/expiration are present. It does not call
 proposal storage or review record persistence, and does not add normal runtime
 wiring.
 
+`docs/adr_contextmemory_temporary_metadata_runtime_observation.md` now records
+the next possible runtime observation boundary. That runtime observation ADR
+exists as design-only guidance: no runtime observation is implemented, any
+future observation must be read-only diagnostic material, no normal runtime
+wiring exists, no behavior influence is approved, and AKBSM writes remain
+blocked.
+
 ## Next Steps
 
 Review this ADR before any implementation pass.

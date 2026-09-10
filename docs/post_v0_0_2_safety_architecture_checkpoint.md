@@ -169,6 +169,11 @@ Temporary metadata negative/retention coverage exists:
 - `tools/verify_contextmemory_temporary_metadata_negative_retention.py`
 - `scenarios/contextmemory_temporary_metadata_negative_retention_coverage.json`
 
+Temporary metadata runtime observation ADR exists:
+
+- `docs/adr_contextmemory_temporary_metadata_runtime_observation.md`
+- `tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -315,6 +320,7 @@ New/important safety architecture verifiers:
 - `tools/verify_contextmemory_temporary_metadata_placement_scaffold.py`
 - `tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py`
 - `tools/verify_contextmemory_temporary_metadata_negative_retention.py`
+- `tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py`
 
 Existing core guards:
 
@@ -407,6 +413,11 @@ commit AKBSM writes.
   missing/invalid TTL/expiration rejection, write-like key/value/nested and
   instruction rejection, local expiration/removal, and unchanged real
   ExpSM/AKBSM memory hashes.
+- Temporary metadata runtime observation ADR exists as design-only guidance.
+  No runtime observation is implemented; any future observation must be
+  read-only diagnostic material, authority-gated, TTL-aware, unwired from
+  normal behavior, and unable to approve storage, proposal queues, or AKBSM/
+  ExpSM writes.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

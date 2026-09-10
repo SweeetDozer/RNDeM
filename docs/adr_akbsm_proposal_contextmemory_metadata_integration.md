@@ -312,3 +312,10 @@ the generic local temporary metadata scaffold. The adapter requires explicit
 scenario/test authority and TTL/expiration, remains no-op without authority,
 rejects write-like metadata through the generic scaffold, calls no
 `ContextMemoryManager`, creates no storage, and adds no normal runtime wiring.
+
+Before any normal-runtime observation, review
+`docs/adr_contextmemory_temporary_metadata_runtime_observation.md`. That runtime
+observation ADR exists as design-only guidance: no runtime observation is
+implemented, future observation must be read-only diagnostic material only, it
+must not influence behavior/scoring/guards/Mode C/PolicyPressureReview, no
+normal runtime wiring exists, and AKBSM writes remain blocked.

@@ -287,6 +287,15 @@ invalid expiration rejection, write-like key/value/nested/instruction
 rejection, local expiration/removal, no runtime wiring, no real ContextMemory
 writes, and unchanged real ExpSM/AKBSM hashes.
 
+`docs/adr_contextmemory_temporary_metadata_runtime_observation.md` and
+`tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py` add a
+design-only runtime observation boundary for temporary metadata. The ADR keeps
+future observation read-only diagnostic, requires explicit observation
+authority or a diagnostic flag, ignores expired metadata, forbids behavior,
+scoring, guard, Mode C, `PolicyPressureReview`, memory writer, AKBSM writer,
+storage, queue, and persistence influence, and leaves normal runtime wiring and
+AKBSM writes blocked.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -320,3 +329,6 @@ in a later packaging pass.
     implementing any safe temporary ContextMemory metadata placement API.
 12. Keep ContextMemory temporary metadata placement scenario/test-only until a
     later explicit pass approves real placement semantics.
+13. Keep ContextMemory temporary metadata runtime observation design-only until
+    a later explicit pass adds read-only diagnostic scenarios and no-behavior-
+    influence verification.

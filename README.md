@@ -16,6 +16,8 @@ Start with:
 - `docs/design_akbsm_draft_proposal_review_lifecycle_implementation.md`
 - `docs/adr_akbsm_draft_proposal_transition_controller_experiment.md`
 - `docs/adr_akbsm_proposal_contextmemory_metadata_integration.md`
+- `docs/adr_contextmemory_temporary_metadata_placement_api.md`
+- `docs/adr_contextmemory_temporary_metadata_runtime_observation.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -50,6 +52,7 @@ python tools/verify_contextmemory_temporary_metadata_placement_api_adr.py
 python tools/verify_contextmemory_temporary_metadata_placement_scaffold.py
 python tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py
 python tools/verify_contextmemory_temporary_metadata_negative_retention.py
+python tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -138,6 +141,11 @@ adapter exists in
 it covers authority rejection, TTL/expiration rejection, invalid expiration,
 write-like key/value/nested/instruction rejection, expired metadata removal,
 and preserves the no-runtime-wiring/no-real-ContextMemory-write boundary.
+The temporary metadata runtime observation ADR exists in
+`docs/adr_contextmemory_temporary_metadata_runtime_observation.md`; it is
+design-only, no runtime observation is implemented, future observation is
+limited to read-only diagnostic material, no normal runtime wiring exists, and
+AKBSM writes remain blocked.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
