@@ -248,6 +248,14 @@ metadata-only reports, is not wired into normal runtime or `_run_tick()`, does
 not call `ContextMemoryManager`, performs no real ContextMemory writes, and
 does not influence behavior/scoring/guards/Mode C/PolicyPressureReview.
 
+Negative/no-behavior coverage now exists for the observer in
+`scenarios/contextmemory_temporary_metadata_runtime_observation_negative_no_behavior.json`
+and `tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py`.
+It covers authority separation, expired metadata active-ignore behavior,
+no-writer-command reports, no behavior/scoring/guard/Mode C/PolicyPressureReview
+instruction reports, AKBSM proposal metadata remaining non-authoritative for
+writes, and no normal runtime or `_run_tick()` observer calls.
+
 ## Next steps
 
 Review the read-only scenario/test-only ContextMemory temporary metadata

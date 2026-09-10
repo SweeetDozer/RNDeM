@@ -54,6 +54,7 @@ python tools/verify_akbsm_proposal_temporary_metadata_placement_adapter.py
 python tools/verify_contextmemory_temporary_metadata_negative_retention.py
 python tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py
 python tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py
+python tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -154,6 +155,11 @@ expired metadata as active metadata, returns metadata-only diagnostic reports,
 is not wired into normal runtime or `_run_tick()`, does not influence behavior,
 scoring, guards, Mode C, or `PolicyPressureReview`, performs no real
 ContextMemory writes, and leaves AKBSM writes blocked.
+Negative/no-behavior coverage for that observer exists in
+`scenarios/contextmemory_temporary_metadata_runtime_observation_negative_no_behavior.json`;
+it covers authority separation, expired metadata active-ignore behavior,
+no-writer-command/no-instruction reports, AKBSM proposal metadata remaining
+non-authoritative, and the observer staying unwired from normal runtime.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

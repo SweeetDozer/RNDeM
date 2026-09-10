@@ -307,6 +307,16 @@ diagnostics, returns metadata-only reports, has no normal runtime or
 `_run_tick()` wiring, performs no real ContextMemory writes, and does not
 influence behavior/scoring/guards/Mode C/PolicyPressureReview.
 
+`scenarios/contextmemory_temporary_metadata_runtime_observation_negative_no_behavior.json`
+and `tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py`
+add negative/no-behavior hardening for the observer. The coverage verifies
+missing/unknown/placement-authority rejection, observation authority cannot
+place metadata or authorize writes, expired metadata remains inactive,
+observation reports contain no writer commands or behavior/scoring/guard/Mode
+C/PolicyPressureReview instructions, AKBSM proposal metadata remains
+non-authoritative for writes, and the observer remains unwired from normal
+runtime and `_run_tick()`.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -346,3 +356,5 @@ in a later packaging pass.
 14. Keep the ContextMemory temporary metadata runtime observation scaffold
     local/scaffold-only until a later explicit pass approves normal-runtime
     diagnostic wiring with no behavior influence.
+15. Keep observer negative/no-behavior coverage green before considering any
+    normal-runtime diagnostic observation wiring.

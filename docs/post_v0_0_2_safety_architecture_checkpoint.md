@@ -180,6 +180,11 @@ Read-only temporary metadata runtime observation scaffold exists:
 - `tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py`
 - `scenarios/contextmemory_temporary_metadata_runtime_observation_scaffold.json`
 
+Temporary metadata runtime observation negative/no-behavior coverage exists:
+
+- `tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py`
+- `scenarios/contextmemory_temporary_metadata_runtime_observation_negative_no_behavior.json`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -328,6 +333,7 @@ New/important safety architecture verifiers:
 - `tools/verify_contextmemory_temporary_metadata_negative_retention.py`
 - `tools/verify_contextmemory_temporary_metadata_runtime_observation_adr.py`
 - `tools/verify_contextmemory_temporary_metadata_runtime_observation_scaffold.py`
+- `tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py`
 
 Existing core guards:
 
@@ -431,6 +437,12 @@ commit AKBSM writes.
   has no normal runtime or `_run_tick()` wiring, calls no `ContextMemoryManager`,
   performs no real ContextMemory writes, and cannot influence behavior/scoring/
   guards/Mode C/PolicyPressureReview.
+- Temporary metadata runtime observation negative/no-behavior coverage verifies
+  missing/unknown/placement-authority rejection, observation authority cannot
+  place metadata or authorize writes, expired metadata stays out of active
+  metadata, reports contain no writer commands or behavior/scoring/guard/Mode
+  C/PolicyPressureReview instructions, AKBSM proposal metadata remains
+  non-authoritative, and no normal runtime or `_run_tick()` observer calls exist.
 - Disabled scenarios verify no-effect/no-write, not future enabled behavior.
 - Phase snapshots were not expanded for disabled scenario-only coverage.
 - Remote feature branches may remain as historical PR references.

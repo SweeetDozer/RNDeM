@@ -8,10 +8,10 @@
     "runtime_source_label": 15,
     "semantic_filter": 3,
     "stable_constant_or_enum": 60,
-    "test_or_verifier_only": 145
+    "test_or_verifier_only": 147
   },
   "by_risk": {
-    "low": 293,
+    "low": 295,
     "medium": 453,
     "unknown": 1
   },
@@ -6993,6 +6993,28 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
+      "line": 261,
+      "path": "tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py",
+      "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
+      "risk": "low",
+      "semantic_decision": false,
+      "snippet": "and observation[\"namespaces_present\"] == (\"akbsm_proposal_review\", \"scenario\")",
+      "stable_runtime_label": false
+    },
+    {
+      "classification": "test_or_verifier_only",
+      "kind": "direct_semantic_name_literal",
+      "line": 263,
+      "path": "tools/verify_contextmemory_temporary_metadata_observation_negative_no_behavior.py",
+      "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
+      "risk": "low",
+      "semantic_decision": false,
+      "snippet": "== (\"akbsm_proposal_review_metadata\", \"sensor_note\")",
+      "stable_runtime_label": false
+    },
+    {
+      "classification": "test_or_verifier_only",
+      "kind": "direct_semantic_name_literal",
       "line": 54,
       "path": "tools/verify_decision_audit_observer.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
@@ -8267,7 +8289,7 @@
     }
   ],
   "title": "Debug-name dependency audit",
-  "total_findings": 747,
+  "total_findings": 749,
   "unknown_runtime_logic_split": {
     "ambiguous_runtime_logic": 1,
     "current_unknown_runtime_logic": 0,
