@@ -271,6 +271,13 @@ metadata scaffold through the existing observer, and returns read-only
 metadata-only diagnostics with no behavior/scoring/guard/Mode C/
 PolicyPressureReview or writer influence.
 
+`docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md` now
+records the optional tick-facing visibility boundary. It is design-only,
+prefers an external diagnostic wrapper/harness, defers any direct `_run_tick()`
+diagnostic hook, changes no runtime source code, adds no `_run_tick()` wiring,
+keeps diagnostics unwired from behavior paths, adds no real ContextMemory
+reads/writes, and leaves AKBSM writes blocked.
+
 ## Next steps
 
 Review the read-only scenario/test-only ContextMemory temporary metadata

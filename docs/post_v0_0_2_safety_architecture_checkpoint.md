@@ -201,6 +201,11 @@ Temporary metadata diagnostic wiring negative/no-behavior coverage exists:
 - `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py`
 - `scenarios/contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.json`
 
+Temporary metadata tick diagnostic visibility ADR exists:
+
+- `docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md`
+- `tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -353,6 +358,7 @@ New/important safety architecture verifiers:
 - `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py`
 - `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py`
 - `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py`
+- `tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py`
 
 Existing core guards:
 
@@ -475,6 +481,12 @@ commit AKBSM writes.
   fields in reports, no normal runtime or `_run_tick()` diagnostic calls, no
   real ContextMemory reads/writes, and AKBSM proposal metadata remaining
   non-authoritative for writes.
+- Temporary metadata tick diagnostic visibility ADR exists as design-only
+  guidance. The preferred future shape is external diagnostic wrapper/harness,
+  direct `_run_tick()` diagnostic hook is deferred, no runtime source code
+  changed, no `_run_tick()` wiring exists, diagnostics remain unwired from
+  behavior paths, no real ContextMemory reads/writes exist, and AKBSM writes
+  remain blocked.
   non-authoritative, and no normal runtime or `_run_tick()` observer calls exist.
 - Temporary metadata diagnostic runtime wiring ADR exists as design-only
   guidance. Diagnostic runtime wiring is not implemented yet, no `_run_tick()`

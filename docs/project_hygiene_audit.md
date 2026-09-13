@@ -347,6 +347,14 @@ PolicyPressureReview instruction fields, no normal runtime or `_run_tick()`
 diagnostic calls, no real ContextMemory reads/writes, and AKBSM proposal
 metadata remaining non-authoritative for writes.
 
+`docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md` and
+`tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py`
+add a design-only ADR for optional tick-facing diagnostic visibility. The ADR
+prefers external diagnostic wrapper/harness, defers any direct `_run_tick()`
+diagnostic hook, changes no runtime source code, adds no `_run_tick()` wiring,
+keeps diagnostics unwired from behavior paths, adds no real ContextMemory
+reads/writes, and leaves AKBSM writes blocked.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -395,3 +403,5 @@ in a later packaging pass.
     no-behavior-influence coverage.
 18. Keep diagnostic wiring negative/no-behavior coverage green before any
     `_run_tick()` or normal runtime diagnostic wiring is considered.
+19. Review `docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md`
+    before implementing any tick-facing diagnostic visibility.

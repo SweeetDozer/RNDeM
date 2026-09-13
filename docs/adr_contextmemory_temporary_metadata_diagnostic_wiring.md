@@ -320,6 +320,14 @@ Mode C/PolicyPressureReview instruction fields, and verifies no normal runtime,
 `_run_tick()`, ContextMemoryManager, real ContextMemory, storage, queue,
 persistence, AKBSM, or ExpSM path is introduced.
 
+`docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md` now
+records the optional tick-facing diagnostic visibility decision. The tick
+diagnostic visibility ADR exists as design-only guidance: the preferred future
+shape is external diagnostic wrapper/harness, direct `_run_tick()` diagnostic
+hook is deferred, no runtime source code changed, no `_run_tick()` wiring
+exists, diagnostics remain unwired from behavior paths, no real ContextMemory
+reads/writes exist, and AKBSM writes remain blocked.
+
 ## Next steps
 
 Review this ADR before any controlled diagnostic runtime observation wiring

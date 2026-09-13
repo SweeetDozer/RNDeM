@@ -19,6 +19,7 @@ Start with:
 - `docs/adr_contextmemory_temporary_metadata_placement_api.md`
 - `docs/adr_contextmemory_temporary_metadata_runtime_observation.md`
 - `docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`
+- `docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -59,6 +60,7 @@ python tools/verify_contextmemory_temporary_metadata_observation_negative_no_beh
 python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py
 python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py
 python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py
+python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -187,6 +189,13 @@ authorize writes, expired metadata active-ignore behavior, no writer-command or
 behavior/scoring/guard/Mode C/PolicyPressureReview instruction fields, no
 normal runtime or `_run_tick()` calls, no real ContextMemory reads/writes, and
 AKBSM proposal metadata remaining non-authoritative for writes.
+The tick diagnostic visibility ADR exists in
+`docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md`;
+it is design-only. The preferred future shape is external diagnostic
+wrapper/harness, direct `_run_tick()` diagnostic hook is deferred, no runtime
+source code changed, no `_run_tick()` wiring exists, diagnostics remain unwired
+from behavior paths, no real ContextMemory reads/writes exist, and AKBSM writes
+remain blocked.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
