@@ -214,6 +214,11 @@ Temporary metadata tick diagnostic wrapper scaffold exists:
 - `tools/verify_contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.py`
 - `scenarios/contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.json`
 
+Temporary metadata / AKBSM proposal diagnostic architecture map exists:
+
+- `docs/contextmemory_temporary_metadata_architecture_map.md`
+- `tools/verify_contextmemory_temporary_metadata_architecture_map.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -511,6 +516,11 @@ commit AKBSM writes.
   data is not passed into the callable, diagnostic snapshots stay separate, and
   no writer-command or behavior/scoring/guard/Mode C/PolicyPressureReview
   instruction fields appear.
+- The architecture map records the current safe stopping point: explicit/local/
+  scaffold-only diagnostics up to an external tick wrapper, with no normal
+  runtime default diagnostics, no direct `_run_tick()` diagnostic hook, no real
+  ContextMemory reads/writes, no proposal storage, no AKBSM writes, and no
+  behavior/scoring/guard influence.
   non-authoritative, and no normal runtime or `_run_tick()` observer calls exist.
 - Temporary metadata diagnostic runtime wiring ADR exists as design-only
   guidance. Diagnostic runtime wiring is not implemented yet, no `_run_tick()`

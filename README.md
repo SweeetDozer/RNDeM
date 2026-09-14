@@ -217,6 +217,12 @@ data passed into the callable, diagnostic snapshot separation, no writer-command
 or behavior/scoring/guard/Mode C/PolicyPressureReview instruction fields,
 expired metadata active-ignore behavior, no normal runtime or `_run_tick()`
 wiring, no real ContextMemory reads/writes, and blocked AKBSM writes.
+The architecture map for the temporary metadata / AKBSM proposal diagnostic
+ladder lives in `docs/contextmemory_temporary_metadata_architecture_map.md`.
+It maps checkpoints `v0.1.0` through `v0.7.0`, the post-`v0.7.0` hardening
+commit, authorities, data flow, no-write boundaries, no-behavior-influence
+boundaries, verifier/scenario coverage, and the current safe stopping point
+before any direct `_run_tick()` hook or default runtime diagnostic wiring.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

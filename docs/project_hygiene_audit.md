@@ -379,6 +379,16 @@ present, expired metadata is ignored as active metadata, and the wrapper remains
 outside normal runtime and `_run_tick()` with no real ContextMemory reads/writes
 and blocked AKBSM writes.
 
+`docs/contextmemory_temporary_metadata_architecture_map.md` and
+`tools/verify_contextmemory_temporary_metadata_architecture_map.py` add a
+docs-only architecture map/checkpoint for the temporary metadata / AKBSM
+proposal diagnostic ladder from `v0.1.0` through `v0.7.0`, plus the post-tag
+hardening commits. The map documents component order, allowed local data flow,
+authority separation, TTL/expiration semantics, no-write boundaries,
+no-behavior-influence boundaries, runtime and `_run_tick()` boundaries,
+verifier/scenario coverage, current safe stopping point, possible next branches,
+and forbidden next steps.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -434,3 +444,7 @@ in a later packaging pass.
     no-behavior-influence coverage.
 21. Keep external tick wrapper negative/no-behavior coverage green before any
     default runtime wiring or direct `_run_tick()` diagnostic hook is considered.
+22. Use `docs/contextmemory_temporary_metadata_architecture_map.md` as the
+    review checkpoint before any direct `_run_tick()` hook, real temporary
+    ContextMemory placement, proposal storage, AKBSM writes, or behavior
+    influence branch.
