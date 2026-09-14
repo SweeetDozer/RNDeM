@@ -366,6 +366,19 @@ metadata-only, calls no `ContextMemoryManager`, creates no real ContextMemory
 reads/writes, and includes no-behavior-influence checks in the scaffold
 verifier.
 
+`scenarios/contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.json`
+and
+`tools/verify_contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.py`
+add negative/no-behavior hardening for the wrapper. The coverage verifies
+authority separation, diagnostic authority cannot place metadata or authorize
+writes, wrapped behavior output equals direct callable output with diagnostics
+enabled or disabled, tick args/kwargs are unchanged, diagnostic data is not
+passed into the callable, diagnostic snapshots are separate, no writer-command
+or behavior/scoring/guard/Mode C/PolicyPressureReview instruction fields are
+present, expired metadata is ignored as active metadata, and the wrapper remains
+outside normal runtime and `_run_tick()` with no real ContextMemory reads/writes
+and blocked AKBSM writes.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -419,3 +432,5 @@ in a later packaging pass.
 20. Keep the external tick diagnostic wrapper scaffold outside `_run_tick()`
     unless a later ADR/pass explicitly approves a direct hook with equivalent
     no-behavior-influence coverage.
+21. Keep external tick wrapper negative/no-behavior coverage green before any
+    default runtime wiring or direct `_run_tick()` diagnostic hook is considered.

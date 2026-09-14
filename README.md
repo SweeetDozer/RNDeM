@@ -207,6 +207,16 @@ default, calls no `ContextMemoryManager`, creates no real ContextMemory
 reads/writes, cannot influence behavior/scoring/guards/Mode C/
 `PolicyPressureReview`, cannot authorize writes, keeps AKBSM proposal metadata
 non-authoritative, and leaves AKBSM writes blocked.
+External tick wrapper negative/no-behavior coverage exists in
+`scenarios/contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.json`
+and `tools/verify_contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.py`.
+It covers authority separation, diagnostic authority inability to place metadata
+or authorize writes, direct/wrapped behavior output equality, diagnostics
+enabled/disabled behavior equality, unchanged tick args/kwargs, no diagnostic
+data passed into the callable, diagnostic snapshot separation, no writer-command
+or behavior/scoring/guard/Mode C/PolicyPressureReview instruction fields,
+expired metadata active-ignore behavior, no normal runtime or `_run_tick()`
+wiring, no real ContextMemory reads/writes, and blocked AKBSM writes.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

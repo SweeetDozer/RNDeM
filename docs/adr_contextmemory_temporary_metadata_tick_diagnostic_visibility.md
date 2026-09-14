@@ -393,6 +393,19 @@ or enabled both preserve behavior output, and diagnostic data is not passed
 into the tick callable. No separate no-behavior verifier is required for this
 scaffold.
 
+`tools/verify_contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.py`
+and
+`scenarios/contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.json`
+add explicit negative/no-behavior hardening for the external wrapper. They cover
+missing/unknown authority rejection, placement/observation/runtime diagnostic
+authority rejection at the tick wrapper boundary, diagnostic authority inability
+to place metadata or authorize writes, direct/wrapped behavior equality with
+diagnostics enabled and disabled, unchanged tick args/kwargs, diagnostic data
+not entering the callable, separated diagnostic snapshots, absence of writer
+commands or behavior/scoring/guard/Mode C/PolicyPressureReview instructions,
+expired metadata active-ignore behavior, no normal runtime or `_run_tick()`
+wiring, no real ContextMemory reads/writes, and blocked AKBSM writes.
+
 ## Next steps
 
 Review this ADR before any tick-facing diagnostic visibility implementation

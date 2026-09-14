@@ -571,6 +571,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py` | negative/no-behavior diagnostic wiring coverage verifies authority separation, no write authority, expired metadata active-ignore behavior, no writer-command or behavior/scoring/guard/Mode C/PolicyPressureReview instruction fields, no runtime wiring, and unchanged real ExpSM/AKBSM hashes |
 | `tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py` | tick diagnostic visibility ADR exists, stays design-only, prefers an external diagnostic wrapper/harness, defers direct `_run_tick()` hook, documents tick-order/no-behavior requirements, and keeps existing safety verifiers passing |
 | `tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py` | external tick diagnostic wrapper scaffold exists, runs only provided tick callables, keeps diagnostics separate from behavior output, proves no diagnostic data enters the tick callable, stays outside `_run_tick()`, and leaves real ExpSM/AKBSM hashes unchanged |
+| `tools/verify_contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.py` | negative/no-behavior tick wrapper coverage verifies authority separation, no metadata placement/write authority, direct/wrapped behavior equality, enabled/disabled diagnostics behavior equality, unchanged tick args/kwargs, separated diagnostics, no instruction fields, no runtime wiring, and unchanged real ExpSM/AKBSM hashes |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -698,6 +699,15 @@ proposal/no-effect safety rather than canonical phase output.
   separately, is read-only/metadata-only, not normal runtime default, and has no
   ContextMemoryManager, real ContextMemory, storage, queue, persistence, AKBSM,
   ExpSM, or behavior influence path.
+- External tick wrapper negative/no-behavior coverage exists. It verifies
+  missing/unknown/placement/observation/runtime authority rejection, proves the
+  tick diagnostic authority cannot place metadata or authorize writes, checks
+  direct and wrapped behavior output equality with diagnostics enabled and
+  disabled, verifies tick args/kwargs stay unchanged and diagnostic data is not
+  passed into the callable, keeps diagnostic snapshot data separate, rejects
+  writer-command and behavior/scoring/guard/Mode C/PolicyPressureReview
+  instruction fields, ignores expired metadata as active metadata, and keeps the
+  wrapper unwired from normal runtime and `_run_tick()`.
   observer remains unwired from behavior paths, no real ContextMemory
   reads/writes exist, and AKBSM writes remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.
