@@ -573,6 +573,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py` | external tick diagnostic wrapper scaffold exists, runs only provided tick callables, keeps diagnostics separate from behavior output, proves no diagnostic data enters the tick callable, stays outside `_run_tick()`, and leaves real ExpSM/AKBSM hashes unchanged |
 | `tools/verify_contextmemory_temporary_metadata_tick_wrapper_negative_no_behavior.py` | negative/no-behavior tick wrapper coverage verifies authority separation, no metadata placement/write authority, direct/wrapped behavior equality, enabled/disabled diagnostics behavior equality, unchanged tick args/kwargs, separated diagnostics, no instruction fields, no runtime wiring, and unchanged real ExpSM/AKBSM hashes |
 | `tools/verify_contextmemory_temporary_metadata_architecture_map.py` | architecture map exists for the temporary metadata / AKBSM proposal diagnostic ladder from `v0.1.0` through `v0.7.0`, documents authorities, data flow, no-write/no-behavior/runtime boundaries, verifier/scenario coverage, and the safe stopping point |
+| `tools/verify_contextmemory_temporary_metadata_architecture_diagram.py` | architecture diagram exists for the temporary metadata / AKBSM proposal diagnostic ladder, visualizes component/data/authority/no-write/no-behavior/runtime boundaries, and keeps the direct `_run_tick()` hook deferred |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -716,6 +717,11 @@ proposal/no-effect safety rather than canonical phase output.
   wrapper; maps checkpoints `v0.1.0` through `v0.7.0`; and preserves the current
   safe stopping point before any direct `_run_tick()` hook or default runtime
   wiring.
+- Temporary metadata architecture diagram exists in
+  `docs/contextmemory_temporary_metadata_architecture_diagram.md`. It visualizes
+  the same ladder, data flow, authority separation, no-write boundary,
+  no-behavior-influence boundary, runtime/`_run_tick()` boundary, safe stopping
+  point, and forbidden paths.
   observer remains unwired from behavior paths, no real ContextMemory
   reads/writes exist, and AKBSM writes remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.

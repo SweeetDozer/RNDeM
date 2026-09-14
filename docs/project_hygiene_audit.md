@@ -389,6 +389,14 @@ no-behavior-influence boundaries, runtime and `_run_tick()` boundaries,
 verifier/scenario coverage, current safe stopping point, possible next branches,
 and forbidden next steps.
 
+`docs/contextmemory_temporary_metadata_architecture_diagram.md` and
+`tools/verify_contextmemory_temporary_metadata_architecture_diagram.py` add a
+docs-only visualization/checkpoint for the same ladder. The diagram uses
+Mermaid and text blocks to show the component ladder, allowed data flow,
+authority separation, no-write boundary, no-behavior-influence boundary,
+runtime/`_run_tick()` boundary, safe stopping point, forbidden paths, and
+related documents.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -448,3 +456,6 @@ in a later packaging pass.
     review checkpoint before any direct `_run_tick()` hook, real temporary
     ContextMemory placement, proposal storage, AKBSM writes, or behavior
     influence branch.
+23. Use `docs/contextmemory_temporary_metadata_architecture_diagram.md` as the
+    visual review aid for the same boundaries before choosing any runtime or
+    storage integration branch.

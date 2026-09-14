@@ -219,6 +219,11 @@ Temporary metadata / AKBSM proposal diagnostic architecture map exists:
 - `docs/contextmemory_temporary_metadata_architecture_map.md`
 - `tools/verify_contextmemory_temporary_metadata_architecture_map.py`
 
+Temporary metadata / AKBSM proposal diagnostic architecture diagram exists:
+
+- `docs/contextmemory_temporary_metadata_architecture_diagram.md`
+- `tools/verify_contextmemory_temporary_metadata_architecture_diagram.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -521,6 +526,10 @@ commit AKBSM writes.
   runtime default diagnostics, no direct `_run_tick()` diagnostic hook, no real
   ContextMemory reads/writes, no proposal storage, no AKBSM writes, and no
   behavior/scoring/guard influence.
+- The architecture diagram visualizes that same stopping point and highlights
+  forbidden write, behavior, and runtime paths. It is documentation-only and
+  does not authorize `_run_tick()` wiring, real ContextMemory placement,
+  proposal storage, AKBSM/ExpSM writes, or behavior influence.
   non-authoritative, and no normal runtime or `_run_tick()` observer calls exist.
 - Temporary metadata diagnostic runtime wiring ADR exists as design-only
   guidance. Diagnostic runtime wiring is not implemented yet, no `_run_tick()`

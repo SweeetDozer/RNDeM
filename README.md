@@ -223,6 +223,11 @@ It maps checkpoints `v0.1.0` through `v0.7.0`, the post-`v0.7.0` hardening
 commit, authorities, data flow, no-write boundaries, no-behavior-influence
 boundaries, verifier/scenario coverage, and the current safe stopping point
 before any direct `_run_tick()` hook or default runtime diagnostic wiring.
+The companion visualization lives in
+`docs/contextmemory_temporary_metadata_architecture_diagram.md`; it renders the
+component ladder, data flow, authority separation, no-write boundary,
+no-behavior boundary, runtime/`_run_tick()` boundary, safe stopping point, and
+forbidden paths.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

@@ -14,6 +14,9 @@ It does not authorize behavior/scoring/guard influence.
 Current `main` checkpoint: `eb7fd21 test: harden temporary metadata tick wrapper coverage`.
 Latest tag in this ladder: `v0.7.0` = temporary metadata external tick diagnostic wrapper checkpoint.
 
+Companion visualization:
+`docs/contextmemory_temporary_metadata_architecture_diagram.md`.
+
 ## Scope
 
 This map covers the temporary metadata and AKBSM proposal diagnostic ladder from
