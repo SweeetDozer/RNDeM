@@ -20,6 +20,9 @@ Companion visualization:
 v1 readiness criteria:
 `docs/v1_readiness_criteria.md`.
 
+v1 release checklist:
+`docs/v1_release_checklist.md`.
+
 ## Scope
 
 This map covers the temporary metadata and AKBSM proposal diagnostic ladder from
@@ -387,6 +390,8 @@ B. Add more docs/scenario hardening only.
 C. Build a visualization/diagram of the architecture map.
 D. Draft a separate ADR for direct `_run_tick()` diagnostic hook, but do not implement it.
 E. Draft a separate ADR for real temporary ContextMemory placement, but do not implement it.
+F. Prepare final v1 release checklist and release-candidate verifier; do not
+   tag `v1.0.0` until a separate reviewed tag pass.
 
 ## Forbidden next steps
 

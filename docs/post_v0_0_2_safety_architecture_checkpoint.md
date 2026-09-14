@@ -229,6 +229,11 @@ v1 readiness criteria exist:
 - `docs/v1_readiness_criteria.md`
 - `tools/verify_v1_readiness_criteria.py`
 
+v1 release checklist exists:
+
+- `docs/v1_release_checklist.md`
+- `tools/verify_v1_release_candidate.py`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -540,6 +545,10 @@ commit AKBSM writes.
   AKBSM/ExpSM write permission, real ContextMemory placement, direct
   `_run_tick()` diagnostic hooks, default runtime diagnostics, or
   behavior/scoring/guard influence.
+- v1 release checklist documents final release-candidate blockers, validation,
+  and stop-and-review procedure. It keeps the direct `_run_tick()` hook
+  deferred, real ContextMemory placement absent, AKBSM writes blocked, and the
+  `v1.0.0` tag uncreated until a separate review/merge/tag pass.
   non-authoritative, and no normal runtime or `_run_tick()` observer calls exist.
 - Temporary metadata diagnostic runtime wiring ADR exists as design-only
   guidance. Diagnostic runtime wiring is not implemented yet, no `_run_tick()`

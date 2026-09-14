@@ -405,6 +405,13 @@ placement, direct `_run_tick()` hooks, default runtime diagnostics, or behavior
 influence. The document also records required verifier, scenario, memory,
 runtime, documentation, and release-validation invariants.
 
+`docs/v1_release_checklist.md` and `tools/verify_v1_release_candidate.py` add a
+docs/verifier-only release-candidate checklist for the future `v1.0.0` tag. The
+checklist documents release blockers, required validation, stop-and-review
+procedure, and the future tag command only. It does not tag `v1.0.0`, keeps
+direct `_run_tick()` hooks deferred, keeps real ContextMemory placement absent,
+and keeps AKBSM writes blocked.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -469,3 +476,6 @@ in a later packaging pass.
     storage integration branch.
 24. Use `docs/v1_readiness_criteria.md` as the release-boundary checklist
     before considering any `v1.0.0` tag.
+25. Use `docs/v1_release_checklist.md` and
+    `tools/verify_v1_release_candidate.py` for the final release-candidate
+    review before any separate `v1.0.0` tag pass.

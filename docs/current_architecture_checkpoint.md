@@ -575,6 +575,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_contextmemory_temporary_metadata_architecture_map.py` | architecture map exists for the temporary metadata / AKBSM proposal diagnostic ladder from `v0.1.0` through `v0.7.0`, documents authorities, data flow, no-write/no-behavior/runtime boundaries, verifier/scenario coverage, and the safe stopping point |
 | `tools/verify_contextmemory_temporary_metadata_architecture_diagram.py` | architecture diagram exists for the temporary metadata / AKBSM proposal diagnostic ladder, visualizes component/data/authority/no-write/no-behavior/runtime boundaries, and keeps the direct `_run_tick()` hook deferred |
 | `tools/verify_v1_readiness_criteria.py` | v1 readiness criteria exist, define `v1.0.0` as a stable safety-bounded prototype checkpoint, preserve forbidden runtime/write/behavior paths, and require memory/runtime/verifier/release invariants |
+| `tools/verify_v1_release_candidate.py` | v1 release checklist exists, `v1.0.0` remains untagged, release blockers and stop-and-review procedure are documented, and existing no-write/no-behavior/no-ContextMemory/no-marker-36 safety boundaries still pass |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -728,6 +729,10 @@ proposal/no-effect safety rather than canonical phase output.
   autonomous self-modification, and not permission for AKBSM/ExpSM writes, real
   ContextMemory placement, direct `_run_tick()` hooks, default runtime
   diagnostics, or behavior/scoring/guard influence.
+- v1 release checklist exists in `docs/v1_release_checklist.md`. It documents
+  release blockers, release-candidate validation, the stop-and-review
+  procedure, and the future tag procedure only. `v1.0.0` is not tagged yet and
+  still requires a separate review/merge/tag pass.
   observer remains unwired from behavior paths, no real ContextMemory
   reads/writes exist, and AKBSM writes remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.

@@ -233,6 +233,11 @@ The v1 readiness criteria live in `docs/v1_readiness_criteria.md`; they define
 autonomous self-modification, not permission for AKBSM/ExpSM writes, not real
 ContextMemory placement, not a direct `_run_tick()` hook, and not behavior
 influence.
+The final v1 release checklist lives in `docs/v1_release_checklist.md` and is
+verified by `tools/verify_v1_release_candidate.py`. It documents release
+blockers, the stop-and-review procedure, and the future tag command only;
+`v1.0.0` is not tagged by the checklist pass and requires a separate
+review/merge/tag pass.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

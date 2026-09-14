@@ -175,6 +175,7 @@ Required documents for `v1.0.0`:
 - `docs/contextmemory_temporary_metadata_architecture_map.md`
 - `docs/contextmemory_temporary_metadata_architecture_diagram.md`
 - `docs/v1_readiness_criteria.md`
+- `docs/v1_release_checklist.md`
 - behavior influence, Mode C, AKBSM write policy, AKBSM proposal lifecycle,
   ContextMemory temporary metadata, diagnostic wiring, and tick visibility ADRs
 
@@ -185,6 +186,7 @@ checklist. Required command group:
 
 ```bash
 python tools/clean_pycache.py
+python tools/verify_v1_release_candidate.py
 python tools/verify_v1_readiness_criteria.py
 python tools/verify_contextmemory_temporary_metadata_architecture_diagram.py
 python tools/verify_contextmemory_temporary_metadata_architecture_map.py
@@ -203,6 +205,10 @@ python -B main.py
 ```
 
 A final `v1.0.0` release pass may run broader/full validation if available.
+
+The release-candidate checklist in `docs/v1_release_checklist.md` documents the
+final blockers, stop-and-review procedure, and future tag command. It does not
+tag `v1.0.0`; tagging requires a separate reviewed pass on `main`.
 
 ## Allowed pre-v1 work
 
