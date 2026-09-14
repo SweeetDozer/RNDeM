@@ -17,6 +17,9 @@ Latest tag in this ladder: `v0.7.0` = temporary metadata external tick diagnosti
 Companion visualization:
 `docs/contextmemory_temporary_metadata_architecture_diagram.md`.
 
+v1 readiness criteria:
+`docs/v1_readiness_criteria.md`.
+
 ## Scope
 
 This map covers the temporary metadata and AKBSM proposal diagnostic ladder from

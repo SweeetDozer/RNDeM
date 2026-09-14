@@ -228,6 +228,11 @@ The companion visualization lives in
 component ladder, data flow, authority separation, no-write boundary,
 no-behavior boundary, runtime/`_run_tick()` boundary, safe stopping point, and
 forbidden paths.
+The v1 readiness criteria live in `docs/v1_readiness_criteria.md`; they define
+`v1.0.0` as a stable safety-bounded prototype checkpoint, not AGI, not
+autonomous self-modification, not permission for AKBSM/ExpSM writes, not real
+ContextMemory placement, not a direct `_run_tick()` hook, and not behavior
+influence.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

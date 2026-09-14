@@ -242,6 +242,7 @@ integration.
 ## Related documents
 
 - `docs/contextmemory_temporary_metadata_architecture_map.md`
+- `docs/v1_readiness_criteria.md`
 - `docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md`
 - `docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`
 - `docs/adr_contextmemory_temporary_metadata_runtime_observation.md`

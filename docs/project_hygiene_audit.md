@@ -397,6 +397,14 @@ authority separation, no-write boundary, no-behavior-influence boundary,
 runtime/`_run_tick()` boundary, safe stopping point, forbidden paths, and
 related documents.
 
+`docs/v1_readiness_criteria.md` and `tools/verify_v1_readiness_criteria.py`
+add docs-only readiness criteria for a future `v1.0.0` safety-bounded prototype
+checkpoint. The criteria define v1 as a review/stopping point, not AGI,
+autonomous self-modification, AKBSM/ExpSM write permission, real ContextMemory
+placement, direct `_run_tick()` hooks, default runtime diagnostics, or behavior
+influence. The document also records required verifier, scenario, memory,
+runtime, documentation, and release-validation invariants.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -459,3 +467,5 @@ in a later packaging pass.
 23. Use `docs/contextmemory_temporary_metadata_architecture_diagram.md` as the
     visual review aid for the same boundaries before choosing any runtime or
     storage integration branch.
+24. Use `docs/v1_readiness_criteria.md` as the release-boundary checklist
+    before considering any `v1.0.0` tag.
