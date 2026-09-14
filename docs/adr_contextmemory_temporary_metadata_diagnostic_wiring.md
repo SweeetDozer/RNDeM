@@ -328,6 +328,14 @@ hook is deferred, no runtime source code changed, no `_run_tick()` wiring
 exists, diagnostics remain unwired from behavior paths, no real ContextMemory
 reads/writes exist, and AKBSM writes remain blocked.
 
+`clc/runtime/context_temporary_metadata_tick_diagnostics.py` now provides the
+external tick diagnostic wrapper scaffold described by that ADR. It accepts a
+provided tick callable, keeps diagnostics out of that callable's inputs,
+returns behavior output unchanged, returns diagnostic snapshot data separately,
+stays outside `_run_tick()`, is not normal runtime default, and remains
+read-only/metadata-only with no ContextMemoryManager, real ContextMemory,
+storage, queue, persistence, AKBSM, ExpSM, or behavior influence path.
+
 ## Next steps
 
 Review this ADR before any controlled diagnostic runtime observation wiring

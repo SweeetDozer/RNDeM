@@ -61,6 +61,7 @@ python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_adr.py
 python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py
 python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py
 python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py
+python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -196,6 +197,16 @@ wrapper/harness, direct `_run_tick()` diagnostic hook is deferred, no runtime
 source code changed, no `_run_tick()` wiring exists, diagnostics remain unwired
 from behavior paths, no real ContextMemory reads/writes exist, and AKBSM writes
 remain blocked.
+The external tick diagnostic wrapper scaffold exists in
+`clc/runtime/context_temporary_metadata_tick_diagnostics.py`; it stays outside
+`_run_tick()`, does not modify `_run_tick()`, requires
+`explicit_tick_diagnostic_harness`, runs a provided tick callable without
+diagnostic inputs, returns behavior output unchanged, returns diagnostic
+snapshot separately, remains read-only and metadata-only, is not normal runtime
+default, calls no `ContextMemoryManager`, creates no real ContextMemory
+reads/writes, cannot influence behavior/scoring/guards/Mode C/
+`PolicyPressureReview`, cannot authorize writes, keeps AKBSM proposal metadata
+non-authoritative, and leaves AKBSM writes blocked.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

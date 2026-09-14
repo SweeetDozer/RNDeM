@@ -8,10 +8,10 @@
     "runtime_source_label": 15,
     "semantic_filter": 3,
     "stable_constant_or_enum": 60,
-    "test_or_verifier_only": 149
+    "test_or_verifier_only": 150
   },
   "by_risk": {
-    "low": 297,
+    "low": 298,
     "medium": 453,
     "unknown": 1
   },
@@ -7037,6 +7037,17 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
+      "line": 289,
+      "path": "tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py",
+      "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
+      "risk": "low",
+      "semantic_decision": false,
+      "snippet": "and report[\"view\"][\"namespaces_present\"] == (\"akbsm_proposal_review\", \"scenario\")",
+      "stable_runtime_label": false
+    },
+    {
+      "classification": "test_or_verifier_only",
+      "kind": "direct_semantic_name_literal",
       "line": 54,
       "path": "tools/verify_decision_audit_observer.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
@@ -8311,7 +8322,7 @@
     }
   ],
   "title": "Debug-name dependency audit",
-  "total_findings": 751,
+  "total_findings": 752,
   "unknown_runtime_logic_split": {
     "ambiguous_runtime_logic": 1,
     "current_unknown_runtime_logic": 0,

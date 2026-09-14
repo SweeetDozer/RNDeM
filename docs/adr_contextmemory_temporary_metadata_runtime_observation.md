@@ -278,6 +278,14 @@ diagnostic hook, changes no runtime source code, adds no `_run_tick()` wiring,
 keeps diagnostics unwired from behavior paths, adds no real ContextMemory
 reads/writes, and leaves AKBSM writes blocked.
 
+The later external tick diagnostic wrapper scaffold exists in
+`clc/runtime/context_temporary_metadata_tick_diagnostics.py`. It remains
+outside `_run_tick()`, runs only a provided tick callable from an explicit
+diagnostic harness, passes no diagnostic data into that callable, returns
+behavior output unchanged, returns diagnostic snapshot data separately, and
+does not influence behavior/scoring/guards/Mode C/PolicyPressureReview or
+writers.
+
 ## Next steps
 
 Review the read-only scenario/test-only ContextMemory temporary metadata

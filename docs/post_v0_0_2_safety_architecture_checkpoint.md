@@ -206,6 +206,12 @@ Temporary metadata tick diagnostic visibility ADR exists:
 - `docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md`
 - `tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py`
 
+Temporary metadata tick diagnostic wrapper scaffold exists:
+
+- `clc/runtime/context_temporary_metadata_tick_diagnostics.py`
+- `tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py`
+- `scenarios/contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.json`
+
 AKBSM writes blocked.
 
 AKBSM proposal creation disabled by default.
@@ -359,6 +365,7 @@ New/important safety architecture verifiers:
 - `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.py`
 - `tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py`
 - `tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py`
+- `tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py`
 
 Existing core guards:
 
@@ -487,6 +494,13 @@ commit AKBSM writes.
   changed, no `_run_tick()` wiring exists, diagnostics remain unwired from
   behavior paths, no real ContextMemory reads/writes exist, and AKBSM writes
   remain blocked.
+- External tick diagnostic wrapper scaffold exists for explicit diagnostic
+  harness use only. It stays outside `_run_tick()`, runs a provided tick
+  callable without diagnostic inputs, preserves behavior output, returns
+  diagnostic snapshot data separately, remains read-only and metadata-only, is
+  not normal runtime default, calls no `ContextMemoryManager`, performs no real
+  ContextMemory reads/writes, and cannot influence behavior/scoring/guards/
+  Mode C/PolicyPressureReview or writers.
   non-authoritative, and no normal runtime or `_run_tick()` observer calls exist.
 - Temporary metadata diagnostic runtime wiring ADR exists as design-only
   guidance. Diagnostic runtime wiring is not implemented yet, no `_run_tick()`

@@ -373,6 +373,26 @@ real ContextMemory reads/writes exist. No behavior/scoring/guard influence
 exists. AKBSM proposal metadata remains non-authoritative for writes. AKBSM
 writes remain blocked.
 
+A later implementation scaffold adds
+`clc/runtime/context_temporary_metadata_tick_diagnostics.py` as the external
+tick diagnostic wrapper surface. It stays outside `_run_tick()`, does not
+modify `_run_tick()`, requires `explicit_tick_diagnostic_harness`, runs a
+provided tick callable without diagnostic inputs, returns behavior output
+unchanged, and returns a diagnostic snapshot separately. The scaffold is
+read-only, metadata-only, not normal runtime default, calls no
+`ContextMemoryManager`, creates no real ContextMemory reads/writes, cannot
+influence behavior/scoring/guards/Mode C/`PolicyPressureReview`, cannot
+authorize writes, keeps AKBSM proposal metadata non-authoritative for writes,
+and leaves AKBSM writes blocked.
+
+`tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py`
+contains the no-behavior-influence proof for this scaffold: direct tick
+callable output equals wrapped behavior output, tick callable args/kwargs stay
+unchanged, diagnostics are separate from behavior output, diagnostics disabled
+or enabled both preserve behavior output, and diagnostic data is not passed
+into the tick callable. No separate no-behavior verifier is required for this
+scaffold.
+
 ## Next steps
 
 Review this ADR before any tick-facing diagnostic visibility implementation
