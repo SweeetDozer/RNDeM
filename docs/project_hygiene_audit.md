@@ -412,6 +412,12 @@ procedure, and the future tag command only. It does not tag `v1.0.0`, keeps
 direct `_run_tick()` hooks deferred, keeps real ContextMemory placement absent,
 and keeps AKBSM writes blocked.
 
+`docs/natural_pattern_data_contract.md` and
+`tools/verify_natural_pattern_data_contract.py` start post-v1 architecture work
+as docs/verifier-only assets. They define natural activation patterns as the
+future data substrate, reject labels/tokens/prompts as primary truth, and keep
+v1 safety boundaries unchanged.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -479,3 +485,7 @@ in a later packaging pass.
 25. Use `docs/v1_release_checklist.md` and
     `tools/verify_v1_release_candidate.py` for the final release-candidate
     review before any separate `v1.0.0` tag pass.
+26. Treat `docs/natural_pattern_data_contract.md` as post-v1 architecture work:
+    it is a design contract for future natural activation-pattern data, not a
+    runtime implementation, sensor adapter, file input API, AKBSM write policy
+    change, or ContextMemory placement approval.

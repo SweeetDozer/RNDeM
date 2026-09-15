@@ -20,6 +20,7 @@ Start with:
 - `docs/adr_contextmemory_temporary_metadata_runtime_observation.md`
 - `docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`
 - `docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md`
+- `docs/natural_pattern_data_contract.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -62,6 +63,7 @@ python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_scaffold.
 python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_no_behavior.py
 python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py
 python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py
+python tools/verify_natural_pattern_data_contract.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -238,6 +240,13 @@ verified by `tools/verify_v1_release_candidate.py`. It documents release
 blockers, the stop-and-review procedure, and the future tag command only;
 `v1.0.0` is not tagged by the checklist pass and requires a separate
 review/merge/tag pass.
+Post-v1 architecture work starts with
+`docs/natural_pattern_data_contract.md`; it defines natural activation patterns
+as RNDeM's fundamental data, rejects prompt/token/class-label semantics as the
+core substrate, separates active AKBSM world-model knowledge from chronicle
+history, and keeps v1 safety boundaries intact. It is docs/verifier-only and
+does not add sensory adapters, pattern-processing implementation, AKBSM writes,
+real ContextMemory placement, or `_run_tick()` wiring.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

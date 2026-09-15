@@ -251,6 +251,12 @@ After v1.0.0 is tagged:
 - review all forbidden paths
 - decide next roadmap only after discussion
 
+Post-v1 design-only contracts may be created after this checkpoint. The Natural
+Pattern Data Contract is allowed only as architecture documentation/verifier
+work: it must not enable sensory adapters, pattern-processing implementation,
+real ContextMemory placement, AKBSM writes, direct `_run_tick()` hooks, default
+diagnostics, or behavior influence.
+
 ## Release blocker list
 
 - dirty working tree

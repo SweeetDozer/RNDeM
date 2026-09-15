@@ -269,6 +269,12 @@ Review whether any direct `_run_tick()` diagnostic hook is justified.
 Review whether AKBSM writes should remain blocked.
 Decide next roadmap only after that review.
 
+Post-v1 architecture documents may be added after the review checkpoint without
+rewriting v1 history. `docs/natural_pattern_data_contract.md` is one such
+post-v1 design contract: it defines natural activation patterns as the future
+data substrate and preserves all v1 safety boundaries until a separate approved
+implementation pass exists.
+
 ## Open questions after v1.0.0
 
 - Should temporary metadata stay permanently external/scaffold-only?
