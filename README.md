@@ -66,6 +66,7 @@ python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_
 python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py
 python tools/verify_natural_pattern_data_contract.py
 python tools/verify_minimal_activation_pattern_substrate_design.py
+python tools/verify_minimal_activation_pattern_substrate.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -246,15 +247,19 @@ Post-v1 architecture work starts with
 `docs/natural_pattern_data_contract.md`; it defines natural activation patterns
 as RNDeM's fundamental data, rejects prompt/token/class-label semantics as the
 core substrate, separates active AKBSM world-model knowledge from chronicle
-history, and keeps v1 safety boundaries intact. It is docs/verifier-only and
-does not add sensory adapters, pattern-processing implementation, AKBSM writes,
-real ContextMemory placement, or `_run_tick()` wiring.
+history, and keeps v1 safety boundaries intact. The first isolated
+pattern-processing substrate now exists separately in `clc/patterns/`; the
+contract still does not approve sensory adapters, AKBSM writes, real
+ContextMemory placement, or `_run_tick()` wiring.
 `docs/design_minimal_activation_pattern_substrate.md` narrows that contract into
 the first implementation-ready substrate boundary: `ActivationPattern`,
 `PatternFrame`, `PatternTrace`, modality/origin/topology, similarity, and
-reactivation. It remains post-v1 docs/verifier-only and does not add
-`clc/patterns/`, persistence, sensor adapters, `_run_tick()` wiring, or memory
-writes.
+reactivation. The isolated in-memory implementation now lives in
+`clc/patterns/` and is covered by
+`tools/verify_minimal_activation_pattern_substrate.py` plus
+`scenarios/minimal_activation_pattern_substrate.json`. It adds no persistence,
+sensor adapters, semantic recognition, `_run_tick()` wiring, AKBSM/ExpSM
+writes, or real ContextMemory placement.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

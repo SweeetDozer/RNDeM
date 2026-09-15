@@ -16,6 +16,12 @@ reflection/pressure influence are not implemented.
 
 ## Directory and module map
 
+`clc/patterns/`
+
+- `model.py`, `similarity.py`, and `reactivation.py` define the isolated
+  in-memory natural activation-pattern substrate. The package is
+  runtime-independent and is not imported by normal runtime code.
+
 `clc/runtime/`
 
 - `clc_runtime.py` wires the runtime, feed methods, `_run_tick()` phase helpers,
@@ -578,6 +584,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_v1_release_candidate.py` | v1 release checklist exists, `v1.0.0` remains untagged, release blockers and stop-and-review procedure are documented, and existing no-write/no-behavior/no-ContextMemory/no-marker-36 safety boundaries still pass |
 | `tools/verify_natural_pattern_data_contract.py` | post-v1 Natural Pattern Data Contract exists, defines activation patterns as fundamental data, rejects labels/tokens/prompts as primary truth, documents AKBSM/ExpSM/chronicle relationships, defers implementation details, and preserves v1 safety boundaries |
 | `tools/verify_minimal_activation_pattern_substrate_design.py` | post-v1 minimal activation-pattern substrate design exists, defines modality/origin/topology/frame/trace/similarity/reactivation boundaries, keeps reactivation non-evidential, defers persistence/adapters/binding, and preserves v1 safety boundaries |
+| `tools/verify_minimal_activation_pattern_substrate.py` | isolated `clc/patterns/` substrate exists, validates immutable pattern/frame/trace models, deterministic same-modality similarity, explicit internal reactivation provenance, scenario coverage, runtime isolation, and unchanged real Memory hashes |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -747,6 +754,10 @@ proposal/no-effect safety rather than canonical phase output.
   PatternFrame, PatternTrace, PatternOrigin, PatternModality, PatternTopology,
   PatternSimilarity, and PatternReactivation while deferring sensor adapters,
   persistence, cross-modal binding, and `_run_tick()` wiring.
+- The isolated minimal activation-pattern substrate now exists in
+  `clc/patterns/`. It is in-memory only, has no sensory adapters or semantic
+  recognition, is not imported by normal runtime code, does not touch
+  `_run_tick()`, and has no AKBSM/ExpSM/ContextMemory write or placement path.
   observer remains unwired from behavior paths, no real ContextMemory
   reads/writes exist, and AKBSM writes remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.

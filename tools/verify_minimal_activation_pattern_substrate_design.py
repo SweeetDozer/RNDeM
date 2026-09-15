@@ -36,12 +36,12 @@ def main() -> int:
                 "does not weaken the Natural Pattern Data Contract",
             ),
         ),
-        "post-v1 docs-only status": _has_all(
+        "post-v1 isolated implementation status": _has_all(
             text,
             (
-                "Post-v1 architecture/design document",
-                "docs/verifier only",
-                "does not implement runtime pattern classes",
+                "Post-v1 architecture/design document with isolated implementation complete",
+                "implemented in `clc/patterns/`",
+                "remains in-memory only and isolated",
             ),
         ),
         "common envelope plus modality topology": _has_all(
@@ -214,10 +214,10 @@ def main() -> int:
                 "Initial validation should use isolated/scenario/test harnesses",
             ),
         ),
-        "next implementation scope bounded": _has_all(
+        "implementation scope bounded": _has_all(
             text,
             (
-                "The next implementation pass should implement only",
+                "The first isolated implementation implements only",
                 "PatternModality",
                 "PatternOrigin",
                 "PatternTopology",
@@ -229,9 +229,11 @@ def main() -> int:
                 "clc/patterns/",
             ),
         ),
-        "future scenarios documented": _has_all(
+        "isolated scenarios documented": _has_all(
             text,
             (
+                "scenarios/minimal_activation_pattern_substrate.json",
+                "tools/verify_minimal_activation_pattern_substrate.py",
                 "create visual external pattern",
                 "frame contains multiple distinct modalities",
                 "raw cross-modality similarity is rejected",

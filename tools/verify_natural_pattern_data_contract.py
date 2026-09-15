@@ -28,12 +28,14 @@ def main() -> int:
     lowered = text.lower()
     results = {
         "natural pattern data contract exists": DOC_PATH.exists(),
-        "post-v1 docs-only status": _has_all(
+        "post-v1 contract status": _has_all(
             lowered,
             (
-                "post-v1 architecture/design contract",
-                "docs-only",
-                "does not implement sensory processing",
+                "post-v1 contract",
+                "first isolated in-memory",
+                "pattern substrate",
+                "contract still does not",
+                "implement sensory processing",
             ),
         ),
         "natural activation patterns are fundamental data": _has_all(
@@ -287,10 +289,11 @@ def main() -> int:
                 "microphone implementation",
             ),
         ),
-        "recommended substrate components are design-only": _has_all(
+        "current minimal substrate documented": _has_all(
             text,
             (
-                "minimal modality-agnostic activation-pattern substrate",
+                "The first isolated in-memory activation-pattern substrate now exists",
+                "clc/patterns/",
                 "ActivationPattern",
                 "PatternFrame",
                 "PatternTrace",
@@ -298,7 +301,7 @@ def main() -> int:
                 "PatternModality",
                 "PatternSimilarity",
                 "PatternReactivation",
-                "Do not implement them in this pass",
+                "not wired into `_run_tick()`",
             ),
         ),
         "no forbidden files": all(not (ROOT / name).exists() for name in FORBIDDEN_FILES),

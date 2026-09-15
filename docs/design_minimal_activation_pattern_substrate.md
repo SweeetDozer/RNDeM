@@ -2,14 +2,14 @@
 
 ## Status
 
-Post-v1 architecture/design document.
+Post-v1 architecture/design document with isolated implementation complete.
 
-This document is docs/verifier only. It does not implement runtime pattern
-classes, `_run_tick()` wiring, pattern persistence, sensor adapters, semantic
-recognition, text/token semantic input, AKBSM writes, ExpSM writes, real
-ContextMemory placement, pattern replay scheduling, or cross-modal binding.
-
-This document does not implement runtime pattern classes.
+The minimal runtime-independent substrate is implemented in `clc/patterns/`.
+It remains in-memory only and isolated from normal CLC runtime behavior. This
+document still does not approve `_run_tick()` wiring, pattern persistence,
+sensor adapters, semantic recognition, text/token semantic input, AKBSM writes,
+ExpSM writes, real ContextMemory placement, pattern replay scheduling, or
+cross-modal binding.
 
 The Natural Pattern Data Contract defines what RNDeM considers fundamental
 data. This design defines the first concrete internal representation boundary
@@ -455,9 +455,9 @@ later explicit integration pass approves it.
 
 Initial validation should use isolated/scenario/test harnesses.
 
-## Minimal Next Implementation Scope
+## Minimal Implementation Scope
 
-The next implementation pass should implement only:
+The first isolated implementation implements only:
 
 - PatternModality
 - PatternOrigin
@@ -487,9 +487,10 @@ Keep it small.
 Do not implement modality encoders. Do not implement sensor hardware. Do not
 implement semantic recognition.
 
-## Required Isolated Scenarios For Next Implementation
+## Implemented Isolated Scenario Coverage
 
-Future isolated scenario coverage should include:
+`scenarios/minimal_activation_pattern_substrate.json` and
+`tools/verify_minimal_activation_pattern_substrate.py` cover:
 
 - create visual external pattern
 - create audio external pattern
@@ -555,3 +556,5 @@ This pass does not create or modify:
 - `technical_feedback_patterns.json`
 
 Do not tag or merge from this design pass.
+
+The implementation pass must still not merge or tag automatically.

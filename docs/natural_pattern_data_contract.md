@@ -4,10 +4,11 @@
 
 Post-v1 architecture/design contract.
 
-This document is docs-only. It does not implement sensory processing, pattern
-processing, memory writers, real ContextMemory placement, AKBSM writes, ExpSM
-writes, sensor adapters, file input APIs, direct `_run_tick()` hooks, default
-runtime diagnostics, or behavior influence.
+This document is the post-v1 contract. The first isolated in-memory pattern
+substrate now exists under `clc/patterns/`, but this contract still does not
+implement sensory processing, memory writers, real ContextMemory placement,
+AKBSM writes, ExpSM writes, sensor adapters, file input APIs, direct
+`_run_tick()` hooks, default runtime diagnostics, or behavior influence.
 
 `v1.0.0` remains the safe runtime/container baseline. This contract defines the
 kind of data substrate future post-v1 CLC development should introduce.
@@ -493,6 +494,17 @@ This pass does not enable:
 - sensor adapters
 - text/image/audio file input APIs
 
+## Current Minimal Substrate
+
+The first isolated in-memory activation-pattern substrate now exists in
+`clc/patterns/`. It implements `PatternModality`, `PatternOrigin`,
+`PatternTopology`, `ActivationPattern`, `PatternFrame`, `PatternTrace`,
+`PatternSimilarity`, and `PatternReactivation`.
+
+This implementation is not wired into `_run_tick()`, has no sensory adapters,
+does not perform semantic recognition, and has no AKBSM, ExpSM, or real
+ContextMemory integration.
+
 ## Deferred Design Questions
 
 Deferred:
@@ -518,26 +530,6 @@ Deferred:
 
 ## Recommended Next Step
 
-The first implementation after explicit approval should be a minimal
-modality-agnostic activation-pattern substrate, before real camera/microphone
-integration.
-
-The first implementation should be a minimal modality-agnostic activation-pattern substrate.
-
-Post-v1 design note: `docs/design_minimal_activation_pattern_substrate.md`
-defines that first substrate boundary as a design-only step. It specifies
-`ActivationPattern`, `PatternFrame`, `PatternTrace`, `PatternOrigin`,
-`PatternModality`, `PatternTopology`, `PatternSimilarity`, and
-`PatternReactivation` without implementing them or wiring them into runtime.
-
-Suggested future components, design only:
-
-- ActivationPattern
-- PatternFrame
-- PatternTrace
-- PatternOrigin
-- PatternModality
-- PatternSimilarity
-- PatternReactivation
-
-Do not implement them in this pass.
+Review and merge the isolated substrate implementation. After a clean review,
+the next design step should be the first natural-pattern source/transduction
+layer without semantic labels.
