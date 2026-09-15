@@ -577,6 +577,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_v1_readiness_criteria.py` | v1 readiness criteria exist, define `v1.0.0` as a stable safety-bounded prototype checkpoint, preserve forbidden runtime/write/behavior paths, and require memory/runtime/verifier/release invariants |
 | `tools/verify_v1_release_candidate.py` | v1 release checklist exists, `v1.0.0` remains untagged, release blockers and stop-and-review procedure are documented, and existing no-write/no-behavior/no-ContextMemory/no-marker-36 safety boundaries still pass |
 | `tools/verify_natural_pattern_data_contract.py` | post-v1 Natural Pattern Data Contract exists, defines activation patterns as fundamental data, rejects labels/tokens/prompts as primary truth, documents AKBSM/ExpSM/chronicle relationships, defers implementation details, and preserves v1 safety boundaries |
+| `tools/verify_minimal_activation_pattern_substrate_design.py` | post-v1 minimal activation-pattern substrate design exists, defines modality/origin/topology/frame/trace/similarity/reactivation boundaries, keeps reactivation non-evidential, defers persistence/adapters/binding, and preserves v1 safety boundaries |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -740,6 +741,12 @@ proposal/no-effect safety rather than canonical phase output.
   non-primary symbolic material, distinguishes active AKBSM knowledge from
   chronicle history, defines ExpSM as operational pattern/action/consequence
   memory, and defers all ActivationPattern/sensor implementation details.
+- Post-v1 minimal activation-pattern substrate design exists in
+  `docs/design_minimal_activation_pattern_substrate.md`. It narrows the data
+  contract into an implementation-ready boundary for ActivationPattern,
+  PatternFrame, PatternTrace, PatternOrigin, PatternModality, PatternTopology,
+  PatternSimilarity, and PatternReactivation while deferring sensor adapters,
+  persistence, cross-modal binding, and `_run_tick()` wiring.
   observer remains unwired from behavior paths, no real ContextMemory
   reads/writes exist, and AKBSM writes remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.

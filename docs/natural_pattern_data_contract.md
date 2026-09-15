@@ -524,6 +524,12 @@ integration.
 
 The first implementation should be a minimal modality-agnostic activation-pattern substrate.
 
+Post-v1 design note: `docs/design_minimal_activation_pattern_substrate.md`
+defines that first substrate boundary as a design-only step. It specifies
+`ActivationPattern`, `PatternFrame`, `PatternTrace`, `PatternOrigin`,
+`PatternModality`, `PatternTopology`, `PatternSimilarity`, and
+`PatternReactivation` without implementing them or wiring them into runtime.
+
 Suggested future components, design only:
 
 - ActivationPattern

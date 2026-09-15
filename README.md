@@ -21,6 +21,7 @@ Start with:
 - `docs/adr_contextmemory_temporary_metadata_diagnostic_wiring.md`
 - `docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md`
 - `docs/natural_pattern_data_contract.md`
+- `docs/design_minimal_activation_pattern_substrate.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -64,6 +65,7 @@ python tools/verify_contextmemory_temporary_metadata_diagnostic_wiring_negative_
 python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_visibility_adr.py
 python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_scaffold.py
 python tools/verify_natural_pattern_data_contract.py
+python tools/verify_minimal_activation_pattern_substrate_design.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -247,6 +249,12 @@ core substrate, separates active AKBSM world-model knowledge from chronicle
 history, and keeps v1 safety boundaries intact. It is docs/verifier-only and
 does not add sensory adapters, pattern-processing implementation, AKBSM writes,
 real ContextMemory placement, or `_run_tick()` wiring.
+`docs/design_minimal_activation_pattern_substrate.md` narrows that contract into
+the first implementation-ready substrate boundary: `ActivationPattern`,
+`PatternFrame`, `PatternTrace`, modality/origin/topology, similarity, and
+reactivation. It remains post-v1 docs/verifier-only and does not add
+`clc/patterns/`, persistence, sensor adapters, `_run_tick()` wiring, or memory
+writes.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

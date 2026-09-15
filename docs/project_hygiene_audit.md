@@ -418,6 +418,13 @@ as docs/verifier-only assets. They define natural activation patterns as the
 future data substrate, reject labels/tokens/prompts as primary truth, and keep
 v1 safety boundaries unchanged.
 
+`docs/design_minimal_activation_pattern_substrate.md` and
+`tools/verify_minimal_activation_pattern_substrate_design.py` refine that
+contract into a design-only implementation boundary for modality/origin/topology
+patterns, frames, traces, similarity, and reactivation. They intentionally add
+no runtime classes, `clc/patterns/` package, persistence, sensor adapters,
+memory writes, or `_run_tick()` wiring.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -489,3 +496,6 @@ in a later packaging pass.
     it is a design contract for future natural activation-pattern data, not a
     runtime implementation, sensor adapter, file input API, AKBSM write policy
     change, or ContextMemory placement approval.
+27. Treat `docs/design_minimal_activation_pattern_substrate.md` as the review
+    gate before any isolated `clc/patterns/` implementation. Keep the first
+    implementation scenario/test-only and outside `_run_tick()`.
