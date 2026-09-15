@@ -154,13 +154,16 @@ def main() -> int:
                 "internal thought",
             ),
         ),
-        "pattern traces deferred": _has_all(
+        "windows and sequences documented": _has_all(
             text,
             (
-                "PatternTrace",
-                "memory-compatible historical trace",
+                "NFPFrame",
+                "NFPWindow",
+                "NFPSequence",
+                "local temporal dynamics",
+                "memory-compatible substrate material",
                 "what raw detail is retained",
-                "how traces decay or consolidate",
+                "how windows/sequences decay or consolidate",
             ),
         ),
         "AKBSM explicit associative world model": _has_all(
@@ -278,7 +281,7 @@ def main() -> int:
         "implementation details deferred": _has_all(
             text,
             (
-                "exact ActivationPattern Python representation",
+                "exact future NFPFrame representation beyond the minimal Python scaffold",
                 "dense vs sparse patterns",
                 "visual resolution",
                 "audio representation",
@@ -294,13 +297,14 @@ def main() -> int:
             (
                 "The first isolated in-memory activation-pattern substrate now exists",
                 "clc/patterns/",
-                "ActivationPattern",
-                "PatternFrame",
-                "PatternTrace",
+                "NFPFrame",
+                "NFPWindow",
+                "NFPSequence",
                 "PatternOrigin",
                 "PatternModality",
-                "PatternSimilarity",
-                "PatternReactivation",
+                "NFPFrameSimilarity",
+                "NFPWindowSimilarity",
+                "NFPReactivation",
                 "not wired into `_run_tick()`",
             ),
         ),

@@ -252,8 +252,8 @@ pattern-processing substrate now exists separately in `clc/patterns/`; the
 contract still does not approve sensory adapters, AKBSM writes, real
 ContextMemory placement, or `_run_tick()` wiring.
 `docs/design_minimal_activation_pattern_substrate.md` narrows that contract into
-the first implementation-ready substrate boundary: `ActivationPattern`,
-`PatternFrame`, `PatternTrace`, modality/origin/topology, similarity, and
+the first implementation-ready substrate boundary: `NFPFrame -> NFPWindow ->
+NFPSequence`, modality/origin/topology, frame/window similarity, and
 reactivation. The isolated in-memory implementation now lives in
 `clc/patterns/` and is covered by
 `tools/verify_minimal_activation_pattern_substrate.py` plus

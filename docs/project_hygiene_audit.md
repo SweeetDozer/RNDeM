@@ -421,13 +421,15 @@ v1 safety boundaries unchanged.
 `docs/design_minimal_activation_pattern_substrate.md` and
 `tools/verify_minimal_activation_pattern_substrate_design.py` refined that
 contract into the implementation boundary for modality/origin/topology
-patterns, frames, traces, similarity, and reactivation while forbidding
-persistence, sensor adapters, memory writes, and `_run_tick()` wiring.
+NFP frames, windows, sequences, frame/window similarity, and reactivation while
+forbidding persistence, sensor adapters, memory writes, and `_run_tick()`
+wiring.
 
 `clc/patterns/`, `scenarios/minimal_activation_pattern_substrate.json`, and
 `tools/verify_minimal_activation_pattern_substrate.py` add the first isolated
-post-v1 natural activation-pattern substrate implementation. It is in-memory
-only, immutable/effectively immutable, runtime-independent, and has no sensory
+post-v1 natural activation-pattern substrate implementation. It explicitly
+preserves `NFPFrame -> NFPWindow -> NFPSequence`, is in-memory only,
+immutable/effectively immutable, runtime-independent, and has no sensory
 adapters, semantic recognition, persistence, AKBSM/ExpSM writes, real
 ContextMemory placement, or `_run_tick()` wiring.
 

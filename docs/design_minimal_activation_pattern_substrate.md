@@ -13,27 +13,55 @@ cross-modal binding.
 
 The Natural Pattern Data Contract defines what RNDeM considers fundamental
 data. This design defines the first concrete internal representation boundary
-for that data.
+for that data and does not weaken the Natural Pattern Data Contract.
 
-Natural Pattern Data Contract defines what RNDeM considers fundamental data.
+The Natural Pattern Data Contract defines what RNDeM considers fundamental data.
 
 ## Design Goal
 
 Define a minimal implementation-ready substrate for:
 
-- ActivationPattern
-- PatternFrame
-- PatternTrace
+- NFPFrame
+- NFPWindow
+- NFPSequence
 - PatternOrigin
 - PatternModality
 - PatternTopology
-- PatternSimilarity
-- PatternReactivation
+- NFPFrameSimilarity
+- NFPWindowSimilarity
+- NFPReactivation
 
-The next implementation pass should be isolated and scenario/test driven. It
-should not be wired into normal runtime or `_run_tick()`.
+The implementation is isolated and scenario/test driven. It is not wired into
+normal runtime or `_run_tick()`.
 
-## Fundamental Decision
+## Fundamental Temporal Hierarchy
+
+The natural-pattern substrate uses:
+
+```text
+NFPFrame
+-> NFPWindow
+-> NFPSequence
+```
+
+This hierarchy is fundamental.
+
+`NFPFrame` is one modality-specific activation state at one active tick.
+
+`NFPWindow` is a short ordered temporal group of compatible `NFPFrame` objects.
+
+`NFPSequence` is a longer ordered temporal structure composed from
+`NFPWindow` objects.
+
+A frame represents instantaneous activation. A window represents local temporal
+dynamics. A sequence represents longer temporal behavior or process.
+
+A window represents local temporal dynamics.
+
+Do not collapse `NFPWindow` and `NFPSequence` into one generic trace
+abstraction.
+
+## Common Envelope
 
 Use a common pattern envelope with modality-specific topology.
 
@@ -42,12 +70,13 @@ Do not force all modalities to share the same geometric shape.
 Conceptually:
 
 ```text
-ActivationPattern
+NFPFrame
+|-- frame_id
 |-- modality
 |-- origin
 |-- topology
 |-- activation values
-|-- active-time metadata
+|-- active_tick
 `-- provenance
 ```
 
@@ -59,13 +88,17 @@ The topology/shape belongs to the modality.
 Examples:
 
 - visual -> spatial field topology
-- audio -> temporal/frequency-like topology
+- audio -> frequency-channel frame topology, with temporal structure in window
 - internal -> distributed state/channel topology
 - pain/damage -> internal channel topology
 - reward -> internal evaluative channel topology
 - action -> action/motor channel topology
 
 These are examples, not permanent hardware representations.
+
+The initial implementation uses small/simple topologies while preserving the
+intended long-term structure. Resolution is adjustable; the Frame -> Window ->
+Sequence hierarchy is not.
 
 ## PatternModality
 
@@ -80,8 +113,8 @@ Minimum modalities:
 
 Memory/reactivation is not itself a sensory modality.
 
-A reactivated visual pattern remains VISUAL. A reactivated audio pattern
-remains AUDIO. Its origin changes; its modality does not.
+A reactivated visual frame remains VISUAL. A reactivated audio frame remains
+AUDIO. Its origin changes; its modality does not.
 
 Modality expresses what kind of activation it is.
 
@@ -98,18 +131,12 @@ Origin expresses how the current activation entered the substrate.
 
 Do not conflate modality and origin.
 
-Future extension points may include simulated sensory origin, imported
-fixture-origin, or tool-mediated origin, but the v1.x implementation should stay
-minimal.
-
 ## Critical Provenance Rule
 
 An internally reactivated pattern is not new environmental evidence.
 
-Internal replay may participate in reasoning. Internal replay may activate
-associations. Internal replay may influence expectations. Internal replay may
-influence action preparation. Internal replay may be compared to current
-external sensory patterns.
+Internal replay may participate in reasoning, associations, expectations, and
+action preparation. It may be compared to current external sensory frames.
 
 But INTERNAL_REACTIVATION must not by itself count as fresh external
 confirmation of an AKBSM relation.
@@ -122,131 +149,147 @@ remembering it repeatedly.
 Internal reactivation alone must not generate a new environmental consequence
 record.
 
-Internal reactivation alone must not generate a new environmental consequence record.
-
 Future AKBSM/ExpSM evaluation must preserve provenance.
 
-## ActivationPattern
+## NFPFrame
 
-ActivationPattern is an immutable or effectively immutable occurrence-level
-activation snapshot.
+`NFPFrame` is an immutable or effectively immutable occurrence-level activation
+snapshot.
 
-Required conceptual fields:
+Required fields:
 
-- pattern_id
+- frame_id
 - modality
 - origin
 - topology
 - values
 - active_tick
-- source_ref / provenance_ref optional
+- provenance_ref optional
+- debug_name optional
 
 Do not require a human-readable semantic name.
 
-Optional debug metadata may exist separately. Pattern identity must not be
+Optional debug metadata may exist separately. Frame identity must not be
 derived from a debug label.
 
-One ActivationPattern represents one modality/domain occurrence.
+One `NFPFrame` represents one modality/domain occurrence at one active tick.
 
-Do not create multimodal ActivationPattern payloads. Cross-modal binding
-belongs to a future episode/context/association layer.
+Do not create multimodal `NFPFrame` payloads. Cross-modal binding belongs to a
+future episode/context/association layer.
 
 Cross-modal binding belongs to a future episode/context/association layer.
 
-Example future relationship:
+## PatternMoment
 
-```text
-visual pattern V
-audio pattern A
-internal pattern I
-```
+`PatternMoment` is an optional multimodal same-tick grouping helper for
+distinct modality-specific `NFPFrame` objects at the same active tick.
 
-may be bound by a future event/episode structure. Their raw values should not
-be merged into one pattern merely because they occurred together.
+It may contain visual, audio, internal, pain/damage, reward/success, and action
+frames simultaneously.
+
+`PatternMoment` is not an `NFPFrame`. It is not semantic interpretation and it
+does not itself mean "event".
 
 ## Values
 
-The first implementation should use simple normalized numeric activation values
-in the range:
+The first implementation uses simple normalized numeric activation values in
+the range:
 
 ```text
 0.0 .. 1.0
 ```
 
-This is an implementation substrate choice, not a claim that biological neurons
-operate identically.
-
 Do not add symbolic meaning to individual values.
 
 ## PatternTopology
 
-PatternTopology is a lightweight descriptor of how activation values are
+`PatternTopology` is a lightweight descriptor of how activation values are
 arranged. It describes structure without defining semantic meaning.
 
 Conceptual examples:
 
 ```text
-shape=(16,16)         # visual field
-shape=(32,8)          # possible audio time/frequency field
+shape=(16,16)         # visual frame field
+shape=(8,)            # audio frequency-channel frame
 shape=(12,)           # internal channels
 shape=(6,)            # action channels
 ```
 
 Do not interpret shape dimensions as semantic labels.
 
-Topology may include a topology/domain identifier if useful. Keep the first
-implementation simple.
+Do not commit to final visual resolution. Do not commit to final audio
+representation. Audio temporal structure belongs in `NFPWindow`.
 
-## PatternFrame
+## NFPWindow
 
-PatternFrame is a collection of activation patterns belonging to one logical
-active-time slice.
+`NFPWindow` is a short ordered temporal group of compatible `NFPFrame` objects.
 
-PatternFrame is a collection belonging to one logical active-time slice.
+Required invariants:
 
-Conceptually:
+- window_id is non-empty
+- at least one frame
+- all frames share modality
+- all frames share compatible/equal topology
+- frame active_ticks strictly increase
+- duplicate frame IDs are rejected
 
-```text
-PatternFrame
-|-- active_tick
-`-- patterns[]
-```
+Derived properties:
 
-A frame may contain multiple modalities simultaneously.
+- modality
+- topology
+- start_tick
+- end_tick
+- length
 
-Example:
+A single frame can express spatial/state activation. A window can express local
+dynamics.
 
-```text
-tick 120:
-  visual pattern
-  audio pattern
-  internal-state pattern
-```
-
-The patterns remain distinct. PatternFrame is not semantic interpretation.
-PatternFrame does not itself mean "event".
-
-## PatternTrace
-
-PatternTrace is a bounded ordered trace of occurrences across active time.
-
-Conceptually:
+Example visual movement:
 
 ```text
-PatternTrace
-|-- trace_id
-|-- frames / pattern occurrences
-|-- start_tick
-|-- end_tick
-`-- provenance
+tick 10: activation at x=1
+tick 11: activation at x=2
+tick 12: activation at x=3
 ```
 
-For the minimal implementation, keep it generic.
+The movement exists in the window, not in any one frame.
 
-Do not decide final long-term retention/consolidation policy yet.
+Example audio:
 
-A PatternTrace is not automatically AKBSM knowledge, ExpSM experience, or a
-chronicle fact. It is substrate material that later systems may consume.
+```text
+tick 20: frequency activation A
+tick 21: frequency activation B
+tick 22: frequency activation C
+```
+
+The local sound structure exists across the window.
+
+## NFPSequence
+
+`NFPSequence` is a longer ordered temporal structure made from `NFPWindow`
+objects.
+
+Required invariants:
+
+- sequence_id is non-empty
+- at least one window
+- windows share modality
+- windows use compatible/equal topology
+- windows are ordered by temporal position
+
+Do not overdesign overlap rules yet. If windows overlap in time, preserve their
+ordering and leave detailed overlap policy deferred.
+
+Derived properties:
+
+- modality
+- topology
+- start_tick
+- end_tick
+- window_count
+
+A sequence is substrate material. It is not automatically an entity, event,
+AKBSM truth, ExpSM experience, or chronicle fact.
 
 ## Active Time
 
@@ -258,86 +301,86 @@ active_tick is the primary temporal coordinate.
 
 Do not make wall-clock time fundamental to pattern identity.
 
-External timestamps may later exist as metadata, but they are not the
-fundamental lifetime axis.
-
-This aligns with the existing RNDeM heart/active-tick concept. Do not implement
-Heart integration in this pass.
-
 Do not implement Heart integration in this pass.
 
-## PatternSimilarity
+## Similarity
 
-PatternSimilarity is a measurement boundary, not semantic identity.
+Similarity is a measurement boundary, not semantic identity.
 
-Conceptually:
+Frame similarity measures instantaneous activation resemblance.
+
+Window similarity measures short temporal-pattern resemblance.
+
+They are not interchangeable.
+
+### NFPFrameSimilarity
+
+Frame similarity uses:
 
 ```text
-similar(pattern_a, pattern_b)
+1.0 - mean(abs(left_i - right_i))
 ```
 
-may only be directly meaningful when topology/modality compatibility rules
-permit comparison.
+Only same modality and compatible/equal topology frames are comparable.
 
-First implementation recommendation:
+Different modality or topology returns non-comparable with no score.
 
-- same modality
-- compatible topology
-- normalized activation-distance/similarity
+### NFPWindowSimilarity
 
-Do not choose a sophisticated neural embedding algorithm yet.
+Window similarity is deterministic and minimal.
 
-Do not use human labels.
+Only same modality, compatible/equal topology, same frame count windows are
+comparable.
 
-Similarity must not automatically create AKBSM relations.
+The first implementation computes:
 
-Return a similarity score as a measurement, not truth.
+```text
+mean(aligned frame similarity scores)
+```
 
-## Cross-Modality Similarity
+Do not implement dynamic time warping, learned embedding, temporal alignment,
+neural similarity, or sequence similarity yet.
 
-Do not directly compare raw VISUAL values with raw AUDIO values in the minimal
-substrate.
-
-Raw cross-modal similarity is not part of the minimal substrate.
+Raw cross-modal similarity is rejected. Cross-modal relationships belong to
+learned association/binding layers.
 
 Cross-modal relationships belong to learned association/binding layers.
 
-## PatternReactivation
+## NFPReactivation
 
-PatternReactivation creates a new occurrence that refers to a previously
-experienced pattern/trace while preserving modality and changing
-provenance/origin.
+`NFPReactivation.reactivate_frame()` creates a new frame occurrence that refers
+to a previously experienced frame while preserving modality and changing
+origin/provenance.
 
-Conceptually:
+Required behavior:
 
-```text
-external VISUAL pattern P at tick 100
+- new frame identity
+- new active_tick
+- same modality
+- same topology
+- same values
+- origin = INTERNAL_REACTIVATION
+- provenance_ref = source frame ID
 
-later internal replay:
-VISUAL pattern P' at tick 300
-origin = INTERNAL_REACTIVATION
-source_ref = P / trace
-```
+The source frame remains immutable.
 
-P' is a new activation occurrence. It is not the same event as P.
-
-It may reproduce all or part of P's activation values.
-
-Do not define final replay fidelity/noise model yet.
+Window/sequence replay scheduling is not implemented. The model allows future
+replay to reconstruct a temporal series of internally reactivated `NFPFrame`
+objects, but scheduler and timing policy are deferred.
 
 ## External Vs Internal Equality
 
-Two patterns may have identical activation values while representing different
+Two frames may have identical activation values while representing different
 epistemic situations.
 
 Example:
 
 ```text
-Pattern A:
+NFPFrame A:
 modality = VISUAL
 origin = EXTERNAL_SENSORY
 
-Pattern B:
+NFPFrame B:
 modality = VISUAL
 origin = INTERNAL_REACTIVATION
 ```
@@ -348,89 +391,52 @@ Their values may be identical. They are not equivalent as evidence.
 
 ACTION is a normal activation modality/domain in the substrate.
 
-An action pattern:
+ACTION frames and ACTION windows may describe motor/action-channel dynamics.
+
+An action frame/window:
 
 - does not contain its own consequence
 - does not declare whether it succeeded
 - does not directly write ExpSM
 
+Consequences arrive later through sensory/internal frames.
+
 Consequences arrive later through sensory/internal patterns.
-
-This preserves:
-
-```text
-action
--> environment
--> consequence
--> sensory/internal activation
-```
-
-rather than:
-
-```text
-action function
--> return value treated as truth
-```
 
 ## Pain / Reward / Internal Patterns
 
-PAIN_DAMAGE and REWARD_SUCCESS may initially be represented as dedicated pattern
-modalities/domains because they are important evaluative signals.
+PAIN_DAMAGE and REWARD_SUCCESS are ordinary activation modalities/domains.
 
-However:
-
-- they are still activation patterns
-- they are not magic scalar truth injected directly into AKBSM
-- they do not directly authorize memory writes
-- their interpretation belongs to later evaluation/experience mechanisms
-
-Do not overdesign affect/emotion here.
+They are not magic scalar truth injected directly into AKBSM, and they do not
+directly authorize memory writes.
 
 ## Pattern Identity
 
 Distinguish:
 
 - occurrence identity
-- pattern similarity
+- frame similarity
+- window similarity
 - stable learned entity identity
 
-An ActivationPattern.pattern_id identifies the occurrence/object.
+An `NFPFrame.frame_id` identifies the frame occurrence/object.
 
 It does not mean that two different occurrences with similar values are already
 the same learned entity.
-
-It does not mean that two different occurrences with similar values are already the same learned entity.
 
 Stable entities are future AKBSM/pattern-abstraction work.
 
 ## Debug Labels
 
-Optional debug labels may be allowed as non-semantic metadata only.
+Optional debug labels are non-semantic metadata only.
 
 ```text
 debug_name="dog"
 ```
 
-does not mean the pattern is a dog.
+does not mean the frame is a dog.
 
 No runtime logic may branch on debug labels.
-
-This preserves the existing debug-name safety philosophy.
-
-## Mutability
-
-Recommend immutable/frozen pattern/frame objects for the first implementation.
-
-New sensory state should create new occurrences rather than mutate historical
-occurrences in place.
-
-A trace/container may accumulate references according to its own controlled API.
-
-Reasons:
-
-- historical occurrence identity should remain stable
-- provenance should remain auditable
-- replay should create a new occurrence
 
 ## No Persistence Yet
 
@@ -442,73 +448,74 @@ Do not define:
 - AKBSM writes
 - ExpSM writes
 - ContextMemory placement
-- long-term trace storage
-
-Those require later passes.
+- long-term sequence storage
 
 ## No _run_tick Wiring Yet
 
-The first implementation of this substrate must initially be isolated.
+This substrate is isolated.
 
-Do not wire it into `_run_tick()` in the next implementation pass unless a
-later explicit integration pass approves it.
+Do not wire it into `_run_tick()` unless a later explicit integration pass
+approves it.
 
-Initial validation should use isolated/scenario/test harnesses.
+Initial validation uses isolated/scenario/test harnesses.
 
-## Minimal Implementation Scope
+## Natural Data Flow
 
-The first isolated implementation implements only:
-
-- PatternModality
-- PatternOrigin
-- PatternTopology
-- ActivationPattern
-- PatternFrame
-- PatternTrace
-- PatternSimilarity
-- PatternReactivation
-
-Suggested module location:
+The substrate reinforces:
 
 ```text
-clc/patterns/
+world
+-> transduction
+-> NFPFrames
+-> NFPWindows
+-> NFPSequences
+-> later associations/experience/action
 ```
 
-Possible files, adjusted to project style:
+It does not implement:
 
 ```text
-clc/patterns/model.py
-clc/patterns/similarity.py
-clc/patterns/reactivation.py
+image file -> semantic image object
+audio file -> transcript
+text -> token meaning
 ```
-
-Keep it small.
-
-Do not implement modality encoders. Do not implement sensor hardware. Do not
-implement semantic recognition.
 
 ## Implemented Isolated Scenario Coverage
 
 `scenarios/minimal_activation_pattern_substrate.json` and
 `tools/verify_minimal_activation_pattern_substrate.py` cover:
 
-- create visual external pattern
-- create audio external pattern
-- create internal-state pattern
-- create action pattern
-- frame contains multiple distinct modalities
-- same-modality compatible patterns can be compared
-- incompatible topology comparison is rejected/safe-no-op
-- raw cross-modality similarity is rejected
-- reactivation preserves modality
-- reactivation changes origin to INTERNAL_REACTIVATION
-- reactivation creates new occurrence identity
-- reactivated pattern preserves source provenance
-- reactivated pattern is not marked as external evidence
-- identical external/replayed values remain epistemically distinct
-- debug labels do not define identity
-- action pattern contains no consequence truth
-- no AKBSM/ExpSM/ContextMemory writes occur
+- create VISUAL external NFPFrame
+- create AUDIO external NFPFrame
+- create INTERNAL frame
+- create ACTION frame
+- NFPFrame validation
+- NFPWindow accepts ordered same-modality compatible frames
+- NFPWindow rejects mixed modalities
+- NFPWindow rejects incompatible topology
+- NFPWindow rejects duplicate frame IDs
+- NFPWindow rejects unordered ticks
+- NFPWindow exposes modality/topology/start/end/length
+- NFPSequence accepts ordered compatible windows
+- NFPSequence rejects mixed modality
+- NFPSequence rejects incompatible topology
+- NFPSequence exposes start/end/window_count
+- frame similarity identical = 1.0
+- frame similarity differing activation = [0,1]
+- cross-modal frame comparison non-comparable
+- topology mismatch non-comparable
+- identical windows = 1.0
+- different compatible windows produce deterministic score
+- different window lengths non-comparable
+- reactivation creates a new NFPFrame
+- reactivation preserves modality/topology/values
+- reactivation origin becomes INTERNAL_REACTIVATION
+- external and internally replayed identical values remain epistemically distinct
+- debug_name does not affect similarity
+- no AKBSM writes
+- no ExpSM writes
+- no ContextMemory writes
+- no `_run_tick()` integration
 
 ## Deferred Questions
 
@@ -520,7 +527,7 @@ Deferred:
 - visual resolution
 - sparse representation
 - compression
-- long-term trace retention
+- long-term sequence retention
 - pattern consolidation
 - stable entity formation
 - cross-modal episode binding
@@ -538,9 +545,8 @@ Deferred:
 
 This design does not weaken the Natural Pattern Data Contract.
 
-This pass does not create or modify:
+This implementation does not create or modify:
 
-- runtime pattern classes
 - `_run_tick()`
 - normal runtime wiring
 - camera/microphone adapters
@@ -555,6 +561,4 @@ This pass does not create or modify:
 - `semantic_core.json`
 - `technical_feedback_patterns.json`
 
-Do not tag or merge from this design pass.
-
-The implementation pass must still not merge or tag automatically.
+Do not tag or merge from this implementation pass.

@@ -238,10 +238,23 @@ The consequence must be learned from subsequent sensory/internal input.
 Function return values must not be treated as learned consequences or world
 truth.
 
-## Pattern Traces
+## Windows And Sequences
 
-A PatternTrace is a memory-compatible historical trace of a pattern occurrence,
-not necessarily the original full raw activation field forever.
+The minimal post-v1 substrate distinguishes:
+
+```text
+NFPFrame
+-> NFPWindow
+-> NFPSequence
+```
+
+An `NFPFrame` is one modality-specific activation state at one active tick.
+An `NFPWindow` is a short ordered group of compatible frames that can express
+local temporal dynamics. An `NFPSequence` is a longer ordered structure made
+from windows.
+
+A sequence is memory-compatible substrate material, not necessarily the
+original full raw activation field forever.
 
 Future design must decide:
 
@@ -249,7 +262,7 @@ Future design must decide:
 - what abstractions are retained
 - how repeated patterns become stable entities
 - how similarity is computed
-- how traces decay or consolidate
+- how windows/sequences decay or consolidate
 
 Those decisions are deferred.
 
@@ -497,9 +510,20 @@ This pass does not enable:
 ## Current Minimal Substrate
 
 The first isolated in-memory activation-pattern substrate now exists in
-`clc/patterns/`. It implements `PatternModality`, `PatternOrigin`,
-`PatternTopology`, `ActivationPattern`, `PatternFrame`, `PatternTrace`,
-`PatternSimilarity`, and `PatternReactivation`.
+`clc/patterns/`. It implements the explicit temporal hierarchy:
+
+```text
+NFPFrame
+-> NFPWindow
+-> NFPSequence
+```
+
+It also implements `PatternModality`, `PatternOrigin`, `PatternTopology`,
+`NFPFrameSimilarity`, `NFPWindowSimilarity`, and `NFPReactivation`.
+
+`NFPFrame` represents one modality-specific activation state at one active
+tick. `NFPWindow` represents local temporal dynamics across compatible frames.
+`NFPSequence` represents longer temporal behavior/process across windows.
 
 This implementation is not wired into `_run_tick()`, has no sensory adapters,
 does not perform semantic recognition, and has no AKBSM, ExpSM, or real
@@ -509,14 +533,14 @@ ContextMemory integration.
 
 Deferred:
 
-- exact ActivationPattern Python representation
+- exact future NFPFrame representation beyond the minimal Python scaffold
 - dense vs sparse patterns
 - pattern dimensionality
 - visual resolution
 - audio representation
 - similarity algorithm
 - pattern compression
-- pattern trace retention
+- pattern sequence retention
 - pattern consolidation
 - pattern-to-entity threshold
 - cross-modal binding algorithm

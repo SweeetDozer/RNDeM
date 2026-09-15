@@ -6,7 +6,7 @@ from enum import Enum
 
 
 class PatternModality(str, Enum):
-    """Activation domain for a pattern occurrence."""
+    """Activation domain for a natural frame."""
 
     VISUAL = "visual"
     AUDIO = "audio"
@@ -17,7 +17,7 @@ class PatternModality(str, Enum):
 
 
 class PatternOrigin(str, Enum):
-    """How an activation pattern entered the substrate."""
+    """How an activation frame entered the substrate."""
 
     EXTERNAL_SENSORY = "external_sensory"
     INTERNAL_STATE = "internal_state"
@@ -47,10 +47,10 @@ class PatternTopology:
 
 
 @dataclass(frozen=True)
-class ActivationPattern:
-    """Immutable occurrence-level activation snapshot."""
+class NFPFrame:
+    """One modality-specific activation state at one active tick."""
 
-    pattern_id: str
+    frame_id: str
     modality: PatternModality
     origin: PatternOrigin
     topology: PatternTopology
@@ -60,9 +60,9 @@ class ActivationPattern:
     debug_name: str | None = None
 
     def __post_init__(self) -> None:
-        pattern_id = str(self.pattern_id).strip()
-        if not pattern_id:
-            raise ValueError("pattern_id must be non-empty")
+        frame_id = str(self.frame_id).strip()
+        if not frame_id:
+            raise ValueError("frame_id must be non-empty")
         if not isinstance(self.modality, PatternModality):
             raise TypeError("modality must be PatternModality")
         if not isinstance(self.origin, PatternOrigin):
@@ -80,7 +80,7 @@ class ActivationPattern:
                 raise ValueError("activation values must be in [0.0, 1.0]")
         provenance_ref = None if self.provenance_ref is None else str(self.provenance_ref).strip()
         debug_name = None if self.debug_name is None else str(self.debug_name)
-        object.__setattr__(self, "pattern_id", pattern_id)
+        object.__setattr__(self, "frame_id", frame_id)
         object.__setattr__(self, "values", values)
         object.__setattr__(self, "active_tick", active_tick)
         object.__setattr__(self, "provenance_ref", provenance_ref or None)
@@ -88,60 +88,144 @@ class ActivationPattern:
 
 
 @dataclass(frozen=True)
-class PatternFrame:
-    """Temporal grouping of distinct pattern occurrences at one active tick."""
+class PatternMoment:
+    """Optional multimodal same-tick grouping; this is not an NFP frame."""
 
     active_tick: int
-    patterns: tuple[ActivationPattern, ...]
+    frames: tuple[NFPFrame, ...]
 
     def __post_init__(self) -> None:
         active_tick = _non_negative_int(self.active_tick, "active_tick")
-        patterns = tuple(self.patterns)
+        frames = tuple(self.frames)
         seen_ids: set[str] = set()
-        for pattern in patterns:
-            if not isinstance(pattern, ActivationPattern):
-                raise TypeError("patterns must contain ActivationPattern objects")
-            if pattern.active_tick != active_tick:
-                raise ValueError("pattern active_tick must match frame active_tick")
-            if pattern.pattern_id in seen_ids:
-                raise ValueError("duplicate pattern_id values are not allowed in one frame")
-            seen_ids.add(pattern.pattern_id)
+        for frame in frames:
+            if not isinstance(frame, NFPFrame):
+                raise TypeError("frames must contain NFPFrame objects")
+            if frame.active_tick != active_tick:
+                raise ValueError("frame active_tick must match moment active_tick")
+            if frame.frame_id in seen_ids:
+                raise ValueError("duplicate frame_id values are not allowed in one moment")
+            seen_ids.add(frame.frame_id)
         object.__setattr__(self, "active_tick", active_tick)
-        object.__setattr__(self, "patterns", patterns)
+        object.__setattr__(self, "frames", frames)
 
 
 @dataclass(frozen=True)
-class PatternTrace:
-    """Bounded ordered in-memory trace of pattern frames."""
+class NFPWindow:
+    """Short ordered temporal group of compatible NFP frames."""
 
-    trace_id: str
-    frames: tuple[PatternFrame, ...]
+    window_id: str
+    frames: tuple[NFPFrame, ...]
     provenance_ref: str | None = None
+    debug_name: str | None = None
 
     def __post_init__(self) -> None:
-        trace_id = str(self.trace_id).strip()
-        if not trace_id:
-            raise ValueError("trace_id must be non-empty")
+        window_id = str(self.window_id).strip()
+        if not window_id:
+            raise ValueError("window_id must be non-empty")
         frames = tuple(self.frames)
+        if not frames:
+            raise ValueError("NFPWindow requires at least one frame")
+        seen_ids: set[str] = set()
         previous_tick: int | None = None
+        modality = frames[0].modality
+        topology = frames[0].topology
         for frame in frames:
-            if not isinstance(frame, PatternFrame):
-                raise TypeError("frames must contain PatternFrame objects")
+            if not isinstance(frame, NFPFrame):
+                raise TypeError("frames must contain NFPFrame objects")
+            if frame.modality != modality:
+                raise ValueError("NFPWindow frames must share modality")
+            if frame.topology != topology:
+                raise ValueError("NFPWindow frames must share topology")
             if previous_tick is not None and frame.active_tick <= previous_tick:
-                raise ValueError("frame ticks must be strictly increasing")
+                raise ValueError("NFPWindow frame ticks must be strictly increasing")
+            if frame.frame_id in seen_ids:
+                raise ValueError("duplicate frame_id values are not allowed in one window")
+            seen_ids.add(frame.frame_id)
             previous_tick = frame.active_tick
         provenance_ref = None if self.provenance_ref is None else str(self.provenance_ref).strip()
-        object.__setattr__(self, "trace_id", trace_id)
+        debug_name = None if self.debug_name is None else str(self.debug_name)
+        object.__setattr__(self, "window_id", window_id)
         object.__setattr__(self, "frames", frames)
         object.__setattr__(self, "provenance_ref", provenance_ref or None)
+        object.__setattr__(self, "debug_name", debug_name)
 
     @property
-    def start_tick(self) -> int | None:
-        return self.frames[0].active_tick if self.frames else None
+    def modality(self) -> PatternModality:
+        return self.frames[0].modality
 
     @property
-    def end_tick(self) -> int | None:
-        return self.frames[-1].active_tick if self.frames else None
+    def topology(self) -> PatternTopology:
+        return self.frames[0].topology
+
+    @property
+    def start_tick(self) -> int:
+        return self.frames[0].active_tick
+
+    @property
+    def end_tick(self) -> int:
+        return self.frames[-1].active_tick
+
+    @property
+    def length(self) -> int:
+        return len(self.frames)
+
+
+@dataclass(frozen=True)
+class NFPSequence:
+    """Longer ordered temporal structure made from NFP windows."""
+
+    sequence_id: str
+    windows: tuple[NFPWindow, ...]
+    provenance_ref: str | None = None
+    debug_name: str | None = None
+
+    def __post_init__(self) -> None:
+        sequence_id = str(self.sequence_id).strip()
+        if not sequence_id:
+            raise ValueError("sequence_id must be non-empty")
+        windows = tuple(self.windows)
+        if not windows:
+            raise ValueError("NFPSequence requires at least one window")
+        modality = windows[0].modality
+        topology = windows[0].topology
+        previous_start: int | None = None
+        for window in windows:
+            if not isinstance(window, NFPWindow):
+                raise TypeError("windows must contain NFPWindow objects")
+            if window.modality != modality:
+                raise ValueError("NFPSequence windows must share modality")
+            if window.topology != topology:
+                raise ValueError("NFPSequence windows must share topology")
+            if previous_start is not None and window.start_tick < previous_start:
+                raise ValueError("NFPSequence windows must be ordered by temporal position")
+            previous_start = window.start_tick
+        provenance_ref = None if self.provenance_ref is None else str(self.provenance_ref).strip()
+        debug_name = None if self.debug_name is None else str(self.debug_name)
+        object.__setattr__(self, "sequence_id", sequence_id)
+        object.__setattr__(self, "windows", windows)
+        object.__setattr__(self, "provenance_ref", provenance_ref or None)
+        object.__setattr__(self, "debug_name", debug_name)
+
+    @property
+    def modality(self) -> PatternModality:
+        return self.windows[0].modality
+
+    @property
+    def topology(self) -> PatternTopology:
+        return self.windows[0].topology
+
+    @property
+    def start_tick(self) -> int:
+        return min(window.start_tick for window in self.windows)
+
+    @property
+    def end_tick(self) -> int:
+        return max(window.end_tick for window in self.windows)
+
+    @property
+    def window_count(self) -> int:
+        return len(self.windows)
 
 
 def _non_negative_int(value: int, field_name: str) -> int:

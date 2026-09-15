@@ -32,7 +32,8 @@ def main() -> int:
         and _has_all(
             text,
             (
-                "Natural Pattern Data Contract defines what RNDeM considers fundamental data",
+                "Natural Pattern Data Contract defines what RNDeM considers",
+                "fundamental data",
                 "does not weaken the Natural Pattern Data Contract",
             ),
         ),
@@ -50,19 +51,32 @@ def main() -> int:
                 "Use a common pattern envelope with modality-specific topology",
                 "Do not force all modalities to share the same geometric shape",
                 "The common abstraction is the activation-pattern contract",
-                "The topology/shape belongs to the modality",
+                "topology/shape belongs to the modality",
             ),
         ),
         "pattern envelope fields": _has_all(
             text,
             (
-                "ActivationPattern",
+                "NFPFrame",
+                "frame_id",
                 "modality",
                 "origin",
                 "topology",
                 "activation values",
-                "active-time metadata",
+                "active_tick",
                 "provenance",
+            ),
+        ),
+        "temporal hierarchy explicit": _has_all(
+            text,
+            (
+                "NFPFrame",
+                "NFPWindow",
+                "NFPSequence",
+                "This hierarchy is fundamental",
+                "A frame represents instantaneous activation",
+                "A window represents local temporal dynamics",
+                "A sequence represents longer temporal behavior or process",
             ),
         ),
         "modality origin distinction": _has_all(
@@ -84,10 +98,10 @@ def main() -> int:
         "reactivation preserves modality changes origin": _has_all(
             text,
             (
-                "A reactivated visual pattern remains VISUAL",
+                "A reactivated visual frame remains VISUAL",
                 "Its origin changes; its modality does not",
                 "origin = INTERNAL_REACTIVATION",
-                "source_ref = P / trace",
+                "provenance_ref = source frame ID",
             ),
         ),
         "internal replay not fresh evidence": _has_all(
@@ -96,34 +110,36 @@ def main() -> int:
                 "An internally reactivated pattern is not new environmental evidence",
                 "must not by itself count as fresh external confirmation",
                 "Repeated self-replay must not allow RNDeM to strengthen a belief",
-                "must not generate a new environmental consequence record",
+                "must not generate a new environmental consequence",
             ),
         ),
         "single-modality activation pattern": _has_all(
             text,
             (
-                "One ActivationPattern represents one modality/domain occurrence",
-                "Do not create multimodal ActivationPattern payloads",
+                "One `NFPFrame` represents one modality/domain occurrence at one active tick",
+                "Do not create multimodal `NFPFrame` payloads",
                 "Cross-modal binding belongs to a future episode/context/association layer",
             ),
         ),
-        "frame may contain multiple modalities": _has_all(
+        "moment may contain multiple modalities": _has_all(
             text,
             (
-                "PatternFrame is a collection",
-                "one logical active-time slice",
-                "A frame may contain multiple modalities simultaneously",
-                "The patterns remain distinct",
+                "PatternMoment",
+                "multimodal same-tick grouping",
+                "is not an `NFPFrame`",
+                "not semantic interpretation",
             ),
         ),
-        "trace is ordered active-time substrate": _has_all(
+        "window and sequence are ordered temporal substrate": _has_all(
             text,
             (
-                "PatternTrace is a bounded ordered trace",
+                "NFPWindow",
+                "NFPSequence",
                 "start_tick",
                 "end_tick",
-                "not automatically AKBSM knowledge",
-                "substrate material that later systems may consume",
+                "length",
+                "window_count",
+                "not automatically an entity",
             ),
         ),
         "active tick temporal coordinate": _has_all(
@@ -131,7 +147,7 @@ def main() -> int:
             (
                 "active_tick is the primary temporal coordinate",
                 "Do not make wall-clock time fundamental",
-                "Do not implement Heart integration in this pass",
+                "Do not implement Heart integration",
             ),
         ),
         "action is activation pattern": _has_all(
@@ -147,34 +163,34 @@ def main() -> int:
             text,
             (
                 "Consequences arrive later through sensory/internal patterns",
-                "action function",
-                "return value treated as truth",
+                "does not contain its own consequence",
+                "does not declare whether it succeeded",
             ),
         ),
         "similarity measurement not identity": _has_all(
             text,
             (
-                "PatternSimilarity is a measurement boundary, not semantic identity",
+                "Similarity is a measurement boundary, not semantic identity",
+                "Frame similarity measures instantaneous activation resemblance",
+                "Window similarity measures short temporal-pattern resemblance",
+                "They are not interchangeable",
                 "same modality",
-                "compatible topology",
-                "Similarity must not automatically create AKBSM relations",
-                "Return a similarity score as a measurement, not truth",
+                "compatible/equal topology",
             ),
         ),
         "raw cross-modal similarity excluded": _has_all(
             text,
             (
-                "Do not directly compare raw VISUAL values with raw AUDIO values",
-                "Raw cross-modal similarity is not part of the minimal substrate",
+                "Raw cross-modal similarity is rejected",
                 "Cross-modal relationships belong to learned association/binding layers",
             ),
         ),
         "debug names non-semantic": _has_all(
             text,
             (
-                "Optional debug labels may be allowed as non-semantic metadata only",
+                "Optional debug labels are non-semantic metadata only",
                 "debug_name=\"dog\"",
-                "does not mean the pattern is a dog",
+                "does not mean the frame is a dog",
                 "No runtime logic may branch on debug labels",
             ),
         ),
@@ -182,18 +198,17 @@ def main() -> int:
             text,
             (
                 "occurrence identity",
-                "pattern similarity",
+                "frame similarity",
+                "window similarity",
                 "stable learned entity identity",
-                "does not mean that two different occurrences with similar values are already the same learned entity",
+                "same learned entity",
             ),
         ),
         "immutable first implementation": _has_all(
             text,
             (
-                "immutable/frozen pattern/frame objects",
-                "New sensory state should create new occurrences",
-                "historical occurrence identity should remain stable",
-                "provenance should remain auditable",
+                "`NFPFrame` is an immutable or effectively immutable occurrence-level activation",
+                "The source frame remains immutable",
             ),
         ),
         "no persistence": _has_all(
@@ -201,7 +216,7 @@ def main() -> int:
             (
                 "The minimal substrate remains in-memory only",
                 "disk persistence",
-                "long-term trace storage",
+                "long-term sequence storage",
             ),
         ),
         "no writes placement wiring": _has_all(
@@ -211,21 +226,22 @@ def main() -> int:
                 "ExpSM writes",
                 "ContextMemory placement",
                 "Do not wire it into `_run_tick()`",
-                "Initial validation should use isolated/scenario/test harnesses",
+                "Initial validation uses isolated/scenario/test harnesses",
             ),
         ),
         "implementation scope bounded": _has_all(
             text,
             (
-                "The first isolated implementation implements only",
+                "Define a minimal implementation-ready substrate for",
+                "NFPFrame",
+                "NFPWindow",
+                "NFPSequence",
                 "PatternModality",
                 "PatternOrigin",
                 "PatternTopology",
-                "ActivationPattern",
-                "PatternFrame",
-                "PatternTrace",
-                "PatternSimilarity",
-                "PatternReactivation",
+                "NFPFrameSimilarity",
+                "NFPWindowSimilarity",
+                "NFPReactivation",
                 "clc/patterns/",
             ),
         ),
@@ -234,12 +250,12 @@ def main() -> int:
             (
                 "scenarios/minimal_activation_pattern_substrate.json",
                 "tools/verify_minimal_activation_pattern_substrate.py",
-                "create visual external pattern",
-                "frame contains multiple distinct modalities",
-                "raw cross-modality similarity is rejected",
-                "reactivation creates new occurrence identity",
-                "identical external/replayed values remain epistemically distinct",
-                "no AKBSM/ExpSM/ContextMemory writes occur",
+                "create VISUAL external NFPFrame",
+                "NFPWindow accepts ordered same-modality compatible frames",
+                "NFPSequence accepts ordered compatible windows",
+                "different window lengths non-comparable",
+                "external and internally replayed identical values remain epistemically distinct",
+                "no `_run_tick()` integration",
             ),
         ),
         "deferred scope documented": _has_all(

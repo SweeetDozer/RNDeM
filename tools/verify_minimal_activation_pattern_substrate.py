@@ -15,14 +15,16 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from clc.patterns import (  # noqa: E402
-    ActivationPattern,
-    PatternFrame,
+    NFPFrame,
+    NFPFrameSimilarity,
+    NFPReactivation,
+    NFPSequence,
+    NFPWindow,
+    NFPWindowSimilarity,
     PatternModality,
+    PatternMoment,
     PatternOrigin,
-    PatternReactivation,
-    PatternSimilarity,
     PatternTopology,
-    PatternTrace,
 )
 
 
@@ -34,7 +36,6 @@ EXPECTED_MEMORY_HASHES = {
     PROJECT_ROOT / "Memory" / "ExpSM" / "ExpSM_data.json": "6a457d5511f063d6484999c0f97802c5dc0fc77c2d504eb183aac1028adc603e",
     PROJECT_ROOT / "Memory" / "AKBSM" / "AKBSM_ne.json": "0153def862ef606140903bb454abaa75f651d18d8bcbd9c3aeb10070705c23bd",
 }
-
 EXPECTED_MODALITIES = {
     "visual",
     "audio",
@@ -50,41 +51,37 @@ EXPECTED_ORIGINS = {
     "action_generated",
 }
 EXPECTED_SCENARIO_CASES = {
-    "create_external_visual_pattern",
-    "create_external_audio_pattern",
-    "create_internal_state_pattern",
-    "create_pain_damage_pattern",
-    "create_reward_success_pattern",
-    "create_action_pattern",
-    "reject_empty_topology",
-    "reject_zero_negative_topology_dimensions",
-    "reject_values_length_topology_mismatch",
-    "reject_values_outside_range",
-    "reject_nan_inf_values",
-    "frame_contains_visual_audio_internal_same_tick",
-    "frame_rejects_wrong_tick_pattern",
-    "frame_rejects_duplicate_occurrence_id",
-    "trace_preserves_tick_ordering",
-    "trace_exposes_start_tick_end_tick",
-    "identical_same_modality_topology_similarity_1",
-    "different_same_modality_topology_similarity_in_range",
-    "different_topology_non_comparable",
-    "different_modality_non_comparable",
-    "reactivation_preserves_modality",
-    "reactivation_preserves_topology",
-    "reactivation_preserves_values",
-    "reactivation_creates_new_pattern_id",
-    "reactivation_changes_active_tick",
-    "reactivation_sets_internal_reactivation",
-    "reactivation_records_source_provenance",
-    "source_occurrence_remains_unchanged",
-    "external_and_identical_replay_have_different_origin",
+    "create_visual_external_nfp_frame",
+    "create_audio_external_nfp_frame",
+    "create_internal_frame",
+    "create_action_frame",
+    "nfp_frame_validation",
+    "nfp_window_accepts_ordered_same_modality_compatible_frames",
+    "nfp_window_rejects_mixed_modalities",
+    "nfp_window_rejects_incompatible_topology",
+    "nfp_window_rejects_duplicate_frame_ids",
+    "nfp_window_rejects_unordered_ticks",
+    "nfp_window_exposes_modality_topology_start_end_length",
+    "nfp_sequence_accepts_ordered_compatible_windows",
+    "nfp_sequence_rejects_mixed_modality",
+    "nfp_sequence_rejects_incompatible_topology",
+    "nfp_sequence_exposes_start_end_window_count",
+    "frame_similarity_identical_1",
+    "frame_similarity_differing_activation_in_range",
+    "cross_modal_frame_comparison_non_comparable",
+    "topology_mismatch_non_comparable",
+    "identical_windows_1",
+    "different_compatible_windows_deterministic_score",
+    "different_window_lengths_non_comparable",
+    "reactivation_creates_new_nfp_frame",
+    "reactivation_preserves_modality_topology_values",
+    "reactivation_origin_internal_reactivation",
+    "external_and_replayed_identical_values_epistemically_distinct",
     "debug_name_does_not_affect_similarity",
-    "debug_name_does_not_define_identity",
-    "action_pattern_contains_no_consequence_truth",
-    "no_akbsm_write_occurs",
-    "no_expsm_write_occurs",
-    "no_contextmemory_placement_occurs",
+    "no_akbsm_writes",
+    "no_expsm_writes",
+    "no_contextmemory_writes",
+    "no_run_tick_integration",
 }
 FORBIDDEN_IMPORTS = {
     "clc.runtime",
@@ -115,13 +112,22 @@ def main() -> int:
     checks = {
         "PatternModality values exist": _pattern_modality_values,
         "PatternOrigin values exist": _pattern_origin_values,
+        "NFPFrame exists": _nfp_frame_exists,
+        "NFPWindow exists": _nfp_window_exists,
+        "NFPSequence exists": _nfp_sequence_exists,
+        "Frame/Window/Sequence hierarchy is explicit": _hierarchy_is_explicit,
+        "Window is not merely an alias for Sequence": _window_not_sequence_alias,
         "PatternTopology validation works": _topology_validation,
-        "ActivationPattern validation works": _activation_validation,
+        "NFPFrame validation works": _frame_validation,
         "objects are immutable": _immutability,
-        "PatternFrame invariants work": _frame_invariants,
-        "PatternTrace ordering works": _trace_ordering,
-        "similarity algorithm is deterministic": _similarity,
-        "reactivation preserves provenance and origin boundary": _reactivation,
+        "single frame is single-modality": _single_frame_is_single_modality,
+        "PatternMoment separates multimodal same-tick grouping": _pattern_moment_is_not_nfp_frame,
+        "NFPWindow invariants work": _window_invariants,
+        "NFPSequence invariants work": _sequence_invariants,
+        "frame similarity works": _frame_similarity,
+        "window similarity works": _window_similarity,
+        "raw cross-modal similarity rejected": _cross_modal_similarity_rejected,
+        "reactivation provenance/origin works": _reactivation,
         "debug names do not affect identity or similarity": _debug_names_non_semantic,
         "ACTION carries no consequence field": _action_has_no_consequence_field,
         "package imports stay isolated": _package_imports_stay_isolated,
@@ -153,6 +159,38 @@ def _pattern_origin_values() -> tuple[bool, str]:
     return values == EXPECTED_ORIGINS, str(sorted(values))
 
 
+def _nfp_frame_exists() -> tuple[bool, str]:
+    return isinstance(_frame("frame", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.5,), 1), NFPFrame), "NFPFrame"
+
+
+def _nfp_window_exists() -> tuple[bool, str]:
+    window = _window("window", 1, (0.1, 0.2))
+    return isinstance(window, NFPWindow), "NFPWindow"
+
+
+def _nfp_sequence_exists() -> tuple[bool, str]:
+    sequence = NFPSequence(sequence_id="sequence", windows=(_window("window", 1, (0.1, 0.2)),))
+    return isinstance(sequence, NFPSequence), "NFPSequence"
+
+
+def _hierarchy_is_explicit() -> tuple[bool, str]:
+    frame = _frame("frame", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.5,), 1)
+    window = NFPWindow(window_id="window", frames=(frame,))
+    sequence = NFPSequence(sequence_id="sequence", windows=(window,))
+    checks = [
+        isinstance(frame, NFPFrame),
+        isinstance(window, NFPWindow),
+        isinstance(sequence, NFPSequence),
+        window.frames == (frame,),
+        sequence.windows == (window,),
+    ]
+    return all(checks), "NFPFrame -> NFPWindow -> NFPSequence"
+
+
+def _window_not_sequence_alias() -> tuple[bool, str]:
+    return NFPWindow is not NFPSequence and NFPWindow.__name__ != NFPSequence.__name__, f"{NFPWindow.__name__}/{NFPSequence.__name__}"
+
+
 def _topology_validation() -> tuple[bool, str]:
     topology = PatternTopology((4, 4))
     checks = [
@@ -164,10 +202,10 @@ def _topology_validation() -> tuple[bool, str]:
     return all(checks), f"size={topology.size}"
 
 
-def _activation_validation() -> tuple[bool, str]:
+def _frame_validation() -> tuple[bool, str]:
     topology = PatternTopology((2,))
-    pattern = ActivationPattern(
-        pattern_id="visual-1",
+    frame = NFPFrame(
+        frame_id="visual-1",
         modality=PatternModality.VISUAL,
         origin=PatternOrigin.EXTERNAL_SENSORY,
         topology=topology,
@@ -176,92 +214,170 @@ def _activation_validation() -> tuple[bool, str]:
         debug_name="dog",
     )
     checks = [
-        pattern.pattern_id == "visual-1",
-        _raises(lambda: ActivationPattern("", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.0, 1.0), 1), ValueError),
-        _raises(lambda: ActivationPattern("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.0,), 1), ValueError),
-        _raises(lambda: ActivationPattern("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (-0.1, 0.0), 1), ValueError),
-        _raises(lambda: ActivationPattern("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (math.nan, 0.0), 1), ValueError),
-        _raises(lambda: ActivationPattern("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (math.inf, 0.0), 1), ValueError),
-        _raises(lambda: ActivationPattern("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.0, 1.0), -1), ValueError),
+        frame.frame_id == "visual-1",
+        _raises(lambda: NFPFrame("", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.0, 1.0), 1), ValueError),
+        _raises(lambda: NFPFrame("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.0,), 1), ValueError),
+        _raises(lambda: NFPFrame("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (-0.1, 0.0), 1), ValueError),
+        _raises(lambda: NFPFrame("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (math.nan, 0.0), 1), ValueError),
+        _raises(lambda: NFPFrame("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (math.inf, 0.0), 1), ValueError),
+        _raises(lambda: NFPFrame("bad", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.0, 1.0), -1), ValueError),
     ]
     return all(checks), "validated range/length/tick"
 
 
 def _immutability() -> tuple[bool, str]:
-    pattern = _pattern("immutable", PatternModality.INTERNAL, PatternOrigin.INTERNAL_STATE, (0.5,), 2)
-    frame = PatternFrame(active_tick=2, patterns=(pattern,))
-    trace = PatternTrace(trace_id="trace-immutable", frames=(frame,))
+    frame = _frame("immutable", PatternModality.INTERNAL, PatternOrigin.INTERNAL_STATE, (0.5,), 2)
+    window = NFPWindow(window_id="window-immutable", frames=(frame,))
+    sequence = NFPSequence(sequence_id="sequence-immutable", windows=(window,))
     checks = [
-        _raises(lambda: setattr(pattern, "active_tick", 3), FrozenInstanceError),
         _raises(lambda: setattr(frame, "active_tick", 3), FrozenInstanceError),
-        _raises(lambda: setattr(trace, "trace_id", "other"), FrozenInstanceError),
+        _raises(lambda: setattr(window, "window_id", "other"), FrozenInstanceError),
+        _raises(lambda: setattr(sequence, "sequence_id", "other"), FrozenInstanceError),
     ]
     return all(checks), "frozen dataclasses"
 
 
-def _frame_invariants() -> tuple[bool, str]:
-    visual = _pattern("visual", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.1, 0.2), 4)
-    audio = _pattern("audio", PatternModality.AUDIO, PatternOrigin.EXTERNAL_SENSORY, (0.3, 0.4), 4)
-    internal = _pattern("internal", PatternModality.INTERNAL, PatternOrigin.INTERNAL_STATE, (0.5, 0.6), 4)
-    frame = PatternFrame(active_tick=4, patterns=(visual, audio, internal))
-    wrong_tick = _pattern("wrong", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.1, 0.2), 5)
-    duplicate_id = _pattern("visual", PatternModality.AUDIO, PatternOrigin.EXTERNAL_SENSORY, (0.3, 0.4), 4)
+def _single_frame_is_single_modality() -> tuple[bool, str]:
+    fields = set(NFPFrame.__dataclass_fields__)
     checks = [
-        len(frame.patterns) == 3,
-        _raises(lambda: PatternFrame(active_tick=4, patterns=(wrong_tick,)), ValueError),
-        _raises(lambda: PatternFrame(active_tick=4, patterns=(visual, duplicate_id)), ValueError),
+        "modality" in fields,
+        "frames" not in fields,
+        "windows" not in fields,
+        "values" in fields,
     ]
-    return all(checks), "multi-modality same tick"
+    return all(checks), str(sorted(fields))
 
 
-def _trace_ordering() -> tuple[bool, str]:
-    frame_1 = PatternFrame(active_tick=1, patterns=(_pattern("p1", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.1,), 1),))
-    frame_2 = PatternFrame(active_tick=3, patterns=(_pattern("p2", PatternModality.AUDIO, PatternOrigin.EXTERNAL_SENSORY, (0.2,), 3),))
-    trace = PatternTrace(trace_id="trace-1", frames=(frame_1, frame_2))
-    duplicate_tick = PatternFrame(active_tick=3, patterns=(_pattern("p3", PatternModality.INTERNAL, PatternOrigin.INTERNAL_STATE, (0.3,), 3),))
+def _pattern_moment_is_not_nfp_frame() -> tuple[bool, str]:
+    visual = _frame("visual", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.1,), 4)
+    audio = _frame("audio", PatternModality.AUDIO, PatternOrigin.EXTERNAL_SENSORY, (0.2,), 4)
+    moment = PatternMoment(active_tick=4, frames=(visual, audio))
     checks = [
-        trace.start_tick == 1,
-        trace.end_tick == 3,
-        _raises(lambda: PatternTrace(trace_id="trace-bad", frames=(frame_2, frame_1)), ValueError),
-        _raises(lambda: PatternTrace(trace_id="trace-dup", frames=(frame_2, duplicate_tick)), ValueError),
+        isinstance(moment, PatternMoment),
+        not isinstance(moment, NFPFrame),
+        len(moment.frames) == 2,
+        _raises(lambda: PatternMoment(active_tick=5, frames=(visual,)), ValueError),
     ]
-    return all(checks), f"{trace.start_tick}->{trace.end_tick}"
+    return all(checks), "PatternMoment groups same-tick frames"
 
 
-def _similarity() -> tuple[bool, str]:
-    left = _pattern("left", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.0, 1.0), 8)
-    same = _pattern("same", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.0, 1.0), 9)
-    different = _pattern("different", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (1.0, 0.0), 9)
-    audio = _pattern("audio", PatternModality.AUDIO, PatternOrigin.EXTERNAL_SENSORY, (0.0, 1.0), 9)
-    other_topology = ActivationPattern("topology", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, PatternTopology((1,)), (0.0,), 9)
-    result_1 = PatternSimilarity.compare(left, same)
-    result_2 = PatternSimilarity.compare(left, same)
-    result_3 = PatternSimilarity.compare(left, different)
-    cross_modal = PatternSimilarity.compare(left, audio)
-    cross_topology = PatternSimilarity.compare(left, other_topology)
+def _window_invariants() -> tuple[bool, str]:
+    frames = (
+        _frame("w1", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.1, 0.2), 10),
+        _frame("w2", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.2, 0.3), 11),
+        _frame("w3", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.3, 0.4), 12),
+    )
+    window = NFPWindow(window_id="window", frames=frames)
+    mixed = _frame("audio", PatternModality.AUDIO, PatternOrigin.EXTERNAL_SENSORY, (0.2, 0.3), 11)
+    topology_mismatch = NFPFrame("topology", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, PatternTopology((1,)), (0.2,), 11)
+    duplicate = _frame("w1", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.2, 0.3), 11)
+    unordered = (
+        _frame("late", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.1, 0.2), 12),
+        _frame("early", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.2, 0.3), 11),
+    )
+    checks = [
+        window.modality == PatternModality.VISUAL,
+        window.topology == frames[0].topology,
+        window.start_tick == 10,
+        window.end_tick == 12,
+        window.length == 3,
+        _raises(lambda: NFPWindow("", frames), ValueError),
+        _raises(lambda: NFPWindow("empty", ()), ValueError),
+        _raises(lambda: NFPWindow("mixed", (frames[0], mixed)), ValueError),
+        _raises(lambda: NFPWindow("topology", (frames[0], topology_mismatch)), ValueError),
+        _raises(lambda: NFPWindow("duplicate", (frames[0], duplicate)), ValueError),
+        _raises(lambda: NFPWindow("unordered", unordered), ValueError),
+    ]
+    return all(checks), f"{window.start_tick}->{window.end_tick}, length={window.length}"
+
+
+def _sequence_invariants() -> tuple[bool, str]:
+    window_1 = _window("window-1", 1, (0.1, 0.2))
+    window_2 = _window("window-2", 3, (0.2, 0.3))
+    sequence = NFPSequence(sequence_id="sequence", windows=(window_1, window_2))
+    audio_window = _window("audio-window", 5, (0.1, 0.2), modality=PatternModality.AUDIO)
+    topology_window = NFPWindow(
+        window_id="topology-window",
+        frames=(
+            NFPFrame("topology-1", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, PatternTopology((1,)), (0.1,), 5),
+        ),
+    )
+    checks = [
+        sequence.modality == PatternModality.VISUAL,
+        sequence.topology == window_1.topology,
+        sequence.start_tick == 1,
+        sequence.end_tick == 3,
+        sequence.window_count == 2,
+        _raises(lambda: NFPSequence("", (window_1,)), ValueError),
+        _raises(lambda: NFPSequence("empty", ()), ValueError),
+        _raises(lambda: NFPSequence("mixed", (window_1, audio_window)), ValueError),
+        _raises(lambda: NFPSequence("topology", (window_1, topology_window)), ValueError),
+        _raises(lambda: NFPSequence("unordered", (window_2, window_1)), ValueError),
+    ]
+    return all(checks), f"{sequence.start_tick}->{sequence.end_tick}, windows={sequence.window_count}"
+
+
+def _frame_similarity() -> tuple[bool, str]:
+    left = _frame("left", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.0, 1.0), 8)
+    same = _frame("same", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.0, 1.0), 9)
+    different = _frame("different", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (1.0, 0.0), 9)
+    result_1 = NFPFrameSimilarity.compare(left, same)
+    result_2 = NFPFrameSimilarity.compare(left, same)
+    result_3 = NFPFrameSimilarity.compare(left, different)
     checks = [
         result_1 == result_2,
         result_1.comparable and result_1.score == 1.0 and result_1.reason is None,
         result_3.comparable and result_3.score is not None and 0.0 <= result_3.score <= 1.0,
-        cross_modal == PatternSimilarity(False, None, "different_modality"),
-        cross_topology == PatternSimilarity(False, None, "different_topology"),
     ]
     return all(checks), f"identical={result_1.score}, different={result_3.score}"
 
 
-def _reactivation() -> tuple[bool, str]:
-    source = _pattern("source", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.2, 0.8), 10)
-    replay = PatternReactivation.reactivate(source, new_pattern_id="replay", active_tick=12, debug_name="remembered")
+def _window_similarity() -> tuple[bool, str]:
+    left = _window("left-window", 10, (0.0, 1.0), (0.2, 0.8))
+    same = _window("same-window", 20, (0.0, 1.0), (0.2, 0.8))
+    different = _window("different-window", 20, (1.0, 0.0), (0.2, 0.6))
+    shorter = _window("shorter-window", 20, (0.0, 1.0))
+    result_1 = NFPWindowSimilarity.compare(left, same)
+    result_2 = NFPWindowSimilarity.compare(left, different)
+    result_3 = NFPWindowSimilarity.compare(left, different)
+    length_mismatch = NFPWindowSimilarity.compare(left, shorter)
     checks = [
-        replay.pattern_id == "replay",
-        replay.pattern_id != source.pattern_id,
+        result_1.comparable and result_1.score == 1.0,
+        result_2 == result_3,
+        result_2.comparable and result_2.score is not None and 0.0 <= result_2.score <= 1.0,
+        length_mismatch.comparable is False,
+        length_mismatch.reason == "different_frame_count",
+    ]
+    return all(checks), f"identical={result_1.score}, different={result_2.score}"
+
+
+def _cross_modal_similarity_rejected() -> tuple[bool, str]:
+    visual = _frame("visual", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.0, 1.0), 1)
+    audio = _frame("audio", PatternModality.AUDIO, PatternOrigin.EXTERNAL_SENSORY, (0.0, 1.0), 1)
+    other_topology = NFPFrame("topology", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, PatternTopology((1,)), (0.0,), 1)
+    cross_modal = NFPFrameSimilarity.compare(visual, audio)
+    cross_topology = NFPFrameSimilarity.compare(visual, other_topology)
+    checks = [
+        cross_modal.comparable is False and cross_modal.score is None and cross_modal.reason == "different_modality",
+        cross_topology.comparable is False and cross_topology.score is None and cross_topology.reason == "different_topology",
+    ]
+    return all(checks), f"{cross_modal.reason}/{cross_topology.reason}"
+
+
+def _reactivation() -> tuple[bool, str]:
+    source = _frame("source", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, (0.2, 0.8), 10)
+    replay = NFPReactivation.reactivate_frame(source, new_frame_id="replay", active_tick=12, debug_name="remembered")
+    checks = [
+        isinstance(replay, NFPFrame),
+        replay.frame_id == "replay",
+        replay.frame_id != source.frame_id,
         replay.active_tick == 12,
         replay.active_tick != source.active_tick,
         replay.modality == source.modality,
         replay.topology == source.topology,
         replay.values == source.values,
         replay.origin == PatternOrigin.INTERNAL_REACTIVATION,
-        replay.provenance_ref == source.pattern_id,
+        replay.provenance_ref == source.frame_id,
         source.origin == PatternOrigin.EXTERNAL_SENSORY,
         replay.origin != source.origin,
     ]
@@ -270,11 +386,11 @@ def _reactivation() -> tuple[bool, str]:
 
 def _debug_names_non_semantic() -> tuple[bool, str]:
     topology = PatternTopology((2,))
-    left = ActivationPattern("left", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.25, 0.75), 1, debug_name="dog")
-    right = ActivationPattern("right", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.25, 0.75), 1, debug_name="cat")
-    similarity = PatternSimilarity.compare(left, right)
+    left = NFPFrame("left", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.25, 0.75), 1, debug_name="dog")
+    right = NFPFrame("right", PatternModality.VISUAL, PatternOrigin.EXTERNAL_SENSORY, topology, (0.25, 0.75), 1, debug_name="cat")
+    similarity = NFPFrameSimilarity.compare(left, right)
     checks = [
-        left.pattern_id != right.pattern_id,
+        left.frame_id != right.frame_id,
         left.debug_name != right.debug_name,
         similarity.comparable,
         similarity.score == 1.0,
@@ -283,7 +399,7 @@ def _debug_names_non_semantic() -> tuple[bool, str]:
 
 
 def _action_has_no_consequence_field() -> tuple[bool, str]:
-    action = _pattern("action", PatternModality.ACTION, PatternOrigin.ACTION_GENERATED, (0.1, 0.9), 7)
+    action = _frame("action", PatternModality.ACTION, PatternOrigin.ACTION_GENERATED, (0.1, 0.9), 7)
     forbidden_fields = {"success", "failure", "consequence", "reward", "world_result"}
     actual_fields = set(action.__dataclass_fields__)
     return not (actual_fields & forbidden_fields), str(sorted(actual_fields))
@@ -313,7 +429,8 @@ def _runtime_does_not_import_patterns() -> tuple[bool, str]:
 def _no_run_tick_integration() -> tuple[bool, str]:
     runtime_path = RUNTIME_ROOT / "clc_runtime.py"
     text = runtime_path.read_text(encoding="utf-8")
-    return "clc.patterns" not in text and "ActivationPattern" not in text, "clc_runtime.py untouched by patterns"
+    pattern_tokens = ("clc.patterns", "NFPFrame", "NFPWindow", "NFPSequence", "ActivationPattern")
+    return not any(token in text for token in pattern_tokens), "clc_runtime.py untouched by patterns"
 
 
 def _no_persistence_or_memory_writes() -> tuple[bool, str]:
@@ -335,7 +452,9 @@ def _scenario_fixture() -> tuple[bool, str]:
     section = data.get("expect", {}).get("minimal_activation_pattern_substrate", {})
     cases = section.get("cases", {})
     missing = sorted(case for case in EXPECTED_SCENARIO_CASES if cases.get(case) is not True)
+    hierarchy = section.get("hierarchy") == ["NFPFrame", "NFPWindow", "NFPSequence"]
     boundaries = [
+        hierarchy,
         section.get("isolated") is True,
         section.get("in_memory_only") is True,
         section.get("runtime_wiring") is False,
@@ -357,21 +476,34 @@ def _memory_hashes_unchanged() -> tuple[bool, str]:
     return not mismatches, "; ".join(mismatches)
 
 
-def _pattern(
-    pattern_id: str,
+def _frame(
+    frame_id: str,
     modality: PatternModality,
     origin: PatternOrigin,
     values: tuple[float, ...],
     active_tick: int,
-) -> ActivationPattern:
-    return ActivationPattern(
-        pattern_id=pattern_id,
+) -> NFPFrame:
+    return NFPFrame(
+        frame_id=frame_id,
         modality=modality,
         origin=origin,
         topology=PatternTopology((len(values),)),
         values=values,
         active_tick=active_tick,
     )
+
+
+def _window(
+    window_id: str,
+    start_tick: int,
+    *values_by_frame: tuple[float, ...],
+    modality: PatternModality = PatternModality.VISUAL,
+) -> NFPWindow:
+    frames = tuple(
+        _frame(f"{window_id}-frame-{index}", modality, PatternOrigin.EXTERNAL_SENSORY, values, start_tick + index)
+        for index, values in enumerate(values_by_frame)
+    )
+    return NFPWindow(window_id=window_id, frames=frames)
 
 
 def _raises(call: Callable[[], object], expected: type[BaseException]) -> bool:

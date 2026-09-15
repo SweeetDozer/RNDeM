@@ -19,8 +19,10 @@ reflection/pressure influence are not implemented.
 `clc/patterns/`
 
 - `model.py`, `similarity.py`, and `reactivation.py` define the isolated
-  in-memory natural activation-pattern substrate. The package is
-  runtime-independent and is not imported by normal runtime code.
+  in-memory natural activation-pattern substrate: `NFPFrame -> NFPWindow ->
+  NFPSequence`, plus modality/origin/topology, frame/window similarity, and
+  frame reactivation. The package is runtime-independent and is not imported by
+  normal runtime code.
 
 `clc/runtime/`
 
@@ -583,8 +585,8 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_v1_readiness_criteria.py` | v1 readiness criteria exist, define `v1.0.0` as a stable safety-bounded prototype checkpoint, preserve forbidden runtime/write/behavior paths, and require memory/runtime/verifier/release invariants |
 | `tools/verify_v1_release_candidate.py` | v1 release checklist exists, `v1.0.0` remains untagged, release blockers and stop-and-review procedure are documented, and existing no-write/no-behavior/no-ContextMemory/no-marker-36 safety boundaries still pass |
 | `tools/verify_natural_pattern_data_contract.py` | post-v1 Natural Pattern Data Contract exists, defines activation patterns as fundamental data, rejects labels/tokens/prompts as primary truth, documents AKBSM/ExpSM/chronicle relationships, defers implementation details, and preserves v1 safety boundaries |
-| `tools/verify_minimal_activation_pattern_substrate_design.py` | post-v1 minimal activation-pattern substrate design exists, defines modality/origin/topology/frame/trace/similarity/reactivation boundaries, keeps reactivation non-evidential, defers persistence/adapters/binding, and preserves v1 safety boundaries |
-| `tools/verify_minimal_activation_pattern_substrate.py` | isolated `clc/patterns/` substrate exists, validates immutable pattern/frame/trace models, deterministic same-modality similarity, explicit internal reactivation provenance, scenario coverage, runtime isolation, and unchanged real Memory hashes |
+| `tools/verify_minimal_activation_pattern_substrate_design.py` | post-v1 minimal activation-pattern substrate design exists, defines NFPFrame/NFPWindow/NFPSequence, modality/origin/topology, frame/window similarity, and reactivation boundaries, keeps reactivation non-evidential, defers persistence/adapters/binding, and preserves v1 safety boundaries |
+| `tools/verify_minimal_activation_pattern_substrate.py` | isolated `clc/patterns/` substrate exists, validates immutable NFP frame/window/sequence models, deterministic frame/window similarity, explicit internal reactivation provenance, scenario coverage, runtime isolation, and unchanged real Memory hashes |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -747,13 +749,14 @@ proposal/no-effect safety rather than canonical phase output.
   patterns as RNDeM's future data substrate, treats text/labels/filenames as
   non-primary symbolic material, distinguishes active AKBSM knowledge from
   chronicle history, defines ExpSM as operational pattern/action/consequence
-  memory, and defers all ActivationPattern/sensor implementation details.
+  memory, and keeps sensor/transduction integration deferred.
 - Post-v1 minimal activation-pattern substrate design exists in
   `docs/design_minimal_activation_pattern_substrate.md`. It narrows the data
-  contract into an implementation-ready boundary for ActivationPattern,
-  PatternFrame, PatternTrace, PatternOrigin, PatternModality, PatternTopology,
-  PatternSimilarity, and PatternReactivation while deferring sensor adapters,
-  persistence, cross-modal binding, and `_run_tick()` wiring.
+  contract into an implementation-ready boundary for `NFPFrame`,
+  `NFPWindow`, `NFPSequence`, `PatternOrigin`, `PatternModality`,
+  `PatternTopology`, `NFPFrameSimilarity`, `NFPWindowSimilarity`, and
+  `NFPReactivation` while deferring sensor adapters, persistence, cross-modal
+  binding, and `_run_tick()` wiring.
 - The isolated minimal activation-pattern substrate now exists in
   `clc/patterns/`. It is in-memory only, has no sensory adapters or semantic
   recognition, is not imported by normal runtime code, does not touch
