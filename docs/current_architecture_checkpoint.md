@@ -603,6 +603,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_minimal_activation_pattern_substrate.py` | isolated `clc/patterns/` substrate exists, validates immutable NFP frame/window/sequence models, deterministic frame/window similarity, explicit internal reactivation provenance, scenario coverage, runtime isolation, and unchanged real Memory hashes |
 | `tools/verify_first_natural_pattern_transduction_design.py` | first natural-pattern transduction design remains documented after implementation, keeps the synthetic visual world external to cognition, requires label-free sensor snapshots, defines deterministic VISUAL EXTERNAL_SENSORY frame transduction and non-semantic window assembly, defers camera/microphone/OpenCV/runtime wiring, and preserves no-write boundaries |
 | `tools/verify_first_natural_pattern_transduction.py` | isolated first natural-pattern source pipeline exists, verifies synthetic visual world behavior, immutable snapshot boundaries, row-major deterministic visual transduction, opaque provenance, hidden-label leakage resistance, non-semantic sliding NFPWindow assembly, runtime isolation, scenario coverage, and unchanged real Memory hashes |
+| `tools/verify_first_closed_loop_action_consequence_design.py` | first closed-loop action/consequence design exists, requires ACTION + ACTION_GENERATED motor activation, numeric-only actuator signals, external-world transition, consequence only through later sensory NFP, replay-safety rejection of INTERNAL_REACTIVATION, no success/failure/collision callback, no runtime wiring, and no Memory writes |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -783,6 +784,13 @@ proposal/no-effect safety rather than canonical phase output.
   world remains an external scenario/test environment, RNDeM-facing input is
   label-free numeric sensory activation, and sensor hardware, semantic
   recognition, memory writes, and `_run_tick()` wiring remain absent.
+- The first closed-loop action/consequence design exists in
+  `docs/design_first_closed_loop_action_consequence.md`. It is design-only:
+  future harness-supplied `ACTION` + `ACTION_GENERATED` frames may be
+  transduced into numeric actuator signals that mutate an external synthetic
+  world, and consequences return only through later sensory NFPs. Actuation,
+  autonomous action selection, success/failure callbacks, reward/pain, memory
+  writes, and `_run_tick()` wiring remain absent.
   observer remains unwired from behavior paths, no real ContextMemory
   reads/writes exist, and AKBSM writes remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.

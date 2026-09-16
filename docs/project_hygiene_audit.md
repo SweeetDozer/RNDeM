@@ -444,6 +444,16 @@ persistence, real ContextMemory placement, and `_run_tick()` wiring remain
 absent. The implemented code lives under `clc/transduction/` and scenario/test
 support lives under `scenarios/support/`.
 
+`docs/design_first_closed_loop_action_consequence.md` and
+`tools/verify_first_closed_loop_action_consequence_design.py` define the first
+post-v1.2 closed-loop action/consequence design. It is docs/verifier-only:
+future harness-supplied `ACTION` + `ACTION_GENERATED` NFPFrames can become
+numeric-only actuator signals, mutate an external scenario/test world, and
+return only as subsequent sensory NFP activation. It defers actuation
+implementation, autonomous action selection, success/failure/collision
+callbacks, reward/pain, runtime wiring, persistence, ContextMemory placement,
+and AKBSM/ExpSM/chronicle writes.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and

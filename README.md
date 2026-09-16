@@ -23,6 +23,7 @@ Start with:
 - `docs/natural_pattern_data_contract.md`
 - `docs/design_minimal_activation_pattern_substrate.md`
 - `docs/design_first_natural_pattern_transduction.md`
+- `docs/design_first_closed_loop_action_consequence.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -70,6 +71,7 @@ python tools/verify_minimal_activation_pattern_substrate_design.py
 python tools/verify_minimal_activation_pattern_substrate.py
 python tools/verify_first_natural_pattern_transduction_design.py
 python tools/verify_first_natural_pattern_transduction.py
+python tools/verify_first_closed_loop_action_consequence_design.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -271,6 +273,14 @@ visual field becomes immutable `VisualFieldSnapshot` data, then label-free
 `VISUAL` + `EXTERNAL_SENSORY` `NFPFrame` material and non-semantic
 `NFPWindow` groups. It does not add sensor hardware, OpenCV, learned
 recognition, runtime wiring, persistence, or memory writes.
+`docs/design_first_closed_loop_action_consequence.md` designs the first
+closed-loop action/consequence path after `v1.2.0`: harness-supplied
+`ACTION` + `ACTION_GENERATED` NFPFrame material would become numeric
+`ActuatorSignal` data, mutate an external synthetic world, and return to RNDeM
+only as subsequent sensory activation through `VisualFieldSnapshot` and
+`VisualFieldTransducer`. It is design-only and does not implement actuation,
+autonomous action selection, success/failure callbacks, reward/pain, runtime
+wiring, persistence, or memory writes.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
