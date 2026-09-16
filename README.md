@@ -72,6 +72,7 @@ python tools/verify_minimal_activation_pattern_substrate.py
 python tools/verify_first_natural_pattern_transduction_design.py
 python tools/verify_first_natural_pattern_transduction.py
 python tools/verify_first_closed_loop_action_consequence_design.py
+python tools/verify_first_closed_loop_action_consequence.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -273,14 +274,18 @@ visual field becomes immutable `VisualFieldSnapshot` data, then label-free
 `VISUAL` + `EXTERNAL_SENSORY` `NFPFrame` material and non-semantic
 `NFPWindow` groups. It does not add sensor hardware, OpenCV, learned
 recognition, runtime wiring, persistence, or memory writes.
-`docs/design_first_closed_loop_action_consequence.md` designs the first
-closed-loop action/consequence path after `v1.2.0`: harness-supplied
-`ACTION` + `ACTION_GENERATED` NFPFrame material would become numeric
-`ActuatorSignal` data, mutate an external synthetic world, and return to RNDeM
-only as subsequent sensory activation through `VisualFieldSnapshot` and
-`VisualFieldTransducer`. It is design-only and does not implement actuation,
-autonomous action selection, success/failure callbacks, reward/pain, runtime
-wiring, persistence, or memory writes.
+`docs/design_first_closed_loop_action_consequence.md` now documents the first
+isolated closed-loop action/consequence implementation after `v1.2.0`:
+harness-supplied `ACTION` + `ACTION_GENERATED` NFPFrame material becomes
+numeric `ActuatorSignal` data, mutates an external synthetic world, and returns
+to RNDeM only as subsequent sensory activation through `VisualFieldSnapshot`
+and `VisualFieldTransducer`. ACTION frames remain harness-generated, actuation
+is numeric and non-semantic, replayed actions cannot execute, world transitions
+return no semantic result, strict `T -> T+1` causality is mechanically
+enforced, and the same action values may have different sensory consequences
+in different hidden world states. It does not add autonomous action selection,
+learning, success/failure callbacks, reward/pain, runtime wiring, persistence,
+or memory writes.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

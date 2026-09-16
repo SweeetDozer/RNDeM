@@ -34,6 +34,16 @@ reflection/pressure influence are not implemented.
   in-memory only, has no learned recognition, no Memory integration, and is not
   imported by normal runtime code or `_run_tick()`.
 
+`clc/actuation/`
+
+- `motor.py` defines immutable numeric `ActuatorSignal` and `ActionTransducer`
+  for the isolated first closed-loop action/consequence path. It accepts only
+  `ACTION` + `ACTION_GENERATED` `NFPFrame` objects with topology `(2,)`, rejects
+  replayed/internal/sensory/non-action frames, preserves tick and activation
+  values, and emits opaque actuator provenance. It does not import transduction,
+  scenario worlds, runtime modules, Memory writers, or behavior/scoring/guard
+  modules.
+
 `clc/runtime/`
 
 - `clc_runtime.py` wires the runtime, feed methods, `_run_tick()` phase helpers,
@@ -157,6 +167,11 @@ reflection/pressure influence are not implemented.
   support for the first natural-pattern source pipeline. Hidden debug metadata
   may exist in that external world, but it does not enter `VisualFieldSnapshot`,
   NFP activation values, topology, provenance, windows, or runtime memory.
+- `scenarios/support/synthetic_closed_loop_visual_world.py` is external
+  scenario/test support for the first closed-loop causal path. It keeps hidden
+  row/column/tick state outside cognition, applies numeric actuator signals with
+  fixed physical wiring, returns `None`, advances exactly one tick, and exposes
+  consequences only through later numeric visual snapshots.
 
 ## Runtime tick pipeline
 
@@ -604,6 +619,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_first_natural_pattern_transduction_design.py` | first natural-pattern transduction design remains documented after implementation, keeps the synthetic visual world external to cognition, requires label-free sensor snapshots, defines deterministic VISUAL EXTERNAL_SENSORY frame transduction and non-semantic window assembly, defers camera/microphone/OpenCV/runtime wiring, and preserves no-write boundaries |
 | `tools/verify_first_natural_pattern_transduction.py` | isolated first natural-pattern source pipeline exists, verifies synthetic visual world behavior, immutable snapshot boundaries, row-major deterministic visual transduction, opaque provenance, hidden-label leakage resistance, non-semantic sliding NFPWindow assembly, runtime isolation, scenario coverage, and unchanged real Memory hashes |
 | `tools/verify_first_closed_loop_action_consequence_design.py` | first closed-loop action/consequence design exists, requires ACTION + ACTION_GENERATED motor activation, numeric-only actuator signals, external-world transition, consequence only through later sensory NFP, replay-safety rejection of INTERNAL_REACTIVATION, no success/failure/collision callback, no runtime wiring, and no Memory writes |
+| `tools/verify_first_closed_loop_action_consequence.py` | isolated first closed-loop implementation exists, verifies immutable numeric actuator signals, ACTION origin/topology validation, replay rejection, strict `T -> T+1` timing, external world dynamics, same-action/different-context behavior, visual sensory return path, no semantic result callback, no runtime wiring, and unchanged Memory hashes |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |

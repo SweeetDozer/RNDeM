@@ -28,12 +28,13 @@ external synthetic visual world
 is non-semantic. The pipeline is not wired into `_run_tick()`, has no learned
 recognition, and has no Memory integration.
 
-The next design layer is the first closed-loop action/consequence design in
-`docs/design_first_closed_loop_action_consequence.md`.
-It keeps this sensory path intact and designs only how a future numeric
-`ACTION` + `ACTION_GENERATED` NFPFrame can affect an external world, after
-which the consequence returns through `VisualFieldSnapshot` and
-`VisualFieldTransducer`. It does not add a direct action-to-sensory shortcut.
+The next layer is the first closed-loop action/consequence implementation in
+`docs/design_first_closed_loop_action_consequence.md`. It keeps this sensory
+path intact and implements only how a harness-supplied numeric `ACTION` +
+`ACTION_GENERATED` NFPFrame can affect an external scenario world, after which
+the consequence returns through `VisualFieldSnapshot` and
+`VisualFieldTransducer`. It does not add a direct action-to-sensory shortcut,
+semantic result callback, learning authority, or normal runtime wiring.
 
 ## Relationship To Existing Architecture
 

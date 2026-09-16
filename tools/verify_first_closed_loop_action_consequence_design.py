@@ -40,11 +40,13 @@ def main() -> int:
     hygiene = HYGIENE_PATH.read_text(encoding="utf-8") if HYGIENE_PATH.exists() else ""
     results = {
         "design document exists": DOC_PATH.exists(),
-        "docs verifier only status": _has_all(
+        "post-v1.2 implemented-isolated status": _has_all(
             text,
             (
-                "Proposed post-v1.2 design only",
-                "does not implement actuation",
+                "Post-v1.2 isolated implementation complete",
+                "first mechanical action/consequence causal path is implemented",
+                "`clc/actuation/`",
+                "scenarios/support/synthetic_closed_loop_visual_world.py",
                 "does not modify `clc/patterns/`",
                 "does not modify `clc/transduction/`",
                 "does not wire anything into normal runtime or `_run_tick()`",
@@ -338,9 +340,15 @@ def main() -> int:
         "safety boundary": _has_all(
             text,
             (
-                "documentation and verifier only",
-                "does not implement actuation",
-                "does not create `clc/actuation/`",
+                "ACTION frames remain harness-generated",
+                "numeric and non-semantic",
+                "replayed `ACTION` frames cannot execute",
+                "returns no semantic result",
+                "strict `T -> T+1` causality is enforced",
+                "same action values may produce different later sensory",
+                "No learning",
+                "runtime",
+                "wiring is added yet",
                 "does not modify Memory",
                 "semantic_core.json",
                 "technical_feedback_patterns.json",
@@ -351,17 +359,20 @@ def main() -> int:
         "contract reference": _has_all(
             contract,
             (
-                "first closed-loop action/consequence design",
-                "ACTION activation",
+                "first closed-loop action/consequence path",
+                "harness-supplied ACTION activation",
                 "subsequent sensory activation",
-                "not autonomous action selection",
+                "not autonomous",
+                "action selection",
             ),
         ),
-        "transduction design reference": "first closed-loop action/consequence design" in transduction_design,
+        "transduction design reference": "first closed-loop action/consequence implementation" in transduction_design,
         "architecture reference": "first closed-loop action/consequence design" in architecture
-        and "tools/verify_first_closed_loop_action_consequence_design.py" in architecture,
+        and "tools/verify_first_closed_loop_action_consequence_design.py" in architecture
+        and "tools/verify_first_closed_loop_action_consequence.py" in architecture,
         "hygiene reference": "tools/verify_first_closed_loop_action_consequence_design.py" in hygiene,
-        "actuation source not implemented": not ACTUATION_ROOT.exists(),
+        "actuation source implemented in isolated location": (ACTUATION_ROOT / "motor.py").exists()
+        and (ACTUATION_ROOT / "__init__.py").exists(),
         "no forbidden root files": all(not (ROOT / name).exists() for name in FORBIDDEN_FILES),
         "existing safety still passes": _run_core_verifiers(),
     }

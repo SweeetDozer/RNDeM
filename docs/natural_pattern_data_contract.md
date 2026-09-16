@@ -167,12 +167,13 @@ copies row-major sensor values into `VISUAL` + `EXTERNAL_SENSORY` `NFPFrame`
 activation values with opaque sensor-snapshot provenance. It does not receive
 hidden labels, classify objects, compute motion, or write Memory.
 
-The first closed-loop action/consequence design is documented separately. It
-keeps the same natural-data rule in the action direction: an ACTION activation
-may later be transduced into a numeric actuator signal that mutates an external
-world, but RNDeM receives the consequence only through subsequent sensory
-activation. It is not autonomous action selection, not a semantic command API,
-not a success/failure callback, not reward or pain, and not a Memory write path.
+The first closed-loop action/consequence path is implemented separately as an
+isolated scenario/test layer. It keeps the same natural-data rule in the action
+direction: a harness-supplied ACTION activation may be transduced into a
+numeric actuator signal that mutates an external world, but RNDeM receives the
+consequence only through subsequent sensory activation. It is not autonomous
+action selection, not a semantic command API, not a success/failure callback,
+not reward or pain, and not a Memory write path.
 
 The consequence path is subsequent sensory activation, not semantic result
 truth.

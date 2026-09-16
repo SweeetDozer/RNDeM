@@ -2,14 +2,22 @@
 
 ## Status
 
-Proposed post-v1.2 design only.
+Post-v1.2 isolated implementation complete.
 
-This document does not implement actuation, does not modify `clc/patterns/`,
-does not modify `clc/transduction/`, does not wire anything into normal
-runtime or `_run_tick()`, and does not add autonomous action selection,
-semantic action names, success/failure callbacks, reward, pain, persistence,
-ContextMemory placement, AKBSM writes, ExpSM writes, chronicle writes,
-prediction, replay scheduling, or cross-modal binding.
+The first mechanical action/consequence causal path is implemented under
+`clc/actuation/` with external scenario/test support in
+`scenarios/support/synthetic_closed_loop_visual_world.py`. It implements only
+numeric `ACTION` + `ACTION_GENERATED` frame transduction into immutable
+`ActuatorSignal` objects and an external synthetic world transition whose
+consequence is observed only through a later `VisualFieldSnapshot` and existing
+`VisualFieldTransducer`.
+
+This document still does not modify `clc/patterns/`, does not modify
+`clc/transduction/`, does not wire anything into normal runtime or
+`_run_tick()`, and does not add autonomous action selection, semantic action
+names, success/failure callbacks, reward, pain, persistence, ContextMemory
+placement, AKBSM writes, ExpSM writes, chronicle writes, prediction, replay
+scheduling, or cross-modal binding.
 
 This design does not wire anything into normal runtime or `_run_tick()`.
 
@@ -31,6 +39,13 @@ ACTION NFP -> external world -> subsequent sensory NFP
 The next closed-loop layer is the first mechanical action/consequence loop. It
 is not learned behavior. It is not autonomous behavior. The internal/action
 generation mechanism remains test-harness supplied for now.
+
+In the first implementation, ACTION frames remain harness-generated. Actuation
+is numeric and non-semantic, replayed `ACTION` frames cannot execute, the world
+transition returns no semantic result, strict `T -> T+1` causality is enforced
+by tick checks, and the same action values may produce different later sensory
+activation in different hidden world states. No learning or normal runtime
+wiring is added yet.
 
 ## Canonical Causal Model
 
