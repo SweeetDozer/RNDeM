@@ -561,4 +561,11 @@ This implementation does not create or modify:
 - `semantic_core.json`
 - `technical_feedback_patterns.json`
 
-Do not tag or merge from this implementation pass.
+## Related Post-v1.1 Design
+
+`docs/design_first_natural_pattern_transduction.md` proposes the first
+label-free natural-pattern source/transduction boundary on top of this
+substrate. It is design-only and keeps `clc/patterns/`, `_run_tick()`, memory
+writes, sensor hardware, semantic recognition, and persistence unchanged.
+
+Do not tag or merge from this design pass.

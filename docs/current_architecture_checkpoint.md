@@ -587,6 +587,7 @@ proposal/no-effect safety rather than canonical phase output.
 | `tools/verify_natural_pattern_data_contract.py` | post-v1 Natural Pattern Data Contract exists, defines activation patterns as fundamental data, rejects labels/tokens/prompts as primary truth, documents AKBSM/ExpSM/chronicle relationships, defers implementation details, and preserves v1 safety boundaries |
 | `tools/verify_minimal_activation_pattern_substrate_design.py` | post-v1 minimal activation-pattern substrate design exists, defines NFPFrame/NFPWindow/NFPSequence, modality/origin/topology, frame/window similarity, and reactivation boundaries, keeps reactivation non-evidential, defers persistence/adapters/binding, and preserves v1 safety boundaries |
 | `tools/verify_minimal_activation_pattern_substrate.py` | isolated `clc/patterns/` substrate exists, validates immutable NFP frame/window/sequence models, deterministic frame/window similarity, explicit internal reactivation provenance, scenario coverage, runtime isolation, and unchanged real Memory hashes |
+| `tools/verify_first_natural_pattern_transduction_design.py` | first natural-pattern transduction design exists, keeps the synthetic visual world external to cognition, requires label-free sensor snapshots, defines deterministic VISUAL EXTERNAL_SENSORY frame transduction and non-semantic window assembly, defers camera/microphone/OpenCV/runtime wiring, and preserves no-write boundaries |
 | `tools/verify_debug_name_dependency_audit.py` | debug-name audit schema and classifications remain valid |
 | `tools/verify_legacy_semantic_decision_migration.py` | high-risk debug-name and legacy semantic decision debt remain resolved |
 | `tools/verify_unknown_runtime_logic_split.py` | unknown runtime logic audit split remains clean |
@@ -761,6 +762,12 @@ proposal/no-effect safety rather than canonical phase output.
   `clc/patterns/`. It is in-memory only, has no sensory adapters or semantic
   recognition, is not imported by normal runtime code, does not touch
   `_run_tick()`, and has no AKBSM/ExpSM/ContextMemory write or placement path.
+- The first natural-pattern transduction design exists in
+  `docs/design_first_natural_pattern_transduction.md`. It is proposed
+  post-v1.1 design only: the synthetic visual world remains an external
+  scenario/test environment, RNDeM-facing input is label-free numeric sensory
+  activation, and `clc/transduction/` implementation, sensor hardware,
+  semantic recognition, memory writes, and `_run_tick()` wiring remain absent.
   observer remains unwired from behavior paths, no real ContextMemory
   reads/writes exist, and AKBSM writes remain blocked.
 - Post-v0.0.2 safety architecture checkpoint is tagged as `v0.0.3`.

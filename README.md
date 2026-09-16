@@ -67,6 +67,7 @@ python tools/verify_contextmemory_temporary_metadata_tick_diagnostic_wrapper_sca
 python tools/verify_natural_pattern_data_contract.py
 python tools/verify_minimal_activation_pattern_substrate_design.py
 python tools/verify_minimal_activation_pattern_substrate.py
+python tools/verify_first_natural_pattern_transduction_design.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -260,6 +261,13 @@ reactivation. The isolated in-memory implementation now lives in
 `scenarios/minimal_activation_pattern_substrate.json`. It adds no persistence,
 sensor adapters, semantic recognition, `_run_tick()` wiring, AKBSM/ExpSM
 writes, or real ContextMemory placement.
+`docs/design_first_natural_pattern_transduction.md` proposes the first
+post-v1.1 natural-pattern source/transduction boundary. It uses a tiny
+synthetic visual scalar-field environment as an external test world, keeps
+semantic labels out of RNDeM-facing data, and designs only
+`VisualFieldSnapshot`, `VisualFieldTransducer`, and `NFPWindowAssembler`
+concepts. It does not implement `clc/transduction/`, sensor hardware, OpenCV,
+runtime wiring, persistence, or memory writes.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

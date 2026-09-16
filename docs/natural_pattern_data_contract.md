@@ -554,6 +554,8 @@ Deferred:
 
 ## Recommended Next Step
 
-Review and merge the isolated substrate implementation. After a clean review,
-the next design step should be the first natural-pattern source/transduction
-layer without semantic labels.
+Review `docs/design_first_natural_pattern_transduction.md` before implementing
+the first natural-pattern source/transduction layer. The proposed first source
+is a tiny synthetic visual scalar-field environment that produces label-free
+sensory activation for VISUAL `NFPFrame` and `NFPWindow` material without
+camera hardware, semantic labels, memory writes, or `_run_tick()` wiring.

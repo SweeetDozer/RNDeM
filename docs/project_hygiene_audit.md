@@ -433,6 +433,15 @@ immutable/effectively immutable, runtime-independent, and has no sensory
 adapters, semantic recognition, persistence, AKBSM/ExpSM writes, real
 ContextMemory placement, or `_run_tick()` wiring.
 
+`docs/design_first_natural_pattern_transduction.md` and
+`tools/verify_first_natural_pattern_transduction_design.py` define the first
+post-v1.1 natural-pattern source/transduction design. The design is docs/
+verifier-only: a tiny synthetic visual scalar-field environment remains
+external test/scenario support, RNDeM-facing data is label-free numeric sensory
+activation, and camera/microphone/OpenCV integration, semantic recognition,
+`clc/transduction/` implementation, memory writes, persistence, real
+ContextMemory placement, and `_run_tick()` wiring remain absent.
+
 ## Audit output tracking recommendation
 
 `docs/debug_name_dependency_audit.json` and
@@ -508,5 +517,6 @@ in a later packaging pass.
     isolated `clc/patterns/` package as the review gate before any source,
     transduction, persistence, ContextMemory, AKBSM, ExpSM, or `_run_tick()`
     integration.
-28. Review and merge the isolated `clc/patterns/` substrate before designing a
-    natural-pattern source/transduction layer without semantic labels.
+28. Review `docs/design_first_natural_pattern_transduction.md` before
+    implementing any isolated synthetic visual environment, label-free
+    `VisualFieldTransducer`, or `NFPWindowAssembler`.
