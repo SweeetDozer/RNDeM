@@ -3,6 +3,11 @@
 Local cognitive loop prototype with a conservative safe-demo runtime, scenario
 fixtures, phase regression snapshots, and focused verifier scripts.
 
+Post-v1.3 Context/Short Memory design proposes reusing ContextMemoryManager for
+typed active-present NFP state and retaining completed raw transitions in bounded
+Short Memory. It is documentation only; implementation and runtime wiring remain
+deferred. Internal replay cannot satisfy an awaited external sensory consequence.
+
 Start with:
 
 - `docs/current_architecture_checkpoint.md`
@@ -24,6 +29,7 @@ Start with:
 - `docs/design_minimal_activation_pattern_substrate.md`
 - `docs/design_first_natural_pattern_transduction.md`
 - `docs/design_first_closed_loop_action_consequence.md`
+- `docs/design_nfp_context_and_short_memory.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -32,6 +38,7 @@ Useful checks:
 
 ```bash
 python tools/verify_project_hygiene.py
+python tools/verify_nfp_context_and_short_memory_design.py
 python tools/verify_behavior_influence_adr.py
 python tools/verify_mode_c_design_doc.py
 python tools/verify_mode_c_first_experiment_adr.py

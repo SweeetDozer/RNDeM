@@ -23,6 +23,12 @@ This design does not wire anything into normal runtime or `_run_tick()`.
 
 ## Relationship To Existing Architecture
 
+The next design, `docs/design_nfp_context_and_short_memory.md`, assigns pending
+before/action/after capture to existing ContextMemory infrastructure and completed
+raw transitions to bounded Short Memory. It preserves the isolated v1.3.0 loop
+and strict T -> T+1 external consequence rule. No separate ExperienceCapture
+memory subsystem, semantic evaluation or permanent writer is introduced.
+
 The current checkpoints separate three layers:
 
 ```text

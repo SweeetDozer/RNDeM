@@ -20,6 +20,13 @@ kind of data substrate future post-v1 CLC development should introduce.
 
 ## Core Principle
 
+The post-v1.3 memory-role design is in
+`docs/design_nfp_context_and_short_memory.md`: Context Memory holds active present
+and pending transitions; Short Memory retains completed recent raw transitions.
+NFPWindow remains a pattern structure, not a memory layer. Preserved origin
+prevents INTERNAL_REACTIVATION from satisfying an external consequence. This
+design adds no memory implementation or permanent write authority.
+
 RNDeM does not fundamentally operate on text, images, audio files, labels, or
 symbolic requests.
 

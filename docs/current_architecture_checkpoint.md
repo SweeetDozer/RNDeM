@@ -16,6 +16,14 @@ reflection/pressure influence are not implemented.
 
 ## Directory and module map
 
+Post-v1.3 design-only extension:
+`docs/design_nfp_context_and_short_memory.md` audits existing ContextMemory and
+recommends evolving its manager with typed NFP active-present state. Completed
+raw transitions would belong to bounded Short Memory. Legacy frame/window types
+and temporary diagnostic metadata remain distinct from natural NFP material.
+No implementation, _run_tick wiring or permanent memory writes are added.
+`tools/verify_nfp_context_and_short_memory_design.py` checks the design contract.
+
 `clc/patterns/`
 
 - `model.py`, `similarity.py`, and `reactivation.py` define the isolated

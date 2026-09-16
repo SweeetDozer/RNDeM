@@ -2,6 +2,15 @@
 
 Status: current repository/project hygiene checkpoint.
 
+Post-v1.3 Context/Short Memory design audit:
+`docs/design_nfp_context_and_short_memory.md` inventories existing context,
+operation queue, active field and local temporary-metadata infrastructure.
+Prefer evolving ContextMemoryManager over a duplicate manager. The planned
+Short Memory retains raw recent transitions with active-tick bounds; temporary
+diagnostic metadata remains non-authoritative. This pass adds only documentation
+and `tools/verify_nfp_context_and_short_memory_design.py`; runtime, Memory files,
+substrate/transduction/actuation and historical checkpoint meanings are unchanged.
+
 ## Git status result
 
 Working directory:
