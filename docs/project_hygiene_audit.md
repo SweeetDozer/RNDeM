@@ -433,14 +433,16 @@ immutable/effectively immutable, runtime-independent, and has no sensory
 adapters, semantic recognition, persistence, AKBSM/ExpSM writes, real
 ContextMemory placement, or `_run_tick()` wiring.
 
-`docs/design_first_natural_pattern_transduction.md` and
-`tools/verify_first_natural_pattern_transduction_design.py` define the first
-post-v1.1 natural-pattern source/transduction design. The design is docs/
-verifier-only: a tiny synthetic visual scalar-field environment remains
-external test/scenario support, RNDeM-facing data is label-free numeric sensory
-activation, and camera/microphone/OpenCV integration, semantic recognition,
-`clc/transduction/` implementation, memory writes, persistence, real
-ContextMemory placement, and `_run_tick()` wiring remain absent.
+`docs/design_first_natural_pattern_transduction.md`,
+`tools/verify_first_natural_pattern_transduction_design.py`, and
+`tools/verify_first_natural_pattern_transduction.py` cover the first post-v1.1
+natural-pattern source/transduction implementation. A tiny synthetic visual
+scalar-field environment remains external test/scenario support,
+RNDeM-facing data is label-free numeric sensory activation, and
+camera/microphone/OpenCV integration, semantic recognition, memory writes,
+persistence, real ContextMemory placement, and `_run_tick()` wiring remain
+absent. The implemented code lives under `clc/transduction/` and scenario/test
+support lives under `scenarios/support/`.
 
 ## Audit output tracking recommendation
 

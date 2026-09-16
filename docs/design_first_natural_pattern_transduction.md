@@ -2,18 +2,31 @@
 
 ## Status
 
-Proposed post-v1.1 design.
+Post-v1.1 design with isolated implementation complete.
 
-This document is docs/verifier only. It does not implement a transduction
-layer, does not modify `clc/patterns/`, does not wire anything into normal
-runtime or `_run_tick()`, and does not add camera/microphone support, OpenCV,
-semantic recognition, text/token input, persistence, ContextMemory placement,
-AKBSM writes, ExpSM writes, cross-modal binding, prediction, or replay
-scheduling.
+The first isolated natural-pattern source pipeline is implemented under
+`clc/transduction/` with external scenario/test support under
+`scenarios/support/`. It remains in-memory only, does not modify
+`clc/patterns/`, does not wire anything into normal runtime or `_run_tick()`,
+and does not add camera/microphone support, OpenCV, semantic recognition,
+text/token input, persistence, ContextMemory placement, AKBSM writes, ExpSM
+writes, cross-modal binding, prediction, or replay scheduling.
 
-This document does not implement a transduction layer.
+This implementation establishes the small source pipeline:
 
-This document does not wire anything into normal runtime or `_run_tick()`.
+```text
+external synthetic visual world
+-> VisualFieldSnapshot
+-> label-free VisualFieldTransducer
+-> VISUAL + EXTERNAL_SENSORY NFPFrame
+-> NFPWindowAssembler
+-> NFPWindow
+```
+
+`VisualFieldSnapshot` is a sensory boundary object, not an NFP. The
+`VisualFieldTransducer` is label-free and deterministic. `NFPWindowAssembler`
+is non-semantic. The pipeline is not wired into `_run_tick()`, has no learned
+recognition, and has no Memory integration.
 
 ## Relationship To Existing Architecture
 
@@ -518,11 +531,9 @@ Do not connect it to:
 
 Initial tests/scenarios operate through a standalone harness.
 
-## Suggested Future Implementation Location
+## Implementation Location
 
-Design only.
-
-Recommended:
+Implemented:
 
 ```text
 clc/transduction/
@@ -548,22 +559,20 @@ the synthetic world is an external test environment,
 not part of RNDeM cognition.
 ```
 
-Do not implement these files in this pass.
+## Implemented Types
 
-## Proposed Future Types
-
-The minimal future implementation should use concepts equivalent to:
+The minimal implementation uses:
 
 - VisualFieldSnapshot
 - VisualFieldTransducer
 - NFPWindowAssembler
 - SyntheticVisualWorld
 
-Exact names may be adjusted to project conventions.
+Exact names match current project conventions.
 
 ## First Implementation Scenario Coverage
 
-The next implementation pass should cover:
+The implementation verifier covers:
 
 - static 16x16 field produces VISUAL EXTERNAL_SENSORY NFPFrame
 - frame topology matches field shape
@@ -637,10 +646,11 @@ Deferred:
 
 ## Safety Boundary
 
-This design does not implement the transduction layer. It does not add files
-under `clc/transduction/` or `scenarios/support/`. It changes no Memory files
-and does not create `semantic_core.json` or `technical_feedback_patterns.json`.
+This implementation remains isolated from normal runtime. It changes no Memory
+files and does not create `semantic_core.json` or
+`technical_feedback_patterns.json`.
 
-This design does not add files under `clc/transduction/`.
+The implementation adds files under `clc/transduction/` and
+`scenarios/support/`, but does not wire them into `CLCRuntime` or `_run_tick()`.
 
-Do not tag or merge from this design pass.
+Do not tag or merge from the implementation pass.

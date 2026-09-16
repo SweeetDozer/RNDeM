@@ -34,8 +34,10 @@ def main() -> int:
                 "post-v1 contract",
                 "first isolated in-memory",
                 "pattern substrate",
-                "contract still does not",
-                "implement sensory processing",
+                "first isolated natural",
+                "source pipeline",
+                "clc/transduction/",
+                "still does not implement memory writers",
             ),
         ),
         "natural activation patterns are fundamental data": _has_all(

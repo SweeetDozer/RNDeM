@@ -5,10 +5,15 @@
 Post-v1 architecture/design contract.
 
 This document is the post-v1 contract. The first isolated in-memory pattern
-substrate now exists under `clc/patterns/`, but this contract still does not
-implement sensory processing, memory writers, real ContextMemory placement,
-AKBSM writes, ExpSM writes, sensor adapters, file input APIs, direct
-`_run_tick()` hooks, default runtime diagnostics, or behavior influence.
+substrate now exists under `clc/patterns/`, and the first isolated natural
+pattern source pipeline now exists under `clc/transduction/` with external
+scenario/test support under `scenarios/support/`. The pipeline is limited to a
+synthetic visual scalar field, immutable `VisualFieldSnapshot`, label-free
+`VisualFieldTransducer`, and non-semantic `NFPWindowAssembler`. This contract
+still does not implement memory writers, real ContextMemory placement, AKBSM
+writes, ExpSM writes, camera/microphone adapters, file input APIs, direct
+`_run_tick()` hooks, default runtime diagnostics, learned recognition, or
+behavior influence.
 
 `v1.0.0` remains the safe runtime/container baseline. This contract defines the
 kind of data substrate future post-v1 CLC development should introduce.
@@ -153,6 +158,14 @@ camera/environment
 -> activation field
 -> internal processing
 ```
+
+The first implemented source uses a synthetic external numeric visual field
+rather than camera hardware. The synthetic world remains scenario/test support
+outside RNDeM cognition; RNDeM-side transduction receives only immutable
+numeric `VisualFieldSnapshot` objects. `VisualFieldTransducer` deterministically
+copies row-major sensor values into `VISUAL` + `EXTERNAL_SENSORY` `NFPFrame`
+activation values with opaque sensor-snapshot provenance. It does not receive
+hidden labels, classify objects, compute motion, or write Memory.
 
 A file may later be used as a simulation source for tests, but the file itself
 must not become semantic truth.
@@ -554,8 +567,8 @@ Deferred:
 
 ## Recommended Next Step
 
-Review `docs/design_first_natural_pattern_transduction.md` before implementing
-the first natural-pattern source/transduction layer. The proposed first source
-is a tiny synthetic visual scalar-field environment that produces label-free
-sensory activation for VISUAL `NFPFrame` and `NFPWindow` material without
-camera hardware, semantic labels, memory writes, or `_run_tick()` wiring.
+Review and merge the isolated first natural-pattern source/transduction layer.
+The implemented first source is a tiny synthetic visual scalar-field
+environment that produces label-free sensory activation for VISUAL `NFPFrame`
+and `NFPWindow` material without camera hardware, semantic labels, memory
+writes, or `_run_tick()` wiring.

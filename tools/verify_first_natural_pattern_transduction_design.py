@@ -32,13 +32,15 @@ def main() -> int:
     text = DOC_PATH.read_text(encoding="utf-8") if DOC_PATH.exists() else ""
     results = {
         "design document exists": DOC_PATH.exists(),
-        "post-v1.1 design-only status": _has_all(
+        "post-v1.1 implemented-isolated status": _has_all(
             text,
             (
-                "Proposed post-v1.1 design",
-                "docs/verifier only",
-                "does not implement a transduction layer",
-                "does not modify `clc/patterns/`",
+                "Post-v1.1 design with isolated implementation complete",
+                "clc/transduction/",
+                "scenarios/support/",
+                "remains in-memory only",
+                "does not modify",
+                "clc/patterns/",
                 "does not wire anything into normal runtime or `_run_tick()`",
             ),
         ),
@@ -236,7 +238,7 @@ def main() -> int:
                 "standalone harness",
             ),
         ),
-        "future implementation locations only": _has_all(
+        "implementation locations documented": _has_all(
             text,
             (
                 "clc/transduction/",
@@ -245,10 +247,9 @@ def main() -> int:
                 "scenarios/support/synthetic_visual_world.py",
                 "external test environment",
                 "not part of RNDeM cognition",
-                "Do not implement these files in this pass",
             ),
         ),
-        "future types documented": _has_all(
+        "implemented types documented": _has_all(
             text,
             (
                 "VisualFieldSnapshot",
@@ -257,7 +258,7 @@ def main() -> int:
                 "SyntheticVisualWorld",
             ),
         ),
-        "next-pass coverage documented": _has_all(
+        "implementation coverage documented": _has_all(
             text,
             (
                 "static 16x16 field produces VISUAL EXTERNAL_SENSORY NFPFrame",
@@ -308,14 +309,14 @@ def main() -> int:
         "safety boundary": _has_all(
             text,
             (
-                "does not implement the transduction layer",
-                "does not add files under `clc/transduction/`",
+                "implementation remains isolated from normal runtime",
+                "does not wire them into `CLCRuntime` or `_run_tick()`",
                 "does not create `semantic_core.json`",
                 "technical_feedback_patterns.json",
-                "Do not tag or merge from this design pass",
+                "Do not tag or merge from the implementation pass",
             ),
         ),
-        "source files not implemented": not TRANSDUCTION_ROOT.exists() and not SCENARIO_SUPPORT_ROOT.exists(),
+        "source files implemented in isolated locations": TRANSDUCTION_ROOT.exists() and SCENARIO_SUPPORT_ROOT.exists(),
         "existing pattern substrate untouched by verifier": PATTERNS_ROOT.exists(),
         "contract and substrate docs exist": CONTRACT_PATH.exists() and SUBSTRATE_PATH.exists(),
         "no forbidden root files": all(not (ROOT / name).exists() for name in FORBIDDEN_FILES),

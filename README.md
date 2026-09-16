@@ -22,6 +22,7 @@ Start with:
 - `docs/adr_contextmemory_temporary_metadata_tick_diagnostic_visibility.md`
 - `docs/natural_pattern_data_contract.md`
 - `docs/design_minimal_activation_pattern_substrate.md`
+- `docs/design_first_natural_pattern_transduction.md`
 - `docs/post_v0_0_2_safety_architecture_checkpoint.md`
 - `docs/phase_regression_snapshots.md`
 - `docs/project_hygiene_audit.md`
@@ -68,6 +69,7 @@ python tools/verify_natural_pattern_data_contract.py
 python tools/verify_minimal_activation_pattern_substrate_design.py
 python tools/verify_minimal_activation_pattern_substrate.py
 python tools/verify_first_natural_pattern_transduction_design.py
+python tools/verify_first_natural_pattern_transduction.py
 python tools/verify_phase_regression_snapshots.py
 python tools/verify_phase_level_invariants.py
 python tools/verify_scenario_fixtures.py
@@ -261,13 +263,14 @@ reactivation. The isolated in-memory implementation now lives in
 `scenarios/minimal_activation_pattern_substrate.json`. It adds no persistence,
 sensor adapters, semantic recognition, `_run_tick()` wiring, AKBSM/ExpSM
 writes, or real ContextMemory placement.
-`docs/design_first_natural_pattern_transduction.md` proposes the first
-post-v1.1 natural-pattern source/transduction boundary. It uses a tiny
-synthetic visual scalar-field environment as an external test world, keeps
-semantic labels out of RNDeM-facing data, and designs only
-`VisualFieldSnapshot`, `VisualFieldTransducer`, and `NFPWindowAssembler`
-concepts. It does not implement `clc/transduction/`, sensor hardware, OpenCV,
-runtime wiring, persistence, or memory writes.
+`docs/design_first_natural_pattern_transduction.md` documents the first
+post-v1.1 natural-pattern source/transduction boundary. The isolated
+implementation now lives in `clc/transduction/` with external scenario/test
+support in `scenarios/support/synthetic_visual_world.py`: a mutable numeric
+visual field becomes immutable `VisualFieldSnapshot` data, then label-free
+`VISUAL` + `EXTERNAL_SENSORY` `NFPFrame` material and non-semantic
+`NFPWindow` groups. It does not add sensor hardware, OpenCV, learned
+recognition, runtime wiring, persistence, or memory writes.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.
