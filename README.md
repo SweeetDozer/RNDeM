@@ -1,5 +1,11 @@
 # RNDeM CLC Prototype
 
+Post-v1.4 design-only boundary:
+[ShortMemory to ExpSM](docs/design_short_memory_to_expsm_boundary.md) audits
+existing ExpSM and proposes endpoint effects, occurrence evidence and transient
+three-axis candidates. No evaluation implementation, persistence or runtime
+wiring is added. Contract check: `tools/verify_short_memory_to_expsm_boundary_design.py`.
+
 Local cognitive loop prototype with a conservative safe-demo runtime, scenario
 fixtures, phase regression snapshots, and focused verifier scripts.
 

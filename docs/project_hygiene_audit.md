@@ -2,6 +2,13 @@
 
 Status: current repository/project hygiene checkpoint.
 
+Post-v1.4 docs/audit/verifier pass:
+`docs/design_short_memory_to_expsm_boundary.md` separates raw observations from
+operational feedback, records existing writer-policy limitations, and defers
+NFP persistence/schema migration. `tools/verify_short_memory_to_expsm_boundary_design.py`
+checks documentation clauses only. Runtime, root Memory, tick order and old
+verifier expectations remain unchanged; this pass does not merge or tag.
+
 Post-v1.3 Context/Short Memory design audit:
 `docs/design_nfp_context_and_short_memory.md` inventories existing context,
 operation queue, active field and local temporary-metadata infrastructure.

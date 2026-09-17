@@ -1,5 +1,10 @@
 # Design: NFP Context And Short Memory
 
+Post-v1.4 follow-up: [ShortMemory to ExpSM boundary](design_short_memory_to_expsm_boundary.md)
+defines a design-only effect/evidence/candidate pipeline. Raw retention and
+candidate lifetime remain separate; neither remember nor eviction initiates
+evaluation or permanent writes. The existing v1.4.0 implementation is unchanged.
+
 ## Status And Checkpoints
 
 Initially a design-only audit after v1.3.0 (`a72f1c2`); isolated implementation

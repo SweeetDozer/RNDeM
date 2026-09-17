@@ -1,5 +1,10 @@
 # Natural Pattern Data Contract
 
+The post-v1.4 [ShortMemory to ExpSM design](design_short_memory_to_expsm_boundary.md)
+keeps signed structural effects distinct from sensory NFP activations and raw
+support distinct from operational confidence. Persistent representation remains
+deferred; this design introduces no substrate or runtime changes.
+
 ## Status
 
 Post-v1 architecture/design contract.

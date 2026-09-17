@@ -2,6 +2,13 @@
 
 Status: current checkpoint for the stabilized `RNDeM_CLC_Prototype`.
 
+Post-v1.4 design only: `docs/design_short_memory_to_expsm_boundary.md` audits
+legacy ExpSM schema/competition/feedback and specifies transient endpoint
+effects, evidence and three-axis consolidation candidates. Native persistent
+representation requires a later controlled schema boundary. No runtime
+implementation or memory mutation is added. Documentation contract verifier:
+`tools/verify_short_memory_to_expsm_boundary_design.py`.
+
 ## Purpose
 
 The prototype is a local cognitive loop experiment. It ingests simple audio,
