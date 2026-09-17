@@ -2,7 +2,9 @@
 
 ## Status And Checkpoints
 
-Design-only audit after v1.3.0 (`a72f1c2`). No memory implementation is added.
+Initially a design-only audit after v1.3.0 (`a72f1c2`); isolated implementation
+now exists in `clc/context/causal_transition.py`, `clc/context/short_memory.py`
+and additive methods on the existing ContextMemoryManager.
 This document does not authorize normal runtime wiring or permanent writes.
 
 | Checkpoint | Established scope |
@@ -24,7 +26,7 @@ separate review; this pass creates no tag.
 Searches covered ContextMemory, ContextMemoryManager, apply_pending, temporary
 metadata, context temporary metadata, memory placement, working memory, short
 memory, and temporary memory under `clc/`, `Memory/`, `docs/`, and `tools/`.
-The relevant implementation inventory is:
+The following inventory describes the pre-implementation baseline:
 
 | Existing file | Observed responsibility and compatibility boundary |
 | --- | --- |
@@ -63,15 +65,17 @@ active-present extension if that extension has explicit, isolated entry points
 and leaves legacy operations, event dispatch, retention and consumers intact.
 No parallel duplicate ContextMemory architecture is proposed.
 
-Recommend an optional typed `NFPContextState` owned by existing ContextMemory,
-with manager-owned observation/lifecycle methods used only by an isolated
-harness initially. NFPContextState is state, not a parallel top-level manager.
+The original recommendation was optional typed `NFPContextState` owned by
+existing ContextMemory. The first implementation instead keeps three private
+typed fields directly on its existing manager, exposed through read-only
+properties; no additional state container is needed. NFPContextState is state,
+not a parallel top-level manager, if a later pass introduces that value type.
 Do not rename/delete ContextMemoryManager. Do not feed natural NFPFrame objects
 to legacy add_frame: the APIs and origin conventions differ. Keep the old
 raw/thought lists, ContextWindow, marker payloads and apply_pending timing
 unchanged. Default construction must preserve current behavior.
 
-Future components are PendingCausalTransition, RecentCausalTransition, the
+Implemented components are PendingCausalTransition, RecentCausalTransition, the
 typed context extension, and ShortMemory. There is no separate ExperienceCapture
 memory subsystem. Do not introduce ExperienceCaptureMemory,
 ExperienceCaptureStore, TransitionMemory, or EpisodeMemory as top-level stores.
@@ -158,10 +162,12 @@ part of pending state.
 7. The isolated coordinator transfers it once into Short Memory.
 8. Context clears pending state and advances to the new sensory window.
 
-Future handoff must validate before mutation and avoid either duplicate insertion
-or losing a completed record on a rejected insertion. Exact API is deferred;
-the isolated manager/coordinator must make completion, insertion and clearing
-one coherent operation. No permanent memory writer participates.
+The manager validates before mutation, clears pending/action state and returns
+the immutable completed value to the isolated caller. The caller owns that value
+and explicitly calls ShortMemory.remember; an insertion exception does not mutate
+ShortMemory and leaves the returned value available to the caller. There is no
+automatic transactional transfer between layers, retry queue or hidden storage.
+The harness performs the two calls in order. No permanent memory writer participates.
 
 Without qualifying evidence, state remains pending until a bounded active-time
 deadline, then becomes expired/incomplete and is released. Recommend allowing
@@ -205,7 +211,11 @@ infer exclusive causation from this record alone.
 Short Memory initially holds only recently completed RecentCausalTransition
 records in insertion/temporal order. It is bounded recent raw past, not permanent
 storage. Use opaque occurrence IDs, preserve frame/window identity and provenance,
-and reject duplicate transition insertion. Human debug/semantic names do not
+and reject duplicate transition insertion while the ID is retained. No unbounded
+lifetime deduplication ledger is kept. IDs are mechanical manager-local counters;
+the first harness pairs one manager with one ShortMemory, and combining manager
+lifetimes requires an explicitly scoped identity contract in a later pass.
+Human debug/semantic names do not
 define transition identity, retention, qualification or ordering.
 
 Neither Context nor Short Memory may store hidden world state: row, column,
@@ -218,7 +228,8 @@ through free-form provenance or auxiliary metadata.
 ## Retention And Permanent Memory Boundaries
 
 Short Memory uses deterministic active-time retention with both max_entries and
-max_age_ticks. Recommend positive integer bounds, monotonic RNDeM active ticks,
+max_age_ticks. Require max_entries > 0 and max_age_ticks >= 0 (zero retains only
+the current observation tick), integer bounds excluding bool, monotonic RNDeM active ticks,
 age measured from observation_tick, and eviction when
 `current_tick - observation_tick > max_age_ticks`. Age equal to the limit is
 retained. Apply age pruning then evict oldest entries to meet max_entries on
@@ -250,9 +261,35 @@ reports/references. Even if future infrastructure is shared, these types and
 authority domains must remain separate; metadata must never complete a pending
 transition or automatically enter Short Memory.
 
+## Implemented API
+
+- ContextMemoryManager.current_external_sensory_window, current_action_frame and
+  pending_causal_transition are read-only properties defaulting to None.
+- observe_external_sensory_window(window) rejects non-external/mixed-origin
+  windows without mutation. Qualifying T+1 returns RecentCausalTransition and
+  clears pending/action; an early current-tick observation returns None; a late
+  observation expires pending, advances context and returns None.
+- observe_action_frame(frame) requires the current visual window to end at the
+  action tick, following the stricter immediate design. The frozen payload
+  validates the general before.end_tick <= action_tick bound. Missing context,
+  a second pending action, replay, or wrong modality raises ValueError.
+- expire_pending_if_overdue(current_tick) preserves pending at T+1, clears it
+  after T+1 and returns the expired PendingCausalTransition for diagnostics.
+  It creates no completed record. Context tick regression is rejected.
+- ShortMemory(max_entries, max_age_ticks).remember(record, current_tick=...) and
+  prune(current_tick) enforce age/capacity. snapshot() returns an immutable tuple.
+  Insertions reject future observations, regressing active time, out-of-order
+  observation ticks and IDs already retained. Equal activation values are not
+  deduplicated. Invalid calls leave existing entries intact.
+
+The ordinary manager constructor does not import clc.patterns or ShortMemory;
+TYPE_CHECKING annotations and local imports keep these methods dormant. The
+apply_pending implementation and legacy data structures are unchanged.
+
 ## Proposed Isolated Harness And Required Scenarios
 
-Proposed calls below express roles, not an implemented API:
+The original conceptual calls below express roles; the implemented API above
+is exercised by `tools/verify_nfp_context_short_memory.py`:
 
 ```text
 visual_window_T -> context.observe_sensory(...)
@@ -265,7 +302,8 @@ Context -> newest sensory state, no pending transition
 
 Use the existing manager with the typed extension, instantiated by the harness.
 No runtime wiring, no _run_tick integration and no permanent Memory writes.
-Required future scenarios:
+Required scenarios (now exercised by the implementation verifier and declared
+in `scenarios/nfp_context_short_memory.json`):
 
 - Accept current EXTERNAL_SENSORY visual window and ACTION_GENERATED occurrence.
 - Capture before window and action, expected observation tick T+1.
@@ -305,8 +343,8 @@ replay scheduling, cross-modal causal episodes, audio consequences, propriocepti
 body-state consequences, long-term NFP persistence, compression, pattern
 abstraction and stable entity formation.
 
-This pass changes only documentation and a design verifier. No runtime behavior,
-ContextMemory placement or ShortMemory implementation changes. No edits to
+The isolated implementation adds typed Context support and ShortMemory.
+No runtime behavior changes or automatic ContextMemory placement are added. No edits to
 clc/patterns/, clc/transduction/, clc/actuation/, Memory, semantic_core.json or
 technical_feedback_patterns.json. No apply_pending moves, retention timing
 changes, persistence, consolidation, Mode C enablement, PolicyPressureReview

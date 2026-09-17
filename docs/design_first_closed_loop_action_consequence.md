@@ -23,11 +23,15 @@ This design does not wire anything into normal runtime or `_run_tick()`.
 
 ## Relationship To Existing Architecture
 
-The next design, `docs/design_nfp_context_and_short_memory.md`, assigns pending
+The next isolated layer, `docs/design_nfp_context_and_short_memory.md`, assigns pending
 before/action/after capture to existing ContextMemory infrastructure and completed
 raw transitions to bounded Short Memory. It preserves the isolated v1.3.0 loop
 and strict T -> T+1 external consequence rule. No separate ExperienceCapture
 memory subsystem, semantic evaluation or permanent writer is introduced.
+Its executable harness now uses the existing ActionTransducer, external world,
+VisualFieldTransducer and sliding windows to complete Context pending state and
+explicitly retain RecentCausalTransition in ShortMemory. The v1.3.0 loop itself
+is unchanged, including equal-valued sensory consequences at a world boundary.
 
 The current checkpoints separate three layers:
 

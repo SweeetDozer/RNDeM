@@ -4,7 +4,7 @@ Debug-name-based semantic logic is risky because renaming or localizing display 
 
 ## Summary counts
 
-Total findings: 752
+Total findings: 754
 
 ## Migrated sites
 
@@ -37,12 +37,12 @@ By classification:
 - semantic_decision_needs_migration: 0
 - semantic_filter: 3
 - stable_constant_or_enum: 60
-- test_or_verifier_only: 150
+- test_or_verifier_only: 152
 - unknown_runtime_logic: 0
 
 By risk:
 - high: 0
-- low: 298
+- low: 300
 - medium: 453
 - unknown: 1
 
@@ -421,7 +421,7 @@ No findings.
   Recommendation: keep as stable control value unless it starts depending on display/debug pattern names
 - `clc/expsm/expsm_mechanism_search.py:282` stable_constant_or_enum/low: `roles = {str(role) for role in target.get("target_role_names", ())}`
   Recommendation: keep as stable control value unless it starts depending on display/debug pattern names
-- ... 218 more findings in `docs/debug_name_dependency_audit.json`.
+- ... 220 more findings in `docs/debug_name_dependency_audit.json`.
 
 ## Recommended migration path
 

@@ -25,7 +25,11 @@ The post-v1.3 memory-role design is in
 and pending transitions; Short Memory retains completed recent raw transitions.
 NFPWindow remains a pattern structure, not a memory layer. Preserved origin
 prevents INTERNAL_REACTIVATION from satisfying an external consequence. This
-design adds no memory implementation or permanent write authority.
+contract is now exercised by isolated typed methods on the existing
+ContextMemoryManager and by in-memory ShortMemory. PendingCausalTransition is
+unresolved present; RecentCausalTransition is completed raw recent experience.
+Normal runtime remains unwired, eviction grants no consolidation/write authority,
+and temporary diagnostic metadata remains non-authoritative.
 
 RNDeM does not fundamentally operate on text, images, audio files, labels, or
 symbolic requests.

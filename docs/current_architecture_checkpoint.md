@@ -16,13 +16,20 @@ reflection/pressure influence are not implemented.
 
 ## Directory and module map
 
-Post-v1.3 design-only extension:
+Post-v1.3 isolated implementation:
 `docs/design_nfp_context_and_short_memory.md` audits existing ContextMemory and
-recommends evolving its manager with typed NFP active-present state. Completed
-raw transitions would belong to bounded Short Memory. Legacy frame/window types
+defines its additive typed NFP active-present support. The existing manager now
+exposes explicit sensory/action observation and pending-expiration methods.
+`clc/context/causal_transition.py` provides frozen PendingCausalTransition and
+RecentCausalTransition; `clc/context/short_memory.py` provides in-memory ShortMemory
+with max_entries/max_age_ticks. Completed raw transitions are returned to the
+isolated caller for explicit insertion. Legacy frame/window types
 and temporary diagnostic metadata remain distinct from natural NFP material.
-No implementation, _run_tick wiring or permanent memory writes are added.
+No _run_tick wiring or permanent memory writes are added; normal runtime does
+not call the APIs or eagerly load the natural-pattern memory modules.
 `tools/verify_nfp_context_and_short_memory_design.py` checks the design contract.
+`tools/verify_nfp_context_short_memory.py` exercises real lifecycle, replay,
+retention, legacy behavior and import/invocation isolation.
 
 `clc/patterns/`
 

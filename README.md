@@ -3,10 +3,12 @@
 Local cognitive loop prototype with a conservative safe-demo runtime, scenario
 fixtures, phase regression snapshots, and focused verifier scripts.
 
-Post-v1.3 Context/Short Memory design proposes reusing ContextMemoryManager for
-typed active-present NFP state and retaining completed raw transitions in bounded
-Short Memory. It is documentation only; implementation and runtime wiring remain
-deferred. Internal replay cannot satisfy an awaited external sensory consequence.
+Post-v1.3 isolated Context/Short Memory support extends ContextMemoryManager with
+typed active-present NFP state. ShortMemory retains completed raw transitions in
+process memory with active-tick bounds. Normal runtime does not use these APIs.
+Internal replay cannot satisfy an external consequence; replayed ACTION cannot
+open a pending transition. Eviction does not consolidate, and no permanent
+ExpSM/AKBSM/Chronicle writer participates.
 
 Start with:
 
@@ -39,6 +41,7 @@ Useful checks:
 ```bash
 python tools/verify_project_hygiene.py
 python tools/verify_nfp_context_and_short_memory_design.py
+python tools/verify_nfp_context_short_memory.py
 python tools/verify_behavior_influence_adr.py
 python tools/verify_mode_c_design_doc.py
 python tools/verify_mode_c_first_experiment_adr.py

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "name": "nfp_context_short_memory",
+  "description": "Isolated NFP Context/Short Memory cases executed by tools/verify_nfp_context_short_memory.py; normal runtime stays dormant.",
+  "runtime": {
+    "profile": "safe_demo",
+    "memory_is_temporary": true,
+    "max_ticks": 0
+  },
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "nfp_context_short_memory": {
+      "isolated": true,
+      "in_memory_only": true,
+      "runtime_wiring": false,
+      "permanent_writes": false,
+      "automatic_consolidation": false,
+      "cases": {
+        "legacy_constructor_queue_apply_pending_and_active_field": true,
+        "pending_validation_and_immutability": true,
+        "recent_validation_and_immutability": true,
+        "external_qualification_and_mixed_origin": true,
+        "visual_replay_cannot_complete_then_external_can": true,
+        "action_replay_and_non_action_rejected": true,
+        "action_requires_current_sensory_tick": true,
+        "second_action_does_not_overwrite": true,
+        "early_and_late_observation": true,
+        "expiration_active_time_boundary": true,
+        "completion_and_layer_distinction": true,
+        "invalid_completion_preserves_pending": true,
+        "full_v13_flow_with_overlapping_windows": true,
+        "same_values_at_world_boundary_are_valid": true,
+        "short_memory_order_and_capacity": true,
+        "short_memory_age_boundary_and_explicit_prune": true,
+        "short_memory_invalid_inputs_are_atomic": true,
+        "equal_activation_occurrences_remain_distinct": true,
+        "debug_names_do_not_define_identity_or_retention": true,
+        "public_fields_have_no_semantic_or_hidden_world_data": true,
+        "old_temporary_metadata_is_non_authoritative": true,
+        "no_permanent_writes_or_consolidation_on_eviction": true,
+        "canonical_manager_and_no_runtime_invocation_or_eager_import": true
+      }
+    }
+  }
+}
