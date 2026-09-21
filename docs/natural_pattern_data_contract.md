@@ -11,6 +11,12 @@ ExperienceEvidence reuses native NFP context/action values, while the grouper
 reuses NFPWindowSimilarity and NFPFrameSimilarity as separate axes. No NFP is
 averaged, serialized, or inserted into persistent ExpSM.
 
+The design-only persistent boundary is specified in
+`docs/design_persistent_nfp_expsm_representation.md`. It retains only structural
+modality/topology/ordered values and signed deltas in explicit versioned,
+JSON-safe values; occurrence IDs, ticks, provenance, origins and debug names are
+excluded from canonical matching content. Implementation and writes are deferred.
+
 ## Status
 
 Post-v1 architecture/design contract.

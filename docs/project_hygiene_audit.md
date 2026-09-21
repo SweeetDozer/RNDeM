@@ -16,6 +16,14 @@ transitions to prove that grouping has no writer, Feedback, SimilarityObserver,
 Activation, DecisionSelector, persistence, or `_run_tick()` authority. Existing
 ExpSM-shaped operational state and root Memory hashes remain unchanged.
 
+Post-v1.5 persistence design audit:
+`docs/design_persistent_nfp_expsm_representation.md` records the absence of a
+central schema/version-aware ExpSM loader and maps direct readers/writers. It
+chooses record-level versioning, legacy/native coexistence and a no-write
+creation-request boundary. The documentation verifier is
+`tools/verify_persistent_nfp_expsm_representation_design.py`. No source under
+runtime/ExpSM/writers and no root Memory file is changed by this pass.
+
 Post-v1.3 Context/Short Memory design audit:
 `docs/design_nfp_context_and_short_memory.md` inventories existing context,
 operation queue, active field and local temporary-metadata infrastructure.

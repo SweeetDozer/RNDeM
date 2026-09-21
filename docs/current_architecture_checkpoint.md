@@ -18,6 +18,16 @@ evidence remains the representative. `tools/verify_short_memory_expsm_evaluation
 and `scenarios/short_memory_expsm_evaluation.json` cover this implementation.
 It has no normal runtime wiring and no ExpSM/AKBSM/Chronicle write authority.
 
+Post-v1.5 design-only persistence boundary:
+`docs/design_persistent_nfp_expsm_representation.md` audits every direct ExpSM
+reader/writer and specifies NFP-native record V1 without implementing it. New
+records require explicit `record_kind`/`representation_version`; baseline records
+remain legacy without eager rewrite. A future version-aware adapter must reject
+unknown versions, preserve top-N/DecisionSelector/used-record Feedback roles and
+build an inspectable creation request before policy-gated mutation. Current
+schema, runtime, writers and Memory files are unchanged. Verifier:
+`tools/verify_persistent_nfp_expsm_representation_design.py`.
+
 ## Purpose
 
 The prototype is a local cognitive loop experiment. It ingests simple audio,

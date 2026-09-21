@@ -350,3 +350,10 @@ Next: review/merge the isolated implementation. Only after it is stable, design
 the candidate/proposal -> persistent ExpSM representation boundary. No current
 ExpSM record, schema, SimilarityObserver, Activation, DecisionSelector, Feedback,
 writer, root Memory file or runtime phase is changed by this implementation.
+
+That next boundary is now designed in
+`design_persistent_nfp_expsm_representation.md`: explicit native record
+kind/version, structural JSON-safe values, legacy coexistence, typed adapter
+outcomes and proposal -> immutable creation request -> policy -> future writer.
+It remains design-only; compatibility B, non-persistence and runtime isolation
+remain in force.
