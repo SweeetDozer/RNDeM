@@ -14,12 +14,16 @@ proposal generation is explicit. It creates no ExpSM records, changes no
 operational counters, persists nothing, and is absent from normal runtime.
 Executable contract: `tools/verify_short_memory_expsm_evaluation.py`.
 
-The next design-only boundary is
+The persistence boundary is defined by
 [`docs/design_persistent_nfp_expsm_representation.md`](docs/design_persistent_nfp_expsm_representation.md).
-It specifies versioned JSON-safe context/action/effect values, legacy/native
-coexistence, typed adapter outcomes and an immutable creation-request handoff.
-No parser, migration, writer change, persistent record or runtime wiring exists
-yet. Contract check: `tools/verify_persistent_nfp_expsm_representation_design.py`.
+`clc/experience/expsm_representation.py` now implements frozen JSON-safe
+context/action/effect values, NFP-native record V1, typed legacy/native parser
+outcomes and an immutable proposal-to-creation-request handoff. The round-trip
+verifier discards source objects before reloading canonical JSON. It performs no
+migration or Memory write, allocates no final record ID, and has no writer,
+policy or runtime authority. Checks:
+`tools/verify_persistent_nfp_expsm_representation.py` and
+`tools/verify_persistent_nfp_expsm_representation_design.py`.
 
 Local cognitive loop prototype with a conservative safe-demo runtime, scenario
 fixtures, phase regression snapshots, and focused verifier scripts.

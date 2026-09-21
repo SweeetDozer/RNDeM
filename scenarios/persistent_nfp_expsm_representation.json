@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "name": "persistent_nfp_expsm_representation",
+  "description": "Isolated NFP-native ExpSM representation and restart-survival coverage; no persistence authority.",
+  "runtime": {"profile": "safe_demo", "memory_is_temporary": true, "max_ticks": 0},
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "persistent_nfp_expsm_representation": {
+      "isolated": true,
+      "runtime_wiring": false,
+      "write_authority": false,
+      "cases": {
+        "runtime_context_action_effect_serialize_structurally": true,
+        "occurrence_metadata_and_debug_names_excluded": true,
+        "json_safe_and_canonical": true,
+        "native_kind_and_version_explicit": true,
+        "legacy_and_native_parse_side_by_side": true,
+        "unsupported_version_is_not_downgraded": true,
+        "malformed_native_values_rejected": true,
+        "activation_and_signed_effect_ranges_validated": true,
+        "same_structure_distinct_record_ids_coexist": true,
+        "proposal_builds_non_authoritative_request": true,
+        "support_remains_creation_metadata": true,
+        "support_does_not_set_counters": true,
+        "fresh_object_json_round_trip": true,
+        "no_fake_migration_or_writer_invocation": true,
+        "no_memory_mutation": true,
+        "existing_operational_pipeline_unchanged": true,
+        "no_run_tick_integration": true
+      }
+    }
+  }
+}

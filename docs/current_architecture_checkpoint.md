@@ -18,14 +18,19 @@ evidence remains the representative. `tools/verify_short_memory_expsm_evaluation
 and `scenarios/short_memory_expsm_evaluation.json` cover this implementation.
 It has no normal runtime wiring and no ExpSM/AKBSM/Chronicle write authority.
 
-Post-v1.5 design-only persistence boundary:
+Post-v1.5 persistence representation boundary:
 `docs/design_persistent_nfp_expsm_representation.md` audits every direct ExpSM
-reader/writer and specifies NFP-native record V1 without implementing it. New
+reader/writer and specifies NFP-native record V1. The isolated implementation
+in `clc/experience/expsm_representation.py` provides frozen serialized values,
+native records, typed adapter outcomes and immutable creation requests. New
 records require explicit `record_kind`/`representation_version`; baseline records
-remain legacy without eager rewrite. A future version-aware adapter must reject
-unknown versions, preserve top-N/DecisionSelector/used-record Feedback roles and
-build an inspectable creation request before policy-gated mutation. Current
-schema, runtime, writers and Memory files are unchanged. Verifier:
+remain legacy without eager rewrite. The isolated version-aware adapter rejects
+unknown versions without entering current loaders; future integration must
+preserve that behavior.
+Restart round trips survive destruction of source objects, while final IDs remain
+writer-owned. Top-N/DecisionSelector/used-record Feedback roles, current schema,
+runtime, writers and Memory files are unchanged. Verifiers:
+`tools/verify_persistent_nfp_expsm_representation.py` and
 `tools/verify_persistent_nfp_expsm_representation_design.py`.
 
 ## Purpose

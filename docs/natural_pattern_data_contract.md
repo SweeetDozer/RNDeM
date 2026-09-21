@@ -606,6 +606,14 @@ Deferred:
 
 ## Recommended Next Step
 
+The isolated persistent NFP-native ExpSM representation V1 now serializes
+structural context/action/effect values and parses legacy/native records side by
+side. Its immutable creation request has no final record ID or mutation
+authority; full JSON restart round-trip coverage is in
+`tools/verify_persistent_nfp_expsm_representation.py`. Review this layer before
+designing any policy-gated writer extension. No migration, Memory write or
+normal runtime integration is part of the representation checkpoint.
+
 Review and merge the isolated first natural-pattern source/transduction layer.
 The implemented first source is a tiny synthetic visual scalar-field
 environment that produces label-free sensory activation for VISUAL `NFPFrame`

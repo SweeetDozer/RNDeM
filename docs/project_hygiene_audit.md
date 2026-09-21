@@ -24,6 +24,14 @@ creation-request boundary. The documentation verifier is
 `tools/verify_persistent_nfp_expsm_representation_design.py`. No source under
 runtime/ExpSM/writers and no root Memory file is changed by this pass.
 
+The subsequent implementation adds one isolated production module, one fixture
+and one real verifier. AST coverage confirms the module imports no writers,
+mutation policy, runtime, SimilarityObserver, Activation, DecisionSelector or
+Feedback path. It parses legacy/native representations without replacing the
+existing loader, and canonical restart tests perform no filesystem writes.
+Final record IDs remain owned by a future writer; migration and runtime wiring
+remain deferred.
+
 Post-v1.3 Context/Short Memory design audit:
 `docs/design_nfp_context_and_short_memory.md` inventories existing context,
 operation queue, active field and local temporary-metadata infrastructure.

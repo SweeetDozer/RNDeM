@@ -2,7 +2,9 @@
 
 ## Status And Checkpoints
 
-Design/audit/verifier only, based on v1.5.0 (`35d0660`). This document defines
+Originally approved as a design/audit boundary based on v1.5.0 (`35d0660`).
+The isolated representation layer is now implemented in
+`clc/experience/expsm_representation.py`; this document defines
 the representation boundary after transient ExpSMConsolidationProposal. It does
 not implement a parser, adapter, creation request, schema migration or writer.
 
@@ -375,10 +377,23 @@ behavior is stable. First implement representation, then mutation.
 12. No eager migration, AKBSM/Chronicle writes, `_run_tick` integration,
     automatic/background/sleep consolidation or semantic outcome evaluation.
 
+## Implemented Representation Checkpoint
+
+The V1 serialized context/action/effect values, native record parser/serializer,
+typed version-aware adapter, immutable creation request and deterministic
+proposal/evidence builder now exist. Legacy and native records parse side by
+side, unknown versions remain unsupported, and restart round-trip validation
+uses fresh JSON-decoded objects. No fake historical NFP occurrence is rebuilt.
+
+The request remains non-authoritative. Final numeric record identity is still
+writer-owned; no migration ran, no writer changed, no policy gate executes, no
+Memory file is written and normal runtime does not import this layer. Executable
+coverage is `tools/verify_persistent_nfp_expsm_representation.py` and
+`scenarios/persistent_nfp_expsm_representation.json`.
+
 ## Deferred Scope And Safety
 
-Deferred: serialized value implementation; parser/serializer; creation-request
-builder; version-aware repository; actual writer support; schema migration
+Deferred: version-aware repository integration; actual writer support; schema migration
 execution; file-envelope version; concurrency-safe ID allocation; initial
 confidence policy changes; legacy conversion; cross-representation learned
 similarity; SimilarityObserver/Activation/mechanism extensions; runtime wiring;
@@ -390,6 +405,6 @@ misses, confidence, SimilarityObserver, Activation, DecisionSelector, Feedback,
 mechanism search, Memory file or `_run_tick()`. No ExpSM, AKBSM or Chronicle
 write is authorized.
 
-Next: review/merge this design, then implement only stable serialized values,
-V1 parser/serializer, version-aware adapter, immutable creation request builder
-and restart round-trip verifier. First implement representation, then mutation.
+Next: review/merge the isolated representation implementation. Only afterward
+design a policy-gated extension of the existing writer. First stabilize
+representation and restart survival, then separately authorize mutation.

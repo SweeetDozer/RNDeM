@@ -351,9 +351,11 @@ the candidate/proposal -> persistent ExpSM representation boundary. No current
 ExpSM record, schema, SimilarityObserver, Activation, DecisionSelector, Feedback,
 writer, root Memory file or runtime phase is changed by this implementation.
 
-That next boundary is now designed in
+That next boundary is now designed and implemented as an isolated no-write
+representation layer in
 `design_persistent_nfp_expsm_representation.md`: explicit native record
 kind/version, structural JSON-safe values, legacy coexistence, typed adapter
 outcomes and proposal -> immutable creation request -> policy -> future writer.
-It remains design-only; compatibility B, non-persistence and runtime isolation
-remain in force.
+`clc/experience/expsm_representation.py` stops at the creation request and typed
+parse boundary. Compatibility B, non-persistence and runtime isolation remain
+in force; no existing writer or legacy loader was changed.
