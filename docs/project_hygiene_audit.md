@@ -9,6 +9,13 @@ NFP persistence/schema migration. `tools/verify_short_memory_to_expsm_boundary_d
 checks documentation clauses only. Runtime, root Memory, tick order and old
 verifier expectations remain unchanged; this pass does not merge or tag.
 
+The subsequent isolated implementation is limited to three new processing
+modules under `clc/experience/`, one fixture, one real verifier, and these
+post-v1 references. The verifier uses AST import/call inspection and real
+transitions to prove that grouping has no writer, Feedback, SimilarityObserver,
+Activation, DecisionSelector, persistence, or `_run_tick()` authority. Existing
+ExpSM-shaped operational state and root Memory hashes remain unchanged.
+
 Post-v1.3 Context/Short Memory design audit:
 `docs/design_nfp_context_and_short_memory.md` inventories existing context,
 operation queue, active field and local temporary-metadata infrastructure.

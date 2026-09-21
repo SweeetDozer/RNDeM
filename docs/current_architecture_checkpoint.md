@@ -9,6 +9,15 @@ representation requires a later controlled schema boundary. No runtime
 implementation or memory mutation is added. Documentation contract verifier:
 `tools/verify_short_memory_to_expsm_boundary_design.py`.
 
+The boundary now also has an isolated implementation in `clc/experience/`.
+`effects.py` extracts immutable signed endpoint deltas; `evidence.py` creates
+occurrence evidence and independent comparisons; `grouping.py` provides
+configurable all-three-axis grouping, explicit ambiguity/duplicate results,
+read-only candidate snapshots and explicit transient proposals. The first real
+evidence remains the representative. `tools/verify_short_memory_expsm_evaluation.py`
+and `scenarios/short_memory_expsm_evaluation.json` cover this implementation.
+It has no normal runtime wiring and no ExpSM/AKBSM/Chronicle write authority.
+
 ## Purpose
 
 The prototype is a local cognitive loop experiment. It ingests simple audio,

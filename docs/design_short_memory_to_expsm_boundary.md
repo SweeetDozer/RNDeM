@@ -2,8 +2,25 @@
 
 ## Status And Checkpoints
 
-Design/audit/verifier only, based on v1.4.0 at `70d228f`.
-No evaluation or consolidation implementation is introduced.
+Initially a design/audit/verifier boundary based on v1.4.0 at `70d228f`.
+An isolated in-memory implementation now exists in `clc/experience/effects.py`,
+`evidence.py`, and `grouping.py`; normal runtime and persistent memory still do
+not use it.
+
+Implemented behavior follows this document: ObservedEffect is an immutable
+signed endpoint delta, ExperienceEvidence is one immutable occurrence, and
+context/action/effect similarity remain three independent dimensions. The
+grouper creates transient candidates with the first real evidence as exemplar.
+Duplicate evidence is an idempotent `DUPLICATE`; evidence matching multiple
+candidates returns `AMBIGUOUS` and mutates none. Reaching `min_support` only
+makes an explicit proposal request eligible; insertion never creates a proposal.
+Proposal != persistent ExpSM representation.
+
+`tools/verify_short_memory_expsm_evaluation.py` exercises real v1.4 transition
+and NFP types, zero/signed effects, independent thresholds, divergence,
+duplicates, ambiguity and proposal eligibility. Its AST audit prohibits writer,
+feedback, activation, selector and persistence calls. The scenario declaration
+is `scenarios/short_memory_expsm_evaluation.json`.
 
 | Checkpoint | Established scope |
 | --- | --- |
@@ -329,6 +346,7 @@ goals/wants/needs; credit assignment; delayed effects; multi-action chains;
 AKBSM evidence conversion; Chronicle promotion; _run_tick integration;
 automatic background consolidation; sleep/offline consolidation.
 
-Next: review/merge this design, then isolated in-memory evaluation/grouping with
-no writes or runtime wiring. Only after that is stable, design the actual
-candidate/proposal -> persistent ExpSM representation boundary.
+Next: review/merge the isolated implementation. Only after it is stable, design
+the candidate/proposal -> persistent ExpSM representation boundary. No current
+ExpSM record, schema, SimilarityObserver, Activation, DecisionSelector, Feedback,
+writer, root Memory file or runtime phase is changed by this implementation.

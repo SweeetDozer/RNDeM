@@ -1,10 +1,18 @@
 # RNDeM CLC Prototype
 
-Post-v1.4 design-only boundary:
+Post-v1.4 boundary:
 [ShortMemory to ExpSM](docs/design_short_memory_to_expsm_boundary.md) audits
-existing ExpSM and proposes endpoint effects, occurrence evidence and transient
-three-axis candidates. No evaluation implementation, persistence or runtime
-wiring is added. Contract check: `tools/verify_short_memory_to_expsm_boundary_design.py`.
+existing ExpSM and defines endpoint effects, occurrence evidence and transient
+three-axis candidates. Persistence and runtime wiring remain absent. Design
+contract check: `tools/verify_short_memory_to_expsm_boundary_design.py`.
+
+The design now has an isolated implementation in `clc/experience/effects.py`,
+`evidence.py`, and `grouping.py`. It extracts signed endpoint effects, builds
+occurrence evidence, compares context/action/effect independently, and groups
+only into transient candidates. Ambiguity is reported without guessing;
+proposal generation is explicit. It creates no ExpSM records, changes no
+operational counters, persists nothing, and is absent from normal runtime.
+Executable contract: `tools/verify_short_memory_expsm_evaluation.py`.
 
 Local cognitive loop prototype with a conservative safe-demo runtime, scenario
 fixtures, phase regression snapshots, and focused verifier scripts.

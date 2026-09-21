@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "short_memory_expsm_evaluation",
+  "description": "Isolated pre-ExpSM evidence evaluation cases; normal runtime remains dormant.",
+  "runtime": {"profile": "safe_demo", "memory_is_temporary": true, "max_ticks": 0},
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "short_memory_expsm_evaluation": {
+      "isolated": true,
+      "in_memory_only": true,
+      "runtime_wiring": false,
+      "permanent_writes": false,
+      "cases": {
+        "observed_effect_extraction_signed_delta_and_zero": true,
+        "effect_is_not_nfp_and_uses_endpoints_only": true,
+        "effect_similarity_and_topology_compatibility": true,
+        "experience_evidence_invariants": true,
+        "context_action_effect_dimensions_are_independent": true,
+        "matching_evidence_groups_with_unique_support": true,
+        "divergent_effects_create_separate_candidates": true,
+        "different_context_creates_separate_candidate": true,
+        "different_action_creates_separate_candidate": true,
+        "duplicate_evidence_is_idempotent": true,
+        "ambiguous_grouping_does_not_mutate": true,
+        "representative_is_real_first_evidence": true,
+        "proposal_requires_explicit_eligible_request": true,
+        "proposal_is_transient_and_non_authoritative": true,
+        "support_is_not_hits_misses_or_confidence": true,
+        "similar_active_expsm_record_is_unchanged": true,
+        "debug_names_and_hidden_world_state_do_not_participate": true,
+        "no_feedback_similarity_observer_activation_selector_or_writer_calls": true,
+        "no_memory_akbsm_chronicle_or_runtime_writes": true
+      }
+    }
+  }
+}

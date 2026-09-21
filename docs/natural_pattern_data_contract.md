@@ -5,6 +5,12 @@ keeps signed structural effects distinct from sensory NFP activations and raw
 support distinct from operational confidence. Persistent representation remains
 deferred; this design introduces no substrate or runtime changes.
 
+The isolated implementation preserves that contract mechanically: ObservedEffect
+does not subclass NFPFrame/NFPWindow and retains signed `[-1,1]` endpoint deltas.
+ExperienceEvidence reuses native NFP context/action values, while the grouper
+reuses NFPWindowSimilarity and NFPFrameSimilarity as separate axes. No NFP is
+averaged, serialized, or inserted into persistent ExpSM.
+
 ## Status
 
 Post-v1 architecture/design contract.
