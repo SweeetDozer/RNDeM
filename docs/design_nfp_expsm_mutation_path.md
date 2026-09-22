@@ -222,11 +222,33 @@ Minimum future behavior improves the shared temp/replace primitive narrowly:
 No partial record becomes authoritative before replacement. A controlled
 replace/write failure test uses an injected store primitive/failure hook, not
 permission hacks against real Memory. The original store must remain readable
-and byte-identical. If replacement succeeds but optional readback fails, report
-a distinct verification failure and do not claim rollback unless an actual
-backup/rollback protocol exists. The first implementation should validate
-before replace strongly enough that readback failure indicates I/O/corruption,
-not ordinary request invalidity.
+and byte-identical.
+
+`WRITE_FAILED` and `READBACK_FAILED` belong to opposite sides of the
+authoritative replacement boundary:
+
+- **WRITE_FAILED:** failure occurs before successful authoritative atomic
+  replace. The previous store remains intact, no new record is considered
+  persisted, and an explicit retry may be possible after resolving the cause.
+- **READBACK_FAILED:** atomic replace completed successfully, or is known to
+  have crossed the authoritative replacement boundary, but fresh verification
+  through the normal reader/adapter could not confirm the new record. The
+  authority state is `INDETERMINATE_FROM_CALLER_PERSPECTIVE`: the new native
+  record may already exist authoritatively on disk. This is not equivalent to
+  "nothing was written" and is not `WRITE_FAILED`.
+
+Hard invariant: `READBACK_FAILED` MUST NOT automatically retry the same
+`ExpSMRecordCreationRequest`. The first write may already have created the
+record; retry could allocate a second writer-owned ID. No content deduplication,
+request-ID idempotency or automatic rollback is introduced.
+
+Once replace succeeds, the first mutation implementation cannot claim to
+restore the previous authoritative store. Such a claim would require a separate,
+designed and proven backup/rollback protocol, which does not exist here.
+`READBACK_FAILED` is a recovery/reconciliation state, not a transactional
+rollback state. Validation before replace should make ordinary invalid requests
+impossible at this stage; readback failure indicates an I/O, corruption or
+verification problem requiring fresh inspection.
 
 The fixed `.tmp`, absent fsync and absent locking in current commit writer are
 known gaps. Improving the common primitive may alter legacy persistence
@@ -248,11 +270,52 @@ READBACK_FAILED
 ```
 
 Fields: status, `record_id: str | None`,
-`record: NFPExpSMRecordV1 | None`, and stable reason/code. Only confirmed
-`CREATED` returns ID and record. Denial is a normal non-authoritative outcome,
-not an application error. Invalid/unsupported/store/write failures return no
-authoritative record, and a would-be materialized object never implies success.
-Statuses describe persistence, never good/bad/successful experience semantics.
+`record: NFPExpSMRecordV1 | None`, `attempted_record_id: str | None`, and stable
+reason/code. `record_id` is confirmed authoritative identity and only `CREATED`
+returns it with a confirmed record. `attempted_record_id` is an optional,
+non-authoritative recovery hint for `READBACK_FAILED`; its presence never means
+that persistence was confirmed and it is never substituted for `record_id`.
+Only confirmed `CREATED` returns ID and record.
+
+Denial is a normal non-authoritative outcome, not an application error.
+Invalid/unsupported/store failures and pre-replace `WRITE_FAILED` return no
+authoritative record. `READBACK_FAILED` also returns no confirmed authoritative
+record object, but its attempted ID records which writer-owned key must be
+reinspected because the new bytes may already be authoritative. Statuses
+describe persistence, never good/bad/successful experience semantics.
+
+## READBACK_FAILED Recovery
+
+Recovery is read-only reconciliation, never an implicit second mutation:
+
+1. stop automatic mutation and retry for this request;
+2. discard writer-local and in-memory assumptions;
+3. reopen the target ExpSM store through a fresh read path;
+4. validate the complete store structure;
+5. inspect `attempted_record_id` (or an equivalent explicit recovery token);
+6. if present, parse that raw record through the normal v1.6 adapter and require
+   `NFP_NATIVE_V1`;
+7. compare context, action, effect, operational metadata and allowed creation
+   provenance with the original request;
+8. produce one recovery conclusion without writing.
+
+Recovery conclusions are distinct from normal create statuses:
+
+- `CONFIRMED_PERSISTED`: the attempted ID exists, parses as NFP_NATIVE_V1 and
+  exactly matches the request. The first mutation did persist authoritatively;
+  this confirms that write and must not resubmit or create a second record.
+- `CONFIRMED_ABSENT`: fresh inspection positively proves the attempted ID is
+  absent, the complete store is otherwise valid, and there is no evidence of
+  the attempted native record. Recovery still performs no retry; any later
+  mutation attempt must be a new explicit action.
+- `UNRESOLVED_OR_STORE_INVALID`: the store is unreadable/malformed, the attempted
+  ID contains unexpected content, the native record is malformed, payload does
+  not match, or authority otherwise cannot be established. No automatic retry,
+  overwrite, rollback or second record creation is allowed; explicit
+  higher-level inspection is required.
+
+All recovery tests use temporary copied stores. They never inject readback
+failure into checked-in `Memory/ExpSM/ExpSM_data.json`.
 
 ## Required Isolated Scenarios
 
@@ -275,10 +338,20 @@ ExpSM store. They snapshot production Memory hashes and root file inventory.
    native record -> `STORE_INVALID`; no replacement.
 8. **Write failure:** injected failure before replace -> `WRITE_FAILED`; old
    bytes intact, no partial native record and no authoritative returned record.
-9. **Readback/restart:** after create, destroy writer/request/runtime objects;
+9. **Forced post-replace readback failure:** complete serialization and atomic
+   replace succeed, then injected fresh readback verification fails. Result is
+   `READBACK_FAILED`, not `WRITE_FAILED`; no confirmed record is returned,
+   attempted_record_id is retained as a recovery hint, and blind retry is
+   forbidden.
+10. **READBACK_FAILED recovery:** a fresh reader inspects the temporary store by
+    attempted ID. In the common successful-replace case the record parses as
+    NFP_NATIVE_V1 and matches the request, yielding `CONFIRMED_PERSISTED` without
+    a retry or second record. Tests/design also retain `CONFIRMED_ABSENT` and
+    `UNRESOLVED_OR_STORE_INVALID` branches without automatic mutation.
+11. **Readback/restart:** after ordinary successful create, destroy writer/request/runtime objects;
    fresh JSON load and v1.6 adapter parse returns NFP_NATIVE_V1 structurally
    equal to request under assigned ID.
-10. **No behavior:** no SimilarityObserver, Activation, DecisionSelector,
+12. **No behavior:** no SimilarityObserver, Activation, DecisionSelector,
     Feedback, mechanism search or `_run_tick()` call occurs.
 
 ## Operational And Memory Boundaries
