@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "name": "nfp_expsm_policy_gated_create",
+  "description": "Isolated policy-gated NFP-native ExpSM CREATE and read-only recovery coverage on temporary stores.",
+  "runtime": {"profile": "safe_demo", "memory_is_temporary": true, "max_ticks": 0},
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "nfp_expsm_policy_gated_create": {
+      "isolated": true,
+      "normal_runtime_wiring": false,
+      "temporary_store_only": true,
+      "cases": {
+        "valid_request_validation": true,
+        "safe_demo_denied_without_write": true,
+        "draft_only_denied_without_fabricated_draft": true,
+        "mutating_memory_creates_one_native_record": true,
+        "writer_owned_max_plus_one_with_id_gaps": true,
+        "legacy_records_preserved_in_mixed_store": true,
+        "support_is_provenance_not_operational_weight": true,
+        "same_request_twice_creates_distinct_ids": true,
+        "malformed_and_unsupported_requests_do_not_write": true,
+        "malformed_store_is_not_repaired": true,
+        "unique_sibling_temp_is_cleaned": true,
+        "pre_replace_failure_is_write_failed": true,
+        "post_replace_failure_is_readback_failed": true,
+        "attempted_id_is_not_confirmed_id": true,
+        "blind_retry_is_prohibited": true,
+        "created_requires_fresh_readback": true,
+        "recovery_confirms_persisted_absent_or_unresolved": true,
+        "recovery_is_read_only_and_never_retries": true,
+        "no_rollback_or_native_update": true,
+        "no_behavior_or_run_tick_integration": true,
+        "production_memory_unchanged": true
+      }
+    }
+  }
+}

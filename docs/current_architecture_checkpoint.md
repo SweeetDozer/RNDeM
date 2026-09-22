@@ -873,6 +873,27 @@ proposal/no-effect safety rather than canonical phase output.
 
 ## Recommended next work
 
+## Isolated NFP-native ExpSM CREATE
+
+- `clc/experience/expsm_native_create.py` implements explicit, policy-gated
+  NFP-native V1 creation and read-only readback-failure reconciliation.
+- Validation precedes policy and persistence. `safe_demo` and `draft_only`
+  return policy denial without allocating an ID or writing; only
+  `mutating_memory` can create.
+- `clc/consolidation/expsm_store_transaction.py` provides strict native-store
+  loading plus unique sibling temp, file fsync, atomic replace, best-effort
+  directory fsync, cleanup, and a path-local in-process lock. Cross-process
+  concurrency is not guaranteed.
+- IDs are writer-owned max+1 values. Gaps are retained, equal requests are not
+  deduplicated, and legacy/native records coexist in `experience` without
+  migration.
+- `CREATED` requires fresh V1 adapter readback. `WRITE_FAILED` is pre-replace;
+  `READBACK_FAILED` is post-replace and indeterminate, cannot be blindly
+  retried, and exposes only an attempted-ID recovery hint.
+- No native UPDATE, retrieval, SimilarityObserver, activation/top-N,
+  DecisionSelector, Feedback, `_run_tick()`, AKBSM, or Chronicle integration
+  was added. Verification writes temporary stores only.
+
 1. Review `docs/adr_mode_c_first_experiment.md` before any implementation pass.
 2. Review `docs/design_mode_c_memory_gate_influence.md` and answer remaining
    Mode C open questions before implementation.

@@ -329,6 +329,18 @@ enforced, and the same action values may have different sensory consequences
 in different hidden world states. It does not add autonomous action selection,
 learning, success/failure callbacks, reward/pain, runtime wiring, persistence,
 or memory writes.
+The first isolated policy-gated NFP-native ExpSM CREATE path now lives in
+`clc/experience/expsm_native_create.py`, backed by the shared persistence
+mechanics in `clc/consolidation/expsm_store_transaction.py`. It validates a
+typed creation request before consulting the actual `MemoryMutationPolicy`;
+`safe_demo` and `draft_only` deny authoritative creation, while
+`mutating_memory` may allocate the max+1 numeric ID, atomically persist one V1
+record, and confirm it through a fresh adapter readback. `WRITE_FAILED` is
+strictly pre-replace; post-replace verification failure is
+`READBACK_FAILED` with an unconfirmed attempted ID and a read-only recovery
+path. The implementation has no normal runtime wiring, native UPDATE,
+similarity/activation/selection/feedback use, or AKBSM/Chronicle interaction.
+Its verifier mutates temporary stores only and preserves production Memory.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

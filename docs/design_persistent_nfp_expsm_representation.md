@@ -3,10 +3,11 @@
 ## Status And Checkpoints
 
 Originally approved as a design/audit boundary based on v1.5.0 (`35d0660`).
-The isolated representation layer is now implemented in
-`clc/experience/expsm_representation.py`; this document defines
-the representation boundary after transient ExpSMConsolidationProposal. It does
-not implement a parser, adapter, creation request, schema migration or writer.
+The isolated representation layer is implemented in
+`clc/experience/expsm_representation.py`; this document defines the
+representation boundary after transient ExpSMConsolidationProposal. The V1
+parser, adapter, and creation request now exist, as does a later isolated
+policy-gated CREATE writer; schema migration and normal runtime wiring do not.
 
 | Checkpoint | Established scope |
 | --- | --- |
@@ -15,7 +16,8 @@ not implement a parser, adapter, creation request, schema migration or writer.
 | v1.3.0 | ACTION -> world -> sensory consequence |
 | v1.4.0 | active present + bounded recent raw past |
 | v1.5.0 | repeated observed-experience evaluation and transient candidates/proposals |
-| Next | stable persistent NFP-native representation without write authority |
+| v1.6.0 | stable persistent NFP-native representation without write authority |
+| Post-v1.6 | isolated policy-gated CREATE, still without runtime activation |
 
 Compatibility decision B is preserved: the legacy schema cannot accept native
 context/action/effect unchanged. JSON's ability to hold arbitrary keys is not
@@ -409,3 +411,18 @@ The next boundary is now designed in `design_nfp_expsm_mutation_path.md`. It
 keeps this request non-authoritative, places validation before policy/write,
 retains writer-owned IDs and extends the existing store architecture rather
 than adding a parallel database. That document still grants no write authority.
+
+## Post-v1.6 CREATE Status
+
+The representation now has one isolated authoritative consumer:
+`NFPExpSMCreateWriter`. It accepts the existing typed
+`ExpSMRecordCreationRequest`, preserves request identity as provenance-only
+trace data, allocates the persistent numeric record ID inside the locked
+mutation operation, and materializes the existing `NFPExpSMRecordV1` without a
+second schema definition. Fresh adapter readback is required before a result is
+confirmed as `CREATED`.
+
+This does not make native records operational. Similarity, activation/top-N,
+decision selection, Feedback, mechanism search, native UPDATE, and normal
+runtime wiring remain deferred. The implementation and verifier do not migrate
+legacy records or mutate production Memory.

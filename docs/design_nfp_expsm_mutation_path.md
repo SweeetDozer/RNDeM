@@ -373,7 +373,33 @@ native record -> comparison adapter -> SimilarityObserver -> Activation top-N
 
 ## First Implementation And Deferred Scope
 
-Implement next only: typed request validator; policy-gated create orchestration;
+## Implementation Status
+
+The first isolated CREATE implementation is now present in
+`clc/experience/expsm_native_create.py`. Its persistence mechanics are shared
+with legacy commit writing through
+`clc/consolidation/expsm_store_transaction.py`; legacy draft validation,
+signature deduplication, record shape, and operation payloads remain unchanged.
+The shared transaction uses a unique sibling temporary file, flush plus file
+fsync, atomic replacement, best-effort directory fsync where supported, and
+failure cleanup. Cross-process writers remain unsupported.
+
+The native path strictly validates the request before policy authorization,
+rejects malformed authoritative stores without repair, and permits creation
+only when the actual policy grants `allow_expsm_commit`. `CREATED` requires a
+fresh strict store load and V1 adapter comparison. A pre-replace failure yields
+`WRITE_FAILED`; a post-replace verification failure yields `READBACK_FAILED`,
+an unconfirmed `attempted_record_id`, and
+`INDETERMINATE_FROM_CALLER_PERSPECTIVE`. The separate reconciliation helper is
+read-only and returns confirmed-persisted, confirmed-absent, or unresolved.
+
+Coverage is in `tools/verify_nfp_expsm_policy_gated_create.py` and
+`scenarios/nfp_expsm_policy_gated_create.json`. All mutation cases use temporary
+stores. Native records remain dormant: there is still no automatic proposal
+persistence, normal runtime wiring, native UPDATE, retrieval/activation,
+selection, Feedback, AKBSM, or Chronicle path.
+
+Implemented in this pass: typed request validator; policy-gated create orchestration;
 shared/version-aware extension of existing ExpSM store writing; writer-owned ID;
 native V1 materialization; temporary-store atomic failure tests; reload/readback.
 

@@ -520,6 +520,19 @@ in a later packaging pass.
 
 ## Recommended safe next actions
 
+## NFP-native ExpSM CREATE Audit
+
+- The isolated policy-gated CREATE source, shared store transaction, scenario,
+  and real verifier are tracked explicitly.
+- Production `Memory/ExpSM/ExpSM_data.json` and `Memory/AKBSM/AKBSM_ne.json`
+  are hash-guarded by the verifier; mutation coverage uses temporary stores.
+- Temporary files are unique siblings and are removed on failed writes. The
+  shared transaction performs file fsync and best-effort directory fsync.
+- The implementation is not imported or called by normal runtime and adds no
+  proposal automation, native UPDATE, behavior influence, or secondary store.
+- Recovery is read-only and has no create/write call; post-replace failures are
+  not represented as safe retries.
+
 1. Keep `main` stable and use review branches for design-only passes.
 2. Decide whether baseline `Memory/` files are tracked project assets or
    operator-local state.

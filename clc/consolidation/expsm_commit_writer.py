@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from clc.context.context_memory import ContextMemory
+from clc.consolidation.expsm_store_transaction import ExpSMStoreTransaction
 from clc.consolidation.memory_write_filters import is_memory_write_technical_pattern
 from clc.core.ids import IdGenerator
 from clc.core.markers import OperationMarker
@@ -158,11 +159,7 @@ class ExpSMCommitWriter:
         return data
 
     def _atomic_write_json(self, path: Path, data: dict[str, Any]) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        temp_path = path.with_name(path.name + ".tmp")
-        with temp_path.open("w", encoding="utf-8") as handle:
-            json.dump(data, handle, indent=2)
-        temp_path.replace(path)
+        ExpSMStoreTransaction(path).write_complete_store(data)
 
     def _validate_draft(self, draft: dict[str, Any]) -> tuple[bool, str | None]:
         if draft.get("draft_status") != "draft_ready_to_commit":
