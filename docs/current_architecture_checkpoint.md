@@ -33,6 +33,15 @@ runtime, writers and Memory files are unchanged. Verifiers:
 `tools/verify_persistent_nfp_expsm_representation.py` and
 `tools/verify_persistent_nfp_expsm_representation_design.py`.
 
+Post-v1.6 mutation-path design:
+`docs/design_nfp_expsm_mutation_path.md` audits the real policy, legacy draft,
+commit/update, CRUD, ID and file-replacement behavior. It chooses a narrow
+shared store-transaction primitive evolved from existing `ExpSMCommitWriter`,
+with typed request validation, `mutating_memory` authority, writer-owned max+1
+IDs and temporary-store failure/readback tests. This is documentation only:
+writers, policy, runtime, operational retrieval and Memory remain unchanged.
+Verifier: `tools/verify_nfp_expsm_mutation_path_design.py`.
+
 ## Purpose
 
 The prototype is a local cognitive loop experiment. It ingests simple audio,

@@ -32,6 +32,15 @@ existing loader, and canonical restart tests perform no filesystem writes.
 Final record IDs remain owned by a future writer; migration and runtime wiring
 remain deferred.
 
+Post-v1.6 mutation-path audit:
+`docs/design_nfp_expsm_mutation_path.md` records that runtime legacy commit uses
+path-injected `ExpSMCommitWriter`, max-numeric+1 IDs and temp-file replacement,
+while CRUD and draft storage have different/direct persistence behavior. The
+design requires a shared strict store transaction, policy-gated native CREATE
+and temporary-copy tests. `tools/verify_nfp_expsm_mutation_path_design.py`
+checks this documentation contract. No writer, policy, Memory or runtime source
+is modified in this pass.
+
 Post-v1.3 Context/Short Memory design audit:
 `docs/design_nfp_context_and_short_memory.md` inventories existing context,
 operation queue, active field and local temporary-metadata infrastructure.

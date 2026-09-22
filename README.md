@@ -25,6 +25,14 @@ policy or runtime authority. Checks:
 `tools/verify_persistent_nfp_expsm_representation.py` and
 `tools/verify_persistent_nfp_expsm_representation_design.py`.
 
+The next design-only boundary is
+[`docs/design_nfp_expsm_mutation_path.md`](docs/design_nfp_expsm_mutation_path.md).
+It audits the actual commit/CRUD/draft/policy paths and specifies request
+validation, policy-gated CREATE, writer-owned max+1 identity and a shared
+fail-safe store transaction. No NFP-native write, writer change, migration or
+runtime wiring exists yet. Contract:
+`tools/verify_nfp_expsm_mutation_path_design.py`.
+
 Local cognitive loop prototype with a conservative safe-demo runtime, scenario
 fixtures, phase regression snapshots, and focused verifier scripts.
 

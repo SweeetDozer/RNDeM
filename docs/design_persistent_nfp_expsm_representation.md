@@ -405,6 +405,7 @@ misses, confidence, SimilarityObserver, Activation, DecisionSelector, Feedback,
 mechanism search, Memory file or `_run_tick()`. No ExpSM, AKBSM or Chronicle
 write is authorized.
 
-Next: review/merge the isolated representation implementation. Only afterward
-design a policy-gated extension of the existing writer. First stabilize
-representation and restart survival, then separately authorize mutation.
+The next boundary is now designed in `design_nfp_expsm_mutation_path.md`. It
+keeps this request non-authoritative, places validation before policy/write,
+retains writer-owned IDs and extends the existing store architecture rather
+than adding a parallel database. That document still grants no write authority.

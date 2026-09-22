@@ -1,0 +1,311 @@
+# Design: Policy-Gated NFP-Native ExpSM Mutation Path
+
+Status: design/audit/verifier only, based on v1.6.0 (`92729f6`). No writer,
+policy, runtime or Memory file is changed by this pass.
+
+## Checkpoint And Scope
+
+| Checkpoint | Boundary |
+|---|---|
+| v1.1.0 | NFP substrate |
+| v1.2.0 | world -> sensory NFP |
+| v1.3.0 | ACTION -> world -> sensory consequence |
+| v1.4.0 | active present + recent raw past |
+| v1.5.0 | observed experience evaluation/grouping |
+| v1.6.0 | persistent NFP-native representation survives restart |
+| Next | policy-gated authoritative creation of one NFP-native ExpSM record |
+
+The first implementation is CREATE only and isolated from normal runtime. It
+does not activate, compare, select or update a native record.
+
+## Actual Current Writer And Store Audit
+
+`Memory/ExpSM/ExpSM_data.json` is one object with `experience` and `reflexes`
+maps. Experience IDs are string keys; current checked-in records are legacy
+`if`/`then`/`result`/`recommendation` records with hits, misses, confidence,
+repeatability, status and timestamps. There is no file-level or legacy-record
+representation version.
+
+The runtime legacy creation path is `MemoryDraftWriter` -> reviewed draft in
+`ExpSM_drafts.json` -> `ExpSMCommitWriter.run()`. Commit requires consolidation
+mode, a recent commit decision, `allow_expsm_commit`, a ready reviewed legacy
+draft and non-technical `if` patterns. The writer computes confidence from
+draft average confidence and repeatability from seen/support counts, creates
+hits=0 and misses=0, and writes legacy fields only. It also deduplicates by
+legacy `draft_signature`; that rule is not valid for native creation.
+
+`ExpSMCommitWriter` owns runtime legacy ID allocation. `_next_experience_id`
+ignores nonnumeric keys and returns `max(numeric IDs, default 0) + 1`; gaps are
+not compacted and existing IDs are not renumbered. Allocation occurs after
+loading the store but before the final write. There is no lock, process-wide
+critical section or compare-and-swap, so concurrent writers can race.
+`Memory/ExpSM/Exp_CRUD.py` independently uses the same max+1 convention, keeps
+an in-memory store and writes directly with `open("w")`; it is not the runtime
+reviewed commit path and its save is not atomic.
+
+Commit/update writers accept explicit draft and ExpSM paths, so temporary copied
+stores are already possible. Their `_atomic_write_json` writes a fixed sibling
+`.tmp`, closes it, then calls `Path.replace`. This prevents a partially written
+destination when serialization/write fails before replace, but there is no
+file or directory fsync, no unique temporary name, no locking, and no recovery
+protocol. Two concurrent writers can collide on the temp path. Commit also
+writes ExpSM and draft files sequentially, so failure on the second replacement
+can leave cross-file state inconsistent. `OSError` becomes a module-update
+failure operation; malformed JSON becomes `ValueError` and then a failure
+operation. Unexpected serialization/type errors are not comprehensively mapped.
+
+Current `_load_expsm_store` requires a top-level object, but replaces a
+non-object `experience` or `reflexes` section with `{}`. That permissive repair
+is unsafe for native creation because it could erase malformed existing data.
+No complete-store schema validation or post-write readback exists. Existing
+top-level keys and records otherwise survive whole-file rewrite.
+
+`ExpSMUpdateWriter` is a separate legacy metadata update path for confidence,
+repeatability and metadata. `ExpSMOutcomeFeedback` and value-feedback writers
+also have their own update concerns. NFP-native update support is deferred.
+
+## Actual Mutation-Policy And Draft Audit
+
+`MemoryMutationPolicy` has three profiles and independent flags:
+
+| Profile | Actual behavior relevant here |
+|---|---|
+| `safe_demo` | `allow_expsm_commit=False`; draft writes are allowed only when `memory_is_temporary=True`; no authoritative native creation |
+| `draft_only` | `allow_draft_writes=True`, but commit/update/value-feedback flags are false; no authoritative native creation |
+| `mutating_memory` | draft, ExpSM commit/update and value-feedback update flags are true; AKBSM remains false |
+
+Draft-only is not merely a name: `MemoryDraftWriter` can persist legacy-shaped
+reviewed drafts to the configured `ExpSM_drafts.json`. That schema contains
+pattern-ID drafts and legacy commit review state, not
+`ExpSMRecordCreationRequest`. The first native creation implementation must not
+invent another draft file or squeeze structural NFP values into this legacy
+schema. In safe/demo or draft-only policy, a valid native request receives a
+normal `DENIED_BY_POLICY` result and remains an inspectable in-memory request.
+The existing legacy draft subsystem remains unchanged. A later ADR may extend
+that same subsystem version-aware if durable native drafts are actually needed.
+
+Only `mutating_memory` with `allow_expsm_commit=True` may authorize permanent
+native creation. Flags for draft, update or value feedback do not imply create
+authority. Policy affects authority only; it must never alter context/action/
+effect content.
+
+## Authority Separation
+
+```text
+ExpSMRecordCreationRequest = validated requested cognitive content
+MemoryMutationPolicy       = whether authoritative mutation is permitted
+ExpSM store writer         = mechanism performing permitted persistence
+NFPExpSMRecordV1           = resulting persistent logical record
+```
+
+Therefore request creation != permission; permission != persistence mechanism;
+persistence mechanism != operational activation. The immutable request gains no
+`save`, `commit`, `persist` or filesystem method. Proposal and request can never
+call a writer directly.
+
+## Request Validation Boundary
+
+Add a pure `validate_expsm_creation_request(request)` equivalent before policy
+evaluation and again at the typed writer boundary. It accepts only the concrete
+`ExpSMRecordCreationRequest`, never an arbitrary dict. It checks:
+
+- kind is `nfp_native` and representation version is exactly 1;
+- complete context, ACTION and signed effect structures;
+- finite activations in [0,1] and finite deltas in [-1,1];
+- context/effect modality and topology compatibility;
+- valid requested hits/misses/confidence/repeatability;
+- valid immutable creation provenance and positive source_support_count;
+- initialization profile is the approved `legacy_crud_defaults_v1`;
+- no final record_id, filesystem path or live cognitive object exists;
+- canonical JSON conversion succeeds with `allow_nan=False`.
+
+Schema validation and policy authorization are distinct. A valid request may be
+denied; an allowed policy cannot legalize malformed or unsupported content.
+V1 writer input is typed and complete, so it cannot fill missing context/action/
+effect from ContextMemory, ShortMemory or global state. Unknown representation
+versions never reach mutation. The current v1.6 raw parser tolerates unrelated
+extra raw keys, but the creation path emits only the exact V1 allowlist from
+typed values; no arbitrary-extension escape hatch is provided.
+
+## Canonical Writer Extension
+
+Choose option C: narrowly extract/reuse a common ExpSM store transaction
+primitive from the existing `ExpSMCommitWriter` architecture. Do not introduce
+an NFP database or second store. The primitive owns configured path, strict
+load, max+1 allocation, complete serialization and atomic replacement. Existing
+legacy commit behavior must be routed through it without changing legacy draft
+validation, signature dedupe, record fields or operation payloads. This common
+primitive needs focused legacy regression tests because it touches shared I/O.
+
+A small policy-gated native creation orchestrator may sit beside the existing
+commit writer. It accepts only a typed request, validates it, checks the actual
+`MemoryMutationPolicy`, and invokes the common store transaction. It is an
+extension of the existing writer architecture, not a parallel writer/database.
+It is configured with an explicit store path for temporary tests. Cognitive
+request/record objects never contain that path.
+
+Legacy `ExpSMCommitWriter` remains canonical for legacy reviewed drafts.
+`ExpSMUpdateWriter`, CRUD and Feedback paths are unchanged. Native CREATE is
+the only new mutation; native hits/misses/confidence/repeatability updates are
+deferred until operational selection identity is stable.
+
+## Writer-Owned ID And Materialization
+
+Inside one writer-owned mutation operation:
+
+```text
+strictly load current store
+-> validate top-level and section shapes
+-> allocate max(numeric experience IDs) + 1
+-> materialize request + allocated ID as NFPExpSMRecordV1
+-> append under experience[record_id]
+-> validate the resulting native record/store shape
+-> serialize the complete store
+-> atomically replace destination
+-> report confirmed record ID/record
+```
+
+The caller never computes or reserves an ID. Given IDs 1, 2 and 7, the new ID
+is 8. Existing IDs and records remain untouched. The first implementation is
+single-process only; the operation must hold one in-process writer lock across
+load/allocation/write to avoid known threads sharing the writer boundary, while
+cross-process/distributed locking is deferred and documented as unsupported.
+No ID is considered consumed before successful replacement.
+
+`request_id != record_id`. Request replay is not idempotent: two separately
+authorized submissions may create two IDs and two records. Equal canonical
+content is not a dedupe key. Native creation never searches SimilarityObserver
+or merges with/increments a similar record. Idempotency would require a future
+request ledger and explicit policy.
+
+After authorization and ID allocation, deterministic materialization uses the
+v1.6 request values unchanged. Initial metadata is the request's validated
+`legacy_crud_defaults_v1`: hits=0, misses=0, confidence=.5,
+repeatability=.5. `source_support_count` remains creation provenance, never hits
+or confidence. Source proposal ID, source support and creation tick are immutable
+creation history; normal Feedback must not rewrite them.
+
+## Mixed Store And Compatibility
+
+Native V1 records live in the existing top-level `experience` map beside legacy
+records. No separate native list and no file-level version are required because
+each native record has `record_kind` and `representation_version`; unversioned
+known-shape records remain legacy. `reflexes` and unrelated top-level data are
+preserved. No eager migration, renumbering or normalization occurs.
+
+Before mutation, snapshot and validate the store as an object with object-valued
+`experience` and `reflexes` sections. Existing record values must be objects;
+known native records must parse through the v1.6 adapter. Legacy records remain
+opaque to native conversion but must satisfy the established minimum legacy
+shape used by coexistence tests. Malformed sections or existing native records
+produce `STORE_INVALID`; never replace them with empty maps.
+
+After an isolated write, all legacy IDs, if/then/result/recommendation,
+hits/misses/confidence/repeatability must compare equal to the pre-write
+snapshot. The new raw record must parse as `NFP_NATIVE_V1` through the v1.6
+adapter and structurally equal the request. Writer serializes; adapter parses;
+the writer does not create another interpretation.
+
+## Atomicity And Failure Safety
+
+Minimum future behavior improves the shared temp/replace primitive narrowly:
+
+1. validate request, policy and current complete store before mutation;
+2. create the complete candidate store in memory without mutating authoritative
+   in-memory state;
+3. serialize deterministically with strict finite JSON to a unique sibling temp;
+4. flush and `os.fsync` the file, close it, then `os.replace` in the same
+   directory; fsync the parent directory where supported;
+5. clean a leftover temp on failure and retain the old destination;
+6. reload/parse in verifier after success.
+
+No partial record becomes authoritative before replacement. A controlled
+replace/write failure test uses an injected store primitive/failure hook, not
+permission hacks against real Memory. The original store must remain readable
+and byte-identical. If replacement succeeds but optional readback fails, report
+a distinct verification failure and do not claim rollback unless an actual
+backup/rollback protocol exists. The first implementation should validate
+before replace strongly enough that readback failure indicates I/O/corruption,
+not ordinary request invalidity.
+
+The fixed `.tmp`, absent fsync and absent locking in current commit writer are
+known gaps. Improving the common primitive may alter legacy persistence
+mechanics and therefore requires exact legacy create/update and failure
+regressions. Do not route native creation through direct `ExpSMCRUD.save()`.
+
+## Mutation Result Model
+
+Use an immutable `ExpSMCreateResult` equivalent with persistence-only statuses:
+
+```text
+CREATED
+DENIED_BY_POLICY
+INVALID_REQUEST
+UNSUPPORTED_REPRESENTATION
+STORE_INVALID
+WRITE_FAILED
+READBACK_FAILED
+```
+
+Fields: status, `record_id: str | None`,
+`record: NFPExpSMRecordV1 | None`, and stable reason/code. Only confirmed
+`CREATED` returns ID and record. Denial is a normal non-authoritative outcome,
+not an application error. Invalid/unsupported/store/write failures return no
+authoritative record, and a would-be materialized object never implies success.
+Statuses describe persistence, never good/bad/successful experience semantics.
+
+## Required Isolated Scenarios
+
+All mutation tests use an explicitly configured temporary directory and copied
+ExpSM store. They snapshot production Memory hashes and root file inventory.
+
+1. **Safe mode:** valid request + `safe_demo` -> `DENIED_BY_POLICY`; bytes
+   unchanged and no ID allocated/consumed.
+2. **Draft mode:** valid request + `draft_only` -> `DENIED_BY_POLICY`; no native
+   draft file is invented; existing legacy draft subsystem behavior is unchanged.
+3. **Authoritative create:** copied mixed-capable store + `mutating_memory` ->
+   one new native V1 record with writer ID, exact payload/provenance/defaults.
+4. **Legacy preservation:** every old ID and legacy semantic/operational field
+   remains equal; no migration or renumbering.
+5. **ID gap:** 1,2,7 -> 8; a second approved equal request -> 9 and a distinct
+   record; canonical JSON/content hash performs no dedupe.
+6. **Malformed/unsupported:** invalid ranges, live/missing content or version
+   999 -> invalid/unsupported result before policy/write; bytes unchanged.
+7. **Store invalid:** malformed JSON, wrong section type or malformed existing
+   native record -> `STORE_INVALID`; no replacement.
+8. **Write failure:** injected failure before replace -> `WRITE_FAILED`; old
+   bytes intact, no partial native record and no authoritative returned record.
+9. **Readback/restart:** after create, destroy writer/request/runtime objects;
+   fresh JSON load and v1.6 adapter parse returns NFP_NATIVE_V1 structurally
+   equal to request under assigned ID.
+10. **No behavior:** no SimilarityObserver, Activation, DecisionSelector,
+    Feedback, mechanism search or `_run_tick()` call occurs.
+
+## Operational And Memory Boundaries
+
+Persistence != active retrieval. A newly written native record remains dormant:
+SimilarityObserver is unchanged; Activation top-N receives no native candidate;
+DecisionSelector sees no new action; Feedback performs no native update. No
+automatic path connects ShortMemory, grouping threshold, proposal creation or
+eviction to mutation. The chain remains explicit:
+
+```text
+candidate -> proposal -> request -> explicit mutation attempt -> policy -> writer
+```
+
+No AKBSM or Chronicle write occurs. Normal runtime and `_run_tick()` remain
+unchanged. After creation stability, a separate design may cover persistent
+native record -> comparison adapter -> SimilarityObserver -> Activation top-N
+-> DecisionSelector. Feedback for selected native identity is a later review.
+
+## First Implementation And Deferred Scope
+
+Implement next only: typed request validator; policy-gated create orchestration;
+shared/version-aware extension of existing ExpSM store writing; writer-owned ID;
+native V1 materialization; temporary-store atomic failure tests; reload/readback.
+
+Deferred: normal runtime wiring; automatic/background/sleep consolidation;
+native operational comparison/retrieval/Activation/selection; all native
+Feedback/update behavior; cross-process locking; request-id ledger/idempotency;
+legacy migration; file-level schema envelope; AKBSM/Chronicle conversion;
+semantic success/failure/reward/goals/needs evaluation.

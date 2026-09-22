@@ -359,3 +359,9 @@ outcomes and proposal -> immutable creation request -> policy -> future writer.
 `clc/experience/expsm_representation.py` stops at the creation request and typed
 parse boundary. Compatibility B, non-persistence and runtime isolation remain
 in force; no existing writer or legacy loader was changed.
+
+The following authoritative boundary is design-only in
+`design_nfp_expsm_mutation_path.md`: explicit request validation, actual
+`MemoryMutationPolicy`, a shared extension of existing ExpSM store writing and
+writer-owned record IDs. Candidate support and ShortMemory eviction still
+trigger no mutation, and no writer/runtime code is changed by that design pass.
