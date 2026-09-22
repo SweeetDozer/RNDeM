@@ -518,6 +518,18 @@ reviewable audit drift. If they become too noisy, keep the verifier output
 tracked in docs and move raw generated reports to an ignored artifact directory
 in a later packaging pass.
 
+## NFP-Native Retrieval Design Audit
+
+- The design and its verifier are documentation/tooling only; no retrieval
+  source module, runtime import, scenario execution path, or writer was added.
+- The verifier mechanically checks audited source constants/formulas and limits
+  this branch to the expected documentation plus verifier files.
+- Future retrieval fixtures must use temporary mixed stores, preserve both
+  production Memory hashes, and prove byte-identical read-only behavior.
+- Action materialization, ModeActionGuard treatment for structural ACTION,
+  native Feedback and all writes remain explicit unresolved boundaries rather
+  than hidden adapters.
+
 ## Recommended safe next actions
 
 ## NFP-native ExpSM CREATE Audit

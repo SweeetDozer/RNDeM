@@ -399,6 +399,11 @@ stores. Native records remain dormant: there is still no automatic proposal
 persistence, normal runtime wiring, native UPDATE, retrieval/activation,
 selection, Feedback, AKBSM, or Chronicle path.
 
+The post-`v1.7.0` read-only consumer boundary is designed separately in
+`design_nfp_expsm_operational_retrieval.md`. Retrieval does not grant mutation
+authority: it must not import the native CREATE writer, update operational
+counters, or treat recall/selection as Feedback.
+
 Implemented in this pass: typed request validator; policy-gated create orchestration;
 shared/version-aware extension of existing ExpSM store writing; writer-owned ID;
 native V1 materialization; temporary-store atomic failure tests; reload/readback.

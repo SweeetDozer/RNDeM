@@ -871,6 +871,23 @@ proposal/no-effect safety rather than canonical phase output.
 - One ambiguous runtime audit finding remains in demo/display code:
   `build_demo_image_from_memory()` splits image debug names for display.
 
+## NFP-Native Operational Retrieval Design
+
+- `docs/design_nfp_expsm_operational_retrieval.md` audits the real legacy
+  SimilarityObserver, Activation/top-N, action scoring, DecisionSelector,
+  ModeActionGuard, mechanism-search, and Feedback identity flow.
+- The first retrieval key is current external-sensory NFP context only. Stored
+  ACTION and effect remain candidate content; effect is structural prediction
+  metadata, not utility.
+- The design chooses representation-aware typed extensions of the existing
+  SimilarityObserver, Activation and DecisionSelector stages. It rejects fake
+  legacy strings, fake historical NFP reconstruction, and parallel stages.
+- Exact persistent record ID survives retrieval and isolated selection. ACTION
+  occurrence materialization/execution and native Feedback remain separate
+  future boundaries.
+- This pass is design/verifier only: no runtime source, `_run_tick()`, store,
+  native counter, AKBSM or Chronicle behavior changed.
+
 ## Recommended next work
 
 ## Isolated NFP-native ExpSM CREATE

@@ -365,3 +365,9 @@ The following authoritative boundary is design-only in
 `MemoryMutationPolicy`, a shared extension of existing ExpSM store writing and
 writer-owned record IDs. Candidate support and ShortMemory eviction still
 trigger no mutation, and no writer/runtime code is changed by that design pass.
+
+After the `v1.7.0` isolated CREATE checkpoint, the first read-only persistent
+consumer is designed in `design_nfp_expsm_operational_retrieval.md`. It uses
+current live context as the retrieval key; ShortMemory evidence, proposal
+support, stored ACTION and stored effect do not become query keys. No automatic
+proposal-to-retrieval/runtime connection is introduced.

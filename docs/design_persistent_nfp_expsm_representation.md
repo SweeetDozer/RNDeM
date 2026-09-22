@@ -426,3 +426,10 @@ This does not make native records operational. Similarity, activation/top-N,
 decision selection, Feedback, mechanism search, native UPDATE, and normal
 runtime wiring remain deferred. The implementation and verifier do not migrate
 legacy records or mutate production Memory.
+
+The proposed first read-only operational use is now specified in
+`design_nfp_expsm_operational_retrieval.md`. It compares live context directly
+with `SerializedNFPContextV1`, without reconstructing fake historical NFP
+occurrences. Persistent ACTION and effect travel as structural candidate
+content rather than retrieval keys, and exact persistent record ID survives
+competition/selection for a later, separately designed Feedback boundary.
