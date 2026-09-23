@@ -94,6 +94,25 @@ activation formula, and remain subject to the existing top-N bound. A numeric
 record-ID fallback may make exact ties deterministic, but only after the
 existing activation order keys and only as infrastructure, never superiority.
 
+### Normative Native Activation Contract
+
+The native mapping is exact: `native Activation coverage := context_similarity`.
+Here coverage means live current context to persistent stored context similarity.
+It excludes ACTION similarity, effect similarity, effect magnitude,
+`source_support_count`, and creation provenance. Native candidates enter the
+existing formula, without a native-specific aggregate score:
+
+```text
+activation =
+    coverage      * 0.55
+  + confidence    * 0.20
+  + repeatability * 0.15
+  + viability     * 0.10
+
+coverage = context_similarity
+viability = (hits + 1) / (hits + misses + 2)
+```
+
 ## Actual Action Candidate And Scoring Audit
 
 `ActionProposer._propose_expsm_actions()` currently reads legacy activation
@@ -152,6 +171,30 @@ Native retrieval must preserve the same identity principle, but native
 Feedback remains deferred. Future Feedback receives the exact selected
 `record_id`; it must never update similarity neighbors or punish unselected
 top-N candidates.
+
+### Normative Identity And Feedback Contract
+
+Candidate/pattern identity is not persistent ExpSM record identity. A
+`candidate_id`, `activation_id`, `pattern_id`, or selector-local identity names
+a transient processing object unless a field is explicitly defined as a source
+reference. The persistent `record_id` alone identifies the stored experience.
+
+The required end-to-end source-reference chain is:
+
+```text
+persistent NFP-native record_id
+-> retrieval candidate source_experience_id or typed equivalent
+-> Activation candidate
+-> DecisionSelector input
+-> selected operational-experience result
+```
+
+The persistent source ID survives every step unchanged. This propagation exists
+specifically so future native Feedback updates only the selected/used persistent
+record by its preserved selected persistent record ID. Content lookup,
+similarity-neighbor lookup, group feedback, and all-top-N feedback are forbidden.
+Feedback remains deferred; native Feedback mutation is deferred. Selection alone
+is not behavioral feedback.
 
 ## Retrieval Semantics
 
@@ -250,6 +293,15 @@ Context similarity excludes ACTION, effect and all operational metadata. Equal
 content at different record IDs yields distinct candidates; there is no content
 hash, request-ID, similarity dedupe, or merge.
 
+The coexistence invariant is exact: same or similar structural
+context/action/effect plus different persistent `record_id` produces distinct
+retrieval candidates. There is no content deduplication, context deduplication,
+action deduplication, effect deduplication, or candidate collapsing before or
+during retrieval, the SimilarityObserver-compatible stage, Activation, top-N,
+or DecisionSelector. Multiple similar NFP-native records may coexist in
+Activation competition, subject only to the existing `top-N = 3`; they are not
+merged into an averaged or representative memory.
+
 ## SimilarityObserver Extension Decision
 
 Choose a representation-aware comparator strategy inside the existing
@@ -308,11 +360,45 @@ SelectedNFPExpSMExperience
 That boundary is deferred. Stored effect remains remembered/predicted
 structural consequence metadata, never `desired_effect` or reward.
 
+The mandatory future execution boundary is:
+
+```text
+Selected NFP-native operational experience
+-> SerializedNFPActionV1
+-> fresh ACTION occurrence materialization
+-> ACTION + ACTION_GENERATED NFPFrame(current_tick)
+-> appropriate existing action guard / ModeActionGuard-compatible gate
+-> only if allowed: ActionTransducer / execution
+```
+
+Action materialization is deferred. A future materialized executable ACTION must
+pass the appropriate action guard before world execution; retrieval or selection
+must not bypass guard semantics. `ModeActionGuard` does not participate in
+context similarity, retrieval candidate production, or Activation scoring,
+because remembered persistent ACTION is not yet an executable occurrence. The
+guard belongs only to the later materialized-action-to-execution boundary and
+does not alter context retrieval similarity.
+
 ## Read-Only And Runtime Boundaries
 
 Retrieval, comparison, activation and isolated selection do not increment hits,
 misses, confidence or repeatability. Recall is not Feedback. Unselected records
 receive no punishment. Store bytes remain unchanged.
+
+A retrieved but not selected record receives no punishment. A top-N but not
+selected record receives no miss increment merely because it lost selection.
+The complete retrieval-to-selection path must not invoke Feedback or persist any
+update.
+
+The retrieval architecture is strictly `read -> parse -> compare -> rank ->
+select`, never `mutate -> commit -> update`. A future retrieval implementation
+must not import or call `MemoryMutationPolicy`, the NFP-native ExpSM create
+writer, `ExpSMCommitWriter`, `ExpSMUpdateWriter`, `ExpSMStoreTransaction`, or a
+native Feedback/update writer during retrieval or competition. The future real
+retrieval verifier must AST/import/call-audit retrieval production modules for
+the absence of those mutation authorities and Feedback mutation. This document
+states that future-verifier obligation; it does not claim to audit retrieval
+source that does not yet exist.
 
 The future isolated implementation has no `_run_tick()` or phase wiring, no
 normal runtime import, no ActionTransducer call, no ACTION occurrence, no

@@ -7818,7 +7818,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 152,
+      "line": 210,
       "path": "tools/verify_nfp_expsm_operational_retrieval_design.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",

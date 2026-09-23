@@ -36,33 +36,88 @@ REQUIRED_SECTIONS = (
     "## Required Isolated Scenarios",
 )
 
-REQUIRED_TERMS = (
-    "current context only",
-    "Stored ACTION is not a query key",
-    "Stored effect is not a query key",
-    "prediction/consequence metadata",
-    "PatternOrigin.EXTERNAL_SENSORY",
-    "INTERNAL_REACTIVATION",
-    "query authority gate",
-    "never creates fake historical",
-    "NFPWindowSimilarity.compare(A, B).score",
-    "comparable=False, score=None",
-    "different_frame_count",
-    "valid legacy: recognized, supported, non-comparable",
-    "UNSUPPORTED_MEMORY_PRESENT",
-    "record_id (exact persistent identity)",
-    "no content",
-    "same `ExpSMSimilarityObserver` stage",
-    "existing `ExpSMActivationModule`",
-    "existing `DecisionSelector`",
-    "SelectedNFPExpSMExperience",
-    "Remembered `SerializedNFPActionV1` is memory content",
-    "fresh action occurrence materializer",
-    "Unselected records receive no punishment",
-    "no `_run_tick()`",
-    "no AKBSM or",
-    "Chronicle/Letopis",
-)
+CONTRACT_GROUPS = {
+    "similarity architecture": (
+        "same `ExpSMSimilarityObserver` stage",
+        "legacy pair threshold `.45`",
+        "different four-field Jaccard quantity",
+        "NFPWindowSimilarity.compare(A, B).score",
+        "comparable=False, score=None",
+        "different_frame_count",
+    ),
+    "retrieval semantics": (
+        "current context only",
+        "Stored ACTION is not a query key",
+        "Stored effect is not a query key",
+        "prediction/consequence metadata",
+        "PatternOrigin.EXTERNAL_SENSORY",
+        "INTERNAL_REACTIVATION",
+        "query authority gate",
+        "never creates fake historical",
+        "valid legacy: recognized, supported, non-comparable",
+        "UNSUPPORTED_MEMORY_PRESENT",
+    ),
+    "Activation mapping": (
+        "native Activation coverage := context_similarity",
+        "coverage = context_similarity",
+        "coverage      * 0.55",
+        "confidence    * 0.20",
+        "repeatability * 0.15",
+        "viability     * 0.10",
+        "viability = (hits + 1) / (hits + misses + 2)",
+        "excludes ACTION similarity, effect similarity, effect magnitude",
+        "`source_support_count`, and creation provenance",
+        "top-N = 3",
+    ),
+    "identity semantics": (
+        "Candidate/pattern identity is not persistent ExpSM record identity",
+        "persistent NFP-native record_id",
+        "retrieval candidate source_experience_id or typed equivalent",
+        "-> Activation candidate",
+        "-> DecisionSelector input",
+        "-> selected operational-experience result",
+        "persistent source ID survives every step unchanged",
+        "different persistent `record_id` produces distinct retrieval candidates",
+        "no content deduplication, context deduplication",
+        "action deduplication, effect deduplication, or candidate collapsing",
+        "Multiple similar NFP-native records may coexist in Activation competition",
+        "not merged into an averaged or representative memory",
+    ),
+    "DecisionSelector boundary": (
+        "existing `DecisionSelector`",
+        "SelectedNFPExpSMExperience",
+        "record_id (exact persistent identity)",
+    ),
+    "Feedback deferral": (
+        "Feedback remains deferred",
+        "native Feedback mutation is deferred",
+        "future native Feedback updates only the selected/used persistent record",
+        "Content lookup, similarity-neighbor lookup, group feedback, and all-top-N feedback are forbidden",
+        "top-N but not selected record receives no miss increment merely because it lost selection",
+        "Selection alone is not behavioral feedback",
+    ),
+    "read-only authority": (
+        "strictly `read -> parse -> compare -> rank -> select`",
+        "never `mutate -> commit -> update`",
+        "must not import or call `MemoryMutationPolicy`",
+        "`ExpSMCommitWriter`, `ExpSMUpdateWriter`, `ExpSMStoreTransaction`",
+        "future real retrieval verifier must AST/import/call-audit",
+        "does not claim to audit retrieval source that does not yet exist",
+    ),
+    "future guard obligation": (
+        "Action materialization is deferred",
+        "future materialized executable ACTION must",
+        "appropriate action guard before world execution",
+        "retrieval or selection must not bypass guard semantics",
+        "does not participate in context similarity, retrieval candidate production, or Activation scoring",
+        "does not alter context retrieval similarity",
+    ),
+    "runtime isolation": (
+        "no `_run_tick()`",
+        "no AKBSM or",
+        "Chronicle/Letopis",
+    ),
+}
 
 REQUIRED_REFERENCES = (
     "clc/expsm/expsm_similarity_observer.py",
@@ -115,9 +170,12 @@ def main() -> int:
     for section in REQUIRED_SECTIONS:
         if section not in text:
             failures.append(f"missing section: {section}")
-    for term in REQUIRED_TERMS:
-        if term.lower() not in lower:
-            failures.append(f"missing design contract: {term}")
+    contract_count = 0
+    for group, terms in CONTRACT_GROUPS.items():
+        for term in terms:
+            contract_count += 1
+            if " ".join(term.lower().split()) not in lower:
+                failures.append(f"missing {group} contract: {term}")
     for reference in REQUIRED_REFERENCES:
         if reference not in text:
             failures.append(f"missing factual reference: {reference}")
@@ -184,7 +242,7 @@ def main() -> int:
             print(f"  {failure}")
         return 1
     print("NFP-native ExpSM operational retrieval design verification:")
-    print(f"PASS: {len(REQUIRED_SECTIONS)} design sections, {len(REQUIRED_TERMS)} contracts, and {len(REQUIRED_REFERENCES)} source references")
+    print(f"PASS: {len(REQUIRED_SECTIONS)} design sections, {contract_count} grouped contracts, and {len(REQUIRED_REFERENCES)} source references")
     print("PASS: current SimilarityObserver, Activation/top-N, DecisionSelector, and feedback identity facts")
     print("Design only; no retrieval, runtime wiring, action execution, feedback mutation, or memory write implemented.")
     return 0
