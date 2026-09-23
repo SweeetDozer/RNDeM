@@ -2,11 +2,12 @@
 
 ## Status And Scope
 
-This is a design/audit boundary based on `v1.7.0` (`54efc62`). It specifies
-the first isolated, read-only route from a live current `NFPWindow` to a
-selected persistent NFP-native operational-experience reference. It implements
-no comparator, retriever, candidate, activation extension, selector extension,
-ACTION occurrence, Feedback, runtime wiring, or memory write.
+This design/audit boundary is based on `v1.7.0` (`54efc62`). It specifies the
+first isolated, read-only route from a live current `NFPWindow` to a selected
+persistent NFP-native operational-experience reference. The approved comparator,
+retriever, candidate, Activation extension, and selector extension are now
+implemented in isolation. It implements no ACTION occurrence, Feedback,
+runtime wiring, or memory write.
 
 The checkpoint sequence is:
 
@@ -443,3 +444,28 @@ Still defer runtime wiring, ACTION materialization/execution, ModeActionGuard
 for structural actions, native Feedback/update, automatic consolidation,
 ExpSM/AKBSM/Chronicle writes, semantic outcome evaluation, reward, pain, goals
 and utility.
+
+## Isolated Implementation Status
+
+The approved isolated path is now implemented in
+`clc/expsm/nfp_operational_retrieval.py`, with typed entry points on the existing
+`ExpSMSimilarityObserver`, `ExpSMActivationModule`, and `DecisionSelector`.
+`NFPExpSMRetrievalQuery` contains only a live current context and requires every
+frame to be `EXTERNAL_SENSORY`. `LivePersistentNFPContextSimilarity` compares
+that window directly with `SerializedNFPContextV1`; it preserves the current
+aligned structural formula and typed non-comparable results without fabricating
+historical occurrences.
+
+The fresh reader uses `ExpSMRecordAdapter`, fails closed for malformed or
+unsupported memory, treats valid legacy records as non-comparable, and keeps
+same-content records distinct by persistent ID. Native candidates map
+`coverage = context_similarity` into the existing Activation formula and top-N
+of three. Persistent `source_experience_id` survives retrieval, Activation, and
+typed selection while candidate, activation, and selection IDs remain transient.
+
+The selected payload still contains only persistent structural ACTION and
+effect prediction metadata. The production retrieval path imports no mutation
+authority and invokes no Feedback, ModeActionGuard, ActionTransducer, runtime,
+or writer. The real verifier AST-audits those boundaries and uses freshly
+reopened temporary mixed stores. ACTION materialization remains deferred; a
+future executable occurrence must pass the appropriate guard before execution.

@@ -341,15 +341,19 @@ strictly pre-replace; post-replace verification failure is
 path. The implementation has no normal runtime wiring, native UPDATE,
 similarity/activation/selection/feedback use, or AKBSM/Chronicle interaction.
 Its verifier mutates temporary stores only and preserves production Memory.
-The next boundary is design-only in
-`docs/design_nfp_expsm_operational_retrieval.md`. It audits the actual legacy
+The approved boundary in `docs/design_nfp_expsm_operational_retrieval.md`
+now has an isolated read-only implementation. The design audits the actual legacy
 SimilarityObserver, Activation/top-N, ActionScoring, DecisionSelector, guard,
 mechanism-search, and Feedback identity path, then specifies context-only
 live-to-persistent NFP comparison and typed extensions of the existing stages.
 ACTION and effect are not retrieval keys; effect remains structural prediction
-metadata, selected record identity is preserved, and ACTION occurrence
-materialization, execution, native Feedback, writes, and `_run_tick()` wiring
-remain deferred.
+metadata, and exact persistent record identity survives retrieval, Activation,
+and typed selection. Queries require `EXTERNAL_SENSORY` context, native coverage
+is structural context similarity, and existing Activation/top-N mechanics are
+reused. The implementation lives in `clc/expsm/nfp_operational_retrieval.py`
+with explicit entry points on the existing SimilarityObserver, Activation, and
+DecisionSelector classes. ACTION occurrence materialization, guard invocation,
+execution, native Feedback, writes, and `_run_tick()` wiring remain deferred.
 Post-v0.0.2 safety architecture is summarized in
 `docs/post_v0_0_2_safety_architecture_checkpoint.md`; it is tagged as
 `v0.0.3` and is not an enabled-behavior runtime release.

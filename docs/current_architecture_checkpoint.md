@@ -885,8 +885,18 @@ proposal/no-effect safety rather than canonical phase output.
 - Exact persistent record ID survives retrieval and isolated selection. ACTION
   occurrence materialization/execution and native Feedback remain separate
   future boundaries.
-- This pass is design/verifier only: no runtime source, `_run_tick()`, store,
-  native counter, AKBSM or Chronicle behavior changed.
+- The isolated implementation now lives in
+  `clc/expsm/nfp_operational_retrieval.py`; existing SimilarityObserver,
+  Activation, and DecisionSelector classes expose explicit typed native entry
+  points while legacy behavior remains unchanged.
+- Query authority requires current `EXTERNAL_SENSORY` context. Direct
+  live/persistent structural similarity supplies Activation coverage; the
+  existing viability formula and top-N of three are reused.
+- Persistent record ID survives retrieval through selection while transient
+  identities remain separate and same-content records coexist.
+- Retrieval has no mutation authority. Selected ACTION remains non-executable
+  persistent structure; Feedback, guard invocation, ACTION materialization,
+  execution, `_run_tick()`, AKBSM, and Chronicle integration remain deferred.
 
 ## Recommended next work
 

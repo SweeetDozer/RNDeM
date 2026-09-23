@@ -73,6 +73,35 @@ class DecisionSelector:
         candidate_field.suppress(candidate.pattern_id, tick + self.cooldown_ticks)
         return ContextOperation(self.id_gen.next("op"), OperationMarker.INTERNAL_DECISION, tick, self.module_name, None, payload)
 
+    def select_native(self, candidates):
+        """Select an activated remembered experience without materializing ACTION."""
+        from clc.expsm.nfp_operational_retrieval import (
+            ActivatedNFPExpSMCandidate,
+            SelectedNFPExpSMExperience,
+        )
+
+        typed = tuple(candidates)
+        if any(not isinstance(candidate, ActivatedNFPExpSMCandidate) for candidate in typed):
+            raise TypeError("native candidates must be ActivatedNFPExpSMCandidate objects")
+        if not typed:
+            return None
+        selected = max(typed, key=lambda candidate: candidate.activation)
+        if selected.activation < self.decision_threshold:
+            return None
+        return SelectedNFPExpSMExperience(
+            selection_id=self.id_gen.next("nfp_expsm_selection"),
+            activation_id=selected.activation_id,
+            retrieval_candidate_id=selected.retrieval_candidate_id,
+            source_experience_id=selected.source_experience_id,
+            context_similarity=selected.context_similarity,
+            activation=selected.activation,
+            action=selected.action,
+            effect=selected.effect,
+            confidence=selected.effective_confidence,
+            repeatability=selected.repeatability,
+            viability=selected.viability,
+        )
+
 
 def _score(candidate: ActionCandidate) -> float:
     return score_breakdown(candidate)["final_score"]

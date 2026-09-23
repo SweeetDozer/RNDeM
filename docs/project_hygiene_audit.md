@@ -545,6 +545,18 @@ in a later packaging pass.
 - Recovery is read-only and has no create/write call; post-replace failures are
   not represented as safe retries.
 
+## NFP-native ExpSM Retrieval Audit
+
+- The isolated retrieval source, scenario fixture, and real verifier are
+  tracked explicitly; verifier stores are temporary and freshly reopened.
+- The native entry points extend existing SimilarityObserver, Activation, and
+  DecisionSelector classes without parallel stages or normal runtime wiring.
+- Production retrieval modules are AST-audited for absence of mutation policy,
+  writers/transactions, Feedback, ActionTransducer, ModeActionGuard, and
+  `_run_tick()` authority.
+- Production Memory hashes are guarded; retrieval, competition, and selection
+  leave bytes and operational counters unchanged.
+
 1. Keep `main` stable and use review branches for design-only passes.
 2. Decide whether baseline `Memory/` files are tracked project assets or
    operator-local state.

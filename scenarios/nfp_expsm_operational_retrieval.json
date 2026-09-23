@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "name": "nfp_expsm_operational_retrieval",
+  "description": "Isolated read-only native retrieval, Activation competition, and typed selection coverage.",
+  "runtime": {"profile": "safe_demo", "memory_is_temporary": true, "max_ticks": 0},
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "nfp_expsm_operational_retrieval": {
+      "isolated": true,
+      "runtime_wiring": false,
+      "write_authority": false,
+      "cases": {
+        "external_query_accepted_internal_reactivation_rejected": true,
+        "runtime_persistent_similarity_parity": true,
+        "modality_topology_and_length_non_comparable": true,
+        "context_only_action_and_effect_independent": true,
+        "legacy_non_comparable_in_mixed_store": true,
+        "unsupported_and_malformed_fail_closed": true,
+        "same_content_distinct_ids_not_deduplicated": true,
+        "coverage_equals_context_similarity": true,
+        "existing_activation_formula_and_top_three": true,
+        "persistent_id_propagates_with_transient_ids_separate": true,
+        "typed_existing_selector_returns_structural_memory": true,
+        "no_guard_execution_feedback_or_runtime_wiring": true,
+        "read_only_store_bytes_unchanged": true
+      }
+    }
+  }
+}

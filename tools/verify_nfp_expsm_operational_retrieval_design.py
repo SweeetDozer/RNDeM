@@ -231,6 +231,12 @@ def main() -> int:
         "docs/debug_name_dependency_audit.md",
         "docs/project_hygiene_audit.md",
         "tools/verify_nfp_expsm_operational_retrieval_design.py",
+        "clc/action/decision_selector.py",
+        "clc/expsm/expsm_activation_module.py",
+        "clc/expsm/expsm_similarity_observer.py",
+        "clc/expsm/nfp_operational_retrieval.py",
+        "scenarios/nfp_expsm_operational_retrieval.json",
+        "tools/verify_nfp_expsm_operational_retrieval.py",
     }
     unexpected = sorted(set(changed) - allowed)
     if unexpected:
@@ -244,7 +250,7 @@ def main() -> int:
     print("NFP-native ExpSM operational retrieval design verification:")
     print(f"PASS: {len(REQUIRED_SECTIONS)} design sections, {contract_count} grouped contracts, and {len(REQUIRED_REFERENCES)} source references")
     print("PASS: current SimilarityObserver, Activation/top-N, DecisionSelector, and feedback identity facts")
-    print("Design only; no retrieval, runtime wiring, action execution, feedback mutation, or memory write implemented.")
+    print("Design boundary verified; isolated retrieval is allowed, with no runtime wiring, action execution, feedback mutation, or memory write.")
     return 0
 
 

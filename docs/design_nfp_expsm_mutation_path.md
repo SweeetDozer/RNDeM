@@ -413,3 +413,12 @@ native operational comparison/retrieval/Activation/selection; all native
 Feedback/update behavior; cross-process locking; request-id ledger/idempotency;
 legacy migration; file-level schema envelope; AKBSM/Chronicle conversion;
 semantic success/failure/reward/goals/needs evaluation.
+
+## Read-Only Consumer Update
+
+Native operational comparison, retrieval, Activation competition, and typed
+selection now exist as an isolated read-only consumer. This does not extend the
+mutation authority described here: retrieval imports/calls no policy, CREATE,
+transaction, commit, update, or Feedback writer. It leaves all operational
+counters and store bytes unchanged. Native Feedback/UPDATE, action
+materialization/execution, and `_run_tick()` wiring remain deferred.

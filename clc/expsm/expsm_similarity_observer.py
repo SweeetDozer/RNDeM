@@ -65,6 +65,12 @@ class ExpSMSimilarityObserver:
             )
         return operations
 
+    def retrieve_native(self, query, config):
+        """Explicit typed native operation; legacy consolidation remains `run`."""
+        from clc.expsm.nfp_operational_retrieval import NFPExpSMRetriever
+
+        return NFPExpSMRetriever(self.expsm_path).retrieve(query, config)
+
     def _load_records(self) -> dict[str, dict[str, Any]]:
         if not self.expsm_path.exists():
             return {}

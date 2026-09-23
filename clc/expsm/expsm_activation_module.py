@@ -70,6 +70,47 @@ class ExpSMActivationModule:
             for match in matches[:MAX_ACTIVATIONS_PER_TICK]
         ]
 
+    def activate_native(self, candidates):
+        """Apply the existing operational formula/top-N to typed native candidates."""
+        from clc.expsm.nfp_operational_retrieval import (
+            ActivatedNFPExpSMCandidate,
+            NFPExpSMRetrievalCandidate,
+        )
+
+        activated = []
+        for candidate in candidates:
+            if not isinstance(candidate, NFPExpSMRetrievalCandidate):
+                raise TypeError("native candidates must be NFPExpSMRetrievalCandidate objects")
+            effective_confidence = min(_clamp(candidate.confidence), LEGACY_CONFIDENCE_SOFT_CAP)
+            viability = _clamp((candidate.hits + 1) / (candidate.hits + candidate.misses + 2))
+            score = _clamp(
+                candidate.context_similarity * 0.55
+                + effective_confidence * 0.20
+                + candidate.repeatability * 0.15
+                + viability * 0.10
+            )
+            if score < MIN_MATCH_SCORE:
+                continue
+            activated.append(
+                ActivatedNFPExpSMCandidate(
+                    activation_id=self.id_gen.next("nfp_expsm_activation"),
+                    retrieval_candidate_id=candidate.candidate_id,
+                    source_experience_id=candidate.source_experience_id,
+                    context_similarity=candidate.context_similarity,
+                    activation=score,
+                    action=candidate.action,
+                    effect=candidate.effect,
+                    hits=candidate.hits,
+                    misses=candidate.misses,
+                    confidence=candidate.confidence,
+                    effective_confidence=effective_confidence,
+                    repeatability=candidate.repeatability,
+                    viability=viability,
+                )
+            )
+        activated.sort(key=lambda item: item.activation, reverse=True)
+        return tuple(activated[:MAX_ACTIVATIONS_PER_TICK])
+
     def _load_store(self) -> dict[str, Any]:
         if not self.expsm_path.exists():
             return {"experience": {}, "reflexes": {}}

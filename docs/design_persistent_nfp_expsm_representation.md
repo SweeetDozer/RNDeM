@@ -433,3 +433,13 @@ with `SerializedNFPContextV1`, without reconstructing fake historical NFP
 occurrences. Persistent ACTION and effect travel as structural candidate
 content rather than retrieval keys, and exact persistent record ID survives
 competition/selection for a later, separately designed Feedback boundary.
+
+## Post-v1.7 Read-Only Retrieval Status
+
+That isolated consumer now exists. A fresh mixed-store reader parses this V1
+representation through `ExpSMRecordAdapter`, compares live external-sensory
+context directly with serialized context, and preserves exact record identity
+through existing Activation/top-N and typed DecisionSelector entry points.
+Transient processing IDs remain separate and equal-content records are not
+deduplicated. The consumer has no write authority, Feedback, ACTION
+materialization, guard invocation, execution, or normal runtime wiring.
