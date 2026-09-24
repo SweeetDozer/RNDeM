@@ -309,3 +309,9 @@ The execution layer has no ExpSM, AKBSM or Chronicle writer authority.
 `RecentCausalTransition`. Tracking failure, pending observation and every
 non-executed status remain no-evidence, never an automatic miss. Execution does
 not invoke evaluation or persistence.
+
+The isolated implementation now preserves the selected transient TargetCore in
+the materialized intent and every execution result while keeping it invisible
+to ACTION values, guard, transduction, actuator signal and world physics. A
+separate explicit caller may pass an eligible result and matching transition to
+the pure native evaluator; the coordinator still never invokes Feedback.

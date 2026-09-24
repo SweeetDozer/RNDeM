@@ -641,5 +641,6 @@ in a later packaging pass.
   transaction recovery and bounded replay behavior against current source.
 - Native HIT/MISS is structural prediction reliability only; no utility,
   reward, neighbor reinforcement or structural rule rewrite is introduced.
-- Evaluation and mutation are separate, and no production source, scenario,
-  runtime phase or Memory file changes in this pass.
+- Evaluation and mutation remain separate. The isolated TargetCore/evaluator
+  production modules and scenario verifier are read-only; no runtime phase,
+  mutation policy, writer, transaction, or Memory file changed.

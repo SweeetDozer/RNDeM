@@ -18,6 +18,7 @@ from clc.experience.expsm_representation import (
 )
 from clc.patterns import NFPWindow, PatternOrigin
 from clc.patterns.similarity import NFPSimilarityResult
+from clc.expsm.nfp_feedback_target import NFPFeedbackTargetCore
 
 
 class NFPExpSMRetrievalStatus(str, Enum):
@@ -88,6 +89,7 @@ class NFPExpSMRetrievalCandidate:
     confidence: float
     repeatability: float
     creation_provenance: object | None = None
+    target_core: NFPFeedbackTargetCore | None = None
 
 
 @dataclass(frozen=True)
@@ -113,6 +115,7 @@ class ActivatedNFPExpSMCandidate:
     effective_confidence: float
     repeatability: float
     viability: float
+    target_core: NFPFeedbackTargetCore | None = None
 
 
 @dataclass(frozen=True)
@@ -128,6 +131,7 @@ class SelectedNFPExpSMExperience:
     confidence: float
     repeatability: float
     viability: float
+    target_core: NFPFeedbackTargetCore | None = None
 
 
 class NFPExpSMRetriever:
@@ -193,6 +197,7 @@ class NFPExpSMRetriever:
                     confidence=native.operational.confidence,
                     repeatability=native.operational.repeatability,
                     creation_provenance=native.creation_metadata,
+                    target_core=NFPFeedbackTargetCore.from_record(native),
                 )
             )
         if candidates:

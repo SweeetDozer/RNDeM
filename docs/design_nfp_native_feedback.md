@@ -295,10 +295,10 @@ nearby-record lookup, or reconstruction. A missing exact `R` is
 closed as `TARGET_NOT_NATIVE`, `UNSUPPORTED_TARGET_REPRESENTATION`, or
 `STORE_INVALID`; it is never reinterpreted as V1.
 
-The current `SelectedNFPExpSMExperience` does not carry serialized context,
-creation provenance, or TargetCore. Without this handoff, native apply must
-remain unavailable; same-ID continuity cannot be proven from the current
-selected payload alone.
+`SelectedNFPExpSMExperience` now carries the transient TargetCore created by
+the authoritative retrieval read, and the isolated guarded execution result
+preserves it. Without this complete handoff, native apply must remain
+unavailable; same-ID continuity cannot be proven from partial payloads.
 
 ## Native Operational Update
 
@@ -387,7 +387,23 @@ statuses above.
 ## Authority Boundary
 
 Execution never calls evaluation automatically; evaluation never writes; apply
-is explicit and policy-gated. This design adds no implementation, runtime phase,
+is explicit and policy-gated. This implementation adds no runtime phase,
 `_run_tick()` call, automatic execution-to-Feedback link, neighbor
 reinforcement, reward/utility semantics, ExpSM/AKBSM/Chronicle write, or Memory
 change.
+
+## Isolated Evaluation Implementation
+
+`NFPFeedbackTargetCore` now implements the exact ten-field transient schema and
+is constructed only from `NFPExpSMRecordV1`. Read-only native retrieval,
+Activation, typed selection and guarded execution preserve the same value
+alongside the separate `source_experience_id`.
+
+`NFPFeedbackEvaluator` is an explicitly invoked pure evaluator. It requires an
+eligible execution and occurrence-matching `RecentCausalTransition`, derives
+actual evidence only through `ObservedEffectExtractor`, and compares aligned
+signed deltas directly. HIT/MISS means prediction reliability only;
+incomplete, non-executed, mismatched and structurally incomparable cases carry
+no applicable evidence. The evaluator imports no mutation policy, transaction,
+writer or runtime authority. Native apply, operational metric updates,
+automatic execution-to-Feedback and `_run_tick()` wiring remain absent.

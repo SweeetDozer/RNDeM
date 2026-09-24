@@ -106,6 +106,7 @@ class ExpSMActivationModule:
                     effective_confidence=effective_confidence,
                     repeatability=candidate.repeatability,
                     viability=viability,
+                    target_core=candidate.target_core,
                 )
             )
         activated.sort(key=lambda item: item.activation, reverse=True)

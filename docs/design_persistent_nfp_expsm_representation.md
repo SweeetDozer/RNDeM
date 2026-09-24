@@ -448,3 +448,9 @@ materialization, guard invocation, execution, or normal runtime wiring.
 predicted effect and creation metadata. A future accepted event may alter only
 operational hits, misses, confidence and repeatability for the exact selected
 record; durable replay metadata is not silently added to V1.
+
+`NFPFeedbackTargetCore.from_record()` now provides the single transient
+ten-field continuity projection of a parsed V1 record. It does not alter this
+persistent schema and excludes identity, lifecycle/update metadata and mutable
+operational metrics. Canonical JSON round-trip equality is covered by the real
+evaluation verifier; no native update writer exists yet.

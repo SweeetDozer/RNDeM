@@ -100,6 +100,7 @@ class DecisionSelector:
             confidence=selected.effective_confidence,
             repeatability=selected.repeatability,
             viability=selected.viability,
+            target_core=selected.target_core,
         )
 
 

@@ -103,6 +103,13 @@ ALLOWED = {
     "docs/design_nfp_expsm_mutation_path.md",
     "docs/design_persistent_nfp_expsm_representation.md",
     "tools/verify_nfp_native_feedback_design.py",
+    "clc/expsm/nfp_feedback_target.py",
+    "clc/expsm/nfp_native_feedback.py",
+    "scenarios/nfp_native_feedback_evaluation.json",
+    "tools/verify_nfp_native_feedback_evaluation.py",
+    "clc/expsm/nfp_operational_retrieval.py",
+    "clc/expsm/expsm_activation_module.py",
+    "clc/action/decision_selector.py",
 }
 
 

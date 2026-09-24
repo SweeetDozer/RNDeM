@@ -37,8 +37,8 @@ TERMS = (
     "Viability remains derived", "evaluation never writes", "freshly load",
     "ExpSMRecordAdapter", "STALE_OR_CHANGED_TARGET", "allow_expsm_update",
     "safe_demo", "draft_only", "mutating_memory", "ExpSMStoreTransaction",
-    "NFPFeedbackTargetCore", "current `SelectedNFPExpSMExperience` does not carry serialized context",
-    "Without this handoff, native apply must remain unavailable",
+    "NFPFeedbackTargetCore", "SelectedNFPExpSMExperience` now carries the transient TargetCore",
+    "Without this complete handoff, native apply must remain unavailable",
     "source_experience_id` answers **which record was selected",
     "TargetCore never replaces or duplicates the record ID",
     "C2 == C", "transient / ephemeral", "cognitively inert",
@@ -61,6 +61,14 @@ ALLOWED = {
     "tools/verify_nfp_native_feedback_design.py",
     "tools/verify_nfp_action_materialization_guarded_execution_design.py",
     "tools/verify_nfp_expsm_operational_retrieval_design.py",
+    "clc/expsm/nfp_feedback_target.py",
+    "clc/expsm/nfp_native_feedback.py",
+    "clc/expsm/nfp_operational_retrieval.py",
+    "clc/expsm/expsm_activation_module.py",
+    "clc/action/decision_selector.py",
+    "clc/actuation/remembered_action_execution.py",
+    "scenarios/nfp_native_feedback_evaluation.json",
+    "tools/verify_nfp_native_feedback_evaluation.py",
 }
 
 V1_FIELDS = {
@@ -247,7 +255,8 @@ def main() -> int:
             f'record["{field}"]' in feedback
             for field in ("hits", "misses", "confidence", "repeatability")
         ),
-        "no implementation": not (ROOT / "clc/expsm/nfp_native_feedback.py").exists(),
+        "isolated evaluation implementation": (ROOT / "clc/expsm/nfp_native_feedback.py").exists()
+            and (ROOT / "clc/expsm/nfp_feedback_target.py").exists(),
         "runtime unchanged": "NFPFeedback" not in (ROOT / "clc/runtime/clc_runtime.py").read_text(encoding="utf-8"),
     }
     failures.extend(f"current source fact drifted: {name}" for name, ok in facts.items() if not ok)

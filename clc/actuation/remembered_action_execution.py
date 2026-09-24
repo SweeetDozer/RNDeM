@@ -10,6 +10,7 @@ from clc.context.short_memory import ShortMemory
 from clc.core.ids import IdGenerator
 from clc.experience.expsm_representation import SerializedNFPActionV1, SerializedObservedEffectV1
 from clc.expsm.nfp_operational_retrieval import SelectedNFPExpSMExperience
+from clc.expsm.nfp_feedback_target import NFPFeedbackTargetCore
 from clc.patterns import NFPFrame, NFPWindow, PatternModality, PatternOrigin, PatternTopology
 from clc.system.mode_action_guard import ModeActionGuard
 from clc.system.system_state import SystemState
@@ -62,6 +63,7 @@ class MaterializedNFPActionIntent:
     predicted_effect: SerializedObservedEffectV1
     selection_context_end_tick: int
     before_context_at_T: NFPWindow
+    target_core: NFPFeedbackTargetCore | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.action_frame, NFPFrame):
@@ -102,6 +104,7 @@ class NFPRememberedActionExecutionResult:
     pending_transition: PendingCausalTransition | None = None
     recent_transition: RecentCausalTransition | None = None
     detail: str = ""
+    target_core: NFPFeedbackTargetCore | None = None
 
     @property
     def executed(self) -> bool:
@@ -141,6 +144,7 @@ class NFPActionOccurrenceMaterializer:
             predicted_effect=selected.effect,
             selection_context_end_tick=request.selection_context_end_tick,
             before_context_at_T=before_context_at_T,
+            target_core=selected.target_core,
         )
 
 
@@ -186,6 +190,7 @@ class NFPRememberedActionExecutionCoordinator:
         common = {
             "source_experience_id": selected.source_experience_id,
             "predicted_effect": selected.effect,
+            "target_core": selected.target_core,
         }
 
         before_context_at_T = context_manager.current_external_sensory_window

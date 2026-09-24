@@ -475,3 +475,9 @@ The guarded occurrence boundary now exists at v1.9. The next design-only
 consumer is `docs/design_nfp_native_feedback.md`: it preserves the exact
 selected `source_experience_id`; retrieval neighbors and top-N losers receive
 no Feedback merely for participating in competition.
+
+The isolated Feedback-evaluation implementation now adds an inert
+`NFPFeedbackTargetCore` to each native candidate directly from its parsed
+authoritative record. Activation and typed selection preserve it without using
+it in similarity, thresholds, scoring, viability, ordering or top-N. Retrieval
+still invokes neither evaluation nor persistence.

@@ -376,9 +376,12 @@ closure. Feedback, persistent writes, automatic retrieval-to-execution, and
 
 ## NFP-Native Feedback Design
 
-`docs/design_nfp_native_feedback.md` defines the next design-only boundary:
+`docs/design_nfp_native_feedback.md` defines the native Feedback boundary:
 actual `RecentCausalTransition` evidence is compared directly with the selected
 record's stored structural prediction. HIT/MISS means prediction reliability,
 not utility or reward. Evaluation and policy-gated persistence stay separate;
-only the exact `source_experience_id` may eventually update. No implementation,
-automatic Feedback, `_run_tick()` wiring, or persistent write is added.
+only the exact `source_experience_id` may eventually update. The isolated
+implementation now carries an exact transient ten-field TargetCore from fresh
+retrieval through selection and guarded execution and exposes pure structural
+evaluation. No native apply, automatic Feedback, `_run_tick()` wiring, or
+persistent write exists.

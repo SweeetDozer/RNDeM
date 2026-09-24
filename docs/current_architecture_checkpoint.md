@@ -948,6 +948,7 @@ Feedback, runtime wiring, or persistent-memory mutation authority.
 The post-v1.9 design in `docs/design_nfp_native_feedback.md` separates real
 causal observation, signed structural effect comparison, typed reliability
 evidence and eventual exact-record mutation. Legacy semantic outcome labels are
-not reused for native classification. The current design adds no implementation,
-runtime wiring or Memory write, and autonomous use remains blocked until
-durable replay handling is designed.
+not reused for native classification. Isolated production types now propagate
+the exact transient TargetCore and perform explicitly invoked pure evaluation.
+There is still no native apply, runtime wiring or Memory write, and autonomous
+use remains blocked until durable replay handling is designed.

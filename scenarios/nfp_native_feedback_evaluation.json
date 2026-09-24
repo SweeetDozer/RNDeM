@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "name": "nfp_native_feedback_evaluation",
+  "description": "Isolated read-only TargetCore propagation and NFP-native prediction-reliability evaluation.",
+  "runtime": {"profile": "safe_demo", "memory_is_temporary": true, "max_ticks": 0},
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "nfp_native_feedback_evaluation": {
+      "isolated": true,
+      "runtime_wiring": false,
+      "write_authority": false,
+      "cases": {
+        "target_core_exact_ten_field_schema": true,
+        "record_id_carried_separately": true,
+        "mutable_fields_excluded": true,
+        "canonical_round_trip_equality": true,
+        "complete_target_core_propagation": true,
+        "target_core_cognitively_inert": true,
+        "executed_and_observed_eligible": true,
+        "non_executed_status_no_evidence": true,
+        "tracking_failure_no_evidence": true,
+        "observation_pending_no_evidence": true,
+        "transition_occurrence_identity_required": true,
+        "actual_effect_from_recent_transition": true,
+        "perfect_prediction_hit": true,
+        "threshold_equality_hit": true,
+        "below_threshold_miss": true,
+        "signed_disagreement": true,
+        "incomparable_modality": true,
+        "incomparable_topology": true,
+        "prediction_reliability_not_utility": true,
+        "operational_metrics_unchanged": true,
+        "persistent_expsm_unchanged": true,
+        "no_automatic_feedback": true,
+        "no_run_tick_wiring": true
+      }
+    }
+  }
+}
