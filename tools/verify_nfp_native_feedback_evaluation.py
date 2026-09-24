@@ -260,6 +260,18 @@ class NFPNativeFeedbackEvaluationTests(unittest.TestCase):
         self.assertEqual(result.status, FeedbackStatus.MISS)
         self.assertIsNotNone(result.evidence)
 
+    def test_effect_comparison_preserves_channel_order(self) -> None:
+        core = NFPFeedbackTargetCore.from_record(_record(effect=(0.75, -0.25)))
+        transition = _transition(before=(0.5, 0.0), after=(0.25, 0.75))
+        result = evaluate_native_feedback(
+            _execution(core, transition), transition, NFPFeedbackEvaluationConfig(0.75),
+        )
+        self.assertEqual(
+            result.effect_similarity, 0.5,
+            "equal value multisets in different channels must not be perfect agreement",
+        )
+        self.assertEqual(result.status, FeedbackStatus.MISS)
+
     def test_incomparable_effects_are_not_misses(self) -> None:
         actual = evaluate_native_feedback
         core = NFPFeedbackTargetCore.from_record(_record())
@@ -284,6 +296,28 @@ class NFPNativeFeedbackEvaluationTests(unittest.TestCase):
             _execution(core, transition, predicted=conflicting), transition, NFPFeedbackEvaluationConfig(0.5),
         )
         self.assertEqual(invalid.status, FeedbackStatus.INVALID_PREDICTION)
+
+    def test_same_source_experience_different_execution_transition_mismatches(self) -> None:
+        core = NFPFeedbackTargetCore.from_record(_record())
+        transition_a = _transition(action_id="action:a", action_tick=4)
+        transition_b = _transition(action_id="action:b", action_tick=6)
+        execution_a = _execution(core, transition_a)
+        execution_b = _execution(core, transition_b)
+
+        self.assertEqual(execution_a.source_experience_id, execution_b.source_experience_id)
+        self.assertNotEqual(execution_a.action_frame.frame_id, execution_b.action_frame.frame_id)
+        self.assertNotEqual(execution_a.action_frame.active_tick, execution_b.action_frame.active_tick)
+
+        crossed = evaluate_native_feedback(
+            execution_a, transition_b, NFPFeedbackEvaluationConfig(0.5),
+        )
+        self.assertEqual(crossed.status, FeedbackStatus.TRANSITION_MISMATCH)
+        self.assertIsNone(crossed.evidence)
+
+        positive_control = evaluate_native_feedback(
+            execution_b, transition_b, NFPFeedbackEvaluationConfig(0.5),
+        )
+        self.assertEqual(positive_control.status, FeedbackStatus.HIT)
 
     def test_no_evidence_execution_statuses(self) -> None:
         core = NFPFeedbackTargetCore.from_record(_record())
