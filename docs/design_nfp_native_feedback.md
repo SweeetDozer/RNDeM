@@ -49,6 +49,12 @@ grounded trial evidence, so both native agreement and disagreement count as a
 trial. Viability remains derived as `(hits + 1) / (hits + misses + 2)` and is
 never persisted separately.
 
+The legacy implementation increments `hits` or `misses` first and then computes
+both confidence and repeatability from those updated counters. The first native
+implementation must preserve that sequencing: classify, increment exactly one
+counter, derive both targets from the post-increment counters, then persist the
+four operational fields together.
+
 Legacy Feedback writes its JSON directly and is not the native mutation model.
 `ExpSMUpdateWriter` is a consolidation-draft metadata updater, not a native
 Feedback writer. `MemoryMutationPolicy` permits authoritative ExpSM updates only
@@ -139,6 +145,126 @@ No evidence object is fabricated for other statuses.
 `source_activation_id` is legacy trace/provenance and may remain diagnostic; it
 does not choose the persistent target and is not sufficient replay identity.
 
+## Persistent V1 Field Audit
+
+The authoritative schema below is derived from `NFPExpSMRecordV1`, its two
+metadata value objects, and its JSON adapter. `record_id` is the persistent map
+key supplied to `from_json_data`; the remaining names are JSON fields (nested
+creation fields are shown individually). Each current persistent V1 field
+appears exactly once.
+
+<!-- NFP_V1_FIELD_AUDIT_START -->
+| field | persistent? | mutable after creation? | operational metric? | immutable TargetCore field? | class and reason |
+| --- | --- | --- | --- | --- | --- |
+| `record_id` | yes, map key | no for a record | no | EXCLUDED | A: exact identity is carried separately as `source_experience_id`; duplicating it in TargetCore would blur address and content continuity. |
+| `record_kind` | yes | no | no | INCLUDED | A: `nfp_native` identifies the representation family and must still match. |
+| `representation_version` | yes | no | no | INCLUDED | A: version `1` defines the parser and structural meaning. |
+| `context_pattern` | yes | no | no | INCLUDED | B: serialized learned context is continuity-critical structure. |
+| `action_pattern` | yes | no | no | INCLUDED | B: serialized ACTION is continuity-critical structure. |
+| `effect_pattern` | yes | no | no | INCLUDED | B: serialized predicted effect is continuity-critical structure. |
+| `source_support_count` | yes, nested in `creation_metadata` | no | no | INCLUDED | C: immutable evidence support at creation identifies this learned record. |
+| `source_proposal_id` | yes, nested in `creation_metadata` | no | no | INCLUDED | C: immutable proposal provenance identifies this learned record. |
+| `created_active_tick` | yes, nested in `creation_metadata` | no | no | INCLUDED | C: immutable cognitive creation tick identifies this learned record. |
+| `initialization_profile` | yes, nested in `creation_metadata` | no | no | INCLUDED | C: immutable initialization semantics determine the record's origin. |
+| `status` | yes | yes, lifecycle/archival state | no | EXCLUDED | E: lifecycle state is independently mutable; native validity is checked before comparison, while continuity concerns learned structure. |
+| `created_at_world` | yes when present | no | no | INCLUDED | C: optional immutable store-creation provenance is parsed and round-trips unchanged across restart. |
+| `updated_at_world` | yes when present | yes on writes | no | EXCLUDED | E: write timestamp changes during legitimate operational updates. |
+| `hits` | yes | yes | yes | EXCLUDED | D: Feedback is allowed to increment it. |
+| `misses` | yes | yes | yes | EXCLUDED | D: Feedback is allowed to increment it. |
+| `confidence` | yes | yes | yes | EXCLUDED | D: Feedback recomputes it from updated counters. |
+| `repeatability` | yes | yes | yes | EXCLUDED | D: Feedback recomputes it from updated counters. |
+<!-- NFP_V1_FIELD_AUDIT_END -->
+
+`status` is validated by the V1 parser as a non-negative integer, but the legacy
+CRUD surface also treats status as lifecycle/archive state. No current native
+Feedback writer exists and the native create path initializes it rather than
+using it as learned content. The first Feedback design therefore EXCLUDES
+`status` from TargetCore. A schema-valid status-only lifecycle change does not
+make an otherwise identical learned rule stale; an archived or otherwise
+unreadable representation still fails the representation/validity gate.
+
+`created_at_world` is optional persisted creation provenance. Current creation
+materializes it once, parsers preserve it, and operational updates have no
+reason to regenerate it, so it is INCLUDED (including exact `None` versus
+string state). `updated_at_world` is explicitly a mutable write timestamp and
+is EXCLUDED.
+
+## NFPFeedbackTargetCore Exact Schema
+
+`source_experience_id` answers **which record was selected**.
+`NFPFeedbackTargetCore` answers **what immutable persistent experience
+structure was selected**. Apply requires both; TargetCore never replaces or
+duplicates the record ID.
+
+The exact conceptual TargetCore schema is:
+
+```text
+record_kind: str
+representation_version: int
+context_pattern: SerializedNFPContextV1
+action_pattern: SerializedNFPActionV1
+effect_pattern: SerializedObservedEffectV1
+source_support_count: int
+source_proposal_id: str
+created_active_tick: int
+initialization_profile: str
+created_at_world: str | None
+```
+
+These ten fields are INCLUDED. The separately carried `source_experience_id`
+and the seven EXCLUDED fields are not members: `record_id`, `status`,
+`updated_at_world`, `hits`, `misses`, `confidence`, and `repeatability`.
+Every inclusion/exclusion decision corresponds to exactly one row in the field
+audit above.
+
+Equality is exact typed structural equality after parsing canonical persistent
+JSON, including tuple order, modality, topology, values, optional timestamp and
+all creation-provenance values. `SerializedNFPContextV1`,
+`SerializedNFPActionV1`, and `SerializedObservedEffectV1` parse JSON numbers to
+validated finite Python floats and serialize those values directly; a normal
+JSON write/read round-trip does not recompute them. Exact equality is therefore
+appropriate. There is no tolerance, similarity, approximate context matching,
+content ranking, debug-label comparison, or human-name comparison.
+
+## TargetCore Origin, Propagation, And Lifetime
+
+TargetCore is constructed during retrieval/candidate creation from the same
+fresh authoritative `NFPExpSMRecordV1` that produced the native candidate. It
+is not constructed from selected ACTION alone and not first invented from the
+fresh read at Feedback apply time.
+
+The complete normative propagation chain is:
+
+```text
+authoritative NFPExpSMRecordV1 (source_experience_id=R, immutable core=C)
+-> NFP retrieval candidate (source_experience_id=R, target_core=C)
+-> selected native result (source_experience_id=R, target_core=C)
+-> remembered-action execution result (source_experience_id=R, target_core=C)
+-> native Feedback evidence (source_experience_id=R, target_core=C)
+-> fresh authoritative apply read of record R (derive C2; compare C2 == C)
+```
+
+Each hop preserves the exact typed value. Selection does not reread the store,
+and later stages MUST NOT reconstruct TargetCore from ACTION, predicted effect,
+record ID, or execution frame because those payloads omit context and creation
+provenance. The future retrieval candidate, selected result, guarded execution
+envelope/result, and Feedback evidence therefore each carry both
+`source_experience_id` and `target_core` intact through materialization, guard,
+world execution and evaluation.
+
+`NFPFeedbackTargetCore` is transient / ephemeral. Its lifetime is authoritative
+retrieval read -> selection -> execution -> explicit Feedback apply, after
+which it may be discarded. It is not a new ExpSM persisted schema field, Memory
+file, Chronicle record, or Python-object-identity requirement; typed values may
+cross freshly recreated pipeline objects or a process restart without writing
+root Memory.
+
+TargetCore is cognitively inert. It does not affect context similarity,
+threshold filtering, Activation, top-N, DecisionSelector scoring, action
+values, materialization, guard decisions, actuator signals, world physics, or
+predicted/actual comparison score. Its sole purpose is mutation-target
+continuity checking.
+
 ## Exact Target And Fresh Read
 
 Future `apply_native_feedback(...)` is a separate explicit mutation boundary.
@@ -153,21 +279,26 @@ legacy, malformed and unsupported targets fail closed as `TARGET_NOT_FOUND`,
 `TARGET_NOT_NATIVE`, `STORE_INVALID`, or
 `UNSUPPORTED_TARGET_REPRESENTATION`. No fallback record is allowed.
 
-The fresh NFP-native target's representation version and immutable core
-(context, ACTION, predicted effect, creation metadata) must equal the selected
-core captured in the evidence request. Drift is
-`STALE_OR_CHANGED_TARGET`, with no update.
+Feedback evidence contains `source_experience_id=R` and the historical
+`target_core=C`. Apply reopens the authoritative store, looks up exact `R`,
+parses and verifies NFP_NATIVE_V1, derives current core `C2`, and performs the
+exact check `C2 == C` before any operational metric mutation. Only equality may
+continue to the independent policy gate and update calculation. Policy may also
+be checked earlier for security, but permission never overrides stale-target
+detection and continuity is always verified before writing.
 
-The current `SelectedNFPExpSMExperience` does not carry serialized context or
-creation metadata. A future implementation must therefore add the narrowest
-transient typed `NFPFeedbackTargetCore` (or equivalent) captured from the exact
-selected record during retrieval, containing source ID, representation/version,
-context, ACTION, predicted effect and creation metadata. Evaluation evidence
-retains that immutable expected core for apply-time equality. It is not
-persisted, does not affect selection, and must not be reconstructed by a new
-similarity search. Without this handoff, native apply must remain unavailable;
-same-ID core consistency cannot be honestly proven from the current selected
-payload alone.
+If `R` exists but `C2 != C`, including drift in context, ACTION, predicted
+effect, any included creation field, or `created_at_world`, apply returns
+`STALE_OR_CHANGED_TARGET` with no update. It performs no similarity fallback,
+nearby-record lookup, or reconstruction. A missing exact `R` is
+`TARGET_NOT_FOUND`. A legacy, unsupported, or malformed exact target fails
+closed as `TARGET_NOT_NATIVE`, `UNSUPPORTED_TARGET_REPRESENTATION`, or
+`STORE_INVALID`; it is never reinterpreted as V1.
+
+The current `SelectedNFPExpSMExperience` does not carry serialized context,
+creation provenance, or TargetCore. Without this handoff, native apply must
+remain unavailable; same-ID continuity cannot be proven from the current
+selected payload alone.
 
 ## Native Operational Update
 
@@ -242,6 +373,16 @@ guard denial, exact selected-record-only update, unchanged top-N losers, equal
 ACTION records remaining independent, policy denial, permitted mutation,
 pre-replace failure, post-replace readback reconciliation, no blind retry,
 single-application limitation, immutable core after miss, and fresh store read.
+
+Target continuity scenarios additionally cover: unchanged `C` allows a
+policy-permitted apply; same-ID changes to context, ACTION, predicted effect,
+each included creation field, or `created_at_world` return
+`STALE_OR_CHANGED_TARGET`; changes only to `hits`, `misses`, `confidence`,
+`repeatability`, `updated_at_world`, or a schema-valid lifecycle `status` do not
+invalidate continuity. Restart coverage recreates every transient pipeline
+object and compares the carried typed value without object identity or Memory
+persistence. Missing and wrong-representation cases retain the fail-closed
+statuses above.
 
 ## Authority Boundary
 
