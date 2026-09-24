@@ -92,6 +92,13 @@ ALLOWED = {
     "docs/current_architecture_checkpoint.md", "docs/project_hygiene_audit.md",
     "tools/verify_nfp_action_materialization_guarded_execution_design.py",
     "tools/verify_nfp_expsm_operational_retrieval_design.py",
+    "clc/actuation/__init__.py",
+    "clc/actuation/remembered_action_execution.py",
+    "clc/system/mode_action_guard.py",
+    "scenarios/nfp_remembered_action_guarded_execution.json",
+    "tools/verify_nfp_remembered_action_guarded_execution.py",
+    "docs/debug_name_dependency_audit.json",
+    "tools/verify_first_closed_loop_action_consequence.py",
 }
 
 

@@ -1,9 +1,13 @@
 from dataclasses import replace
+from typing import TYPE_CHECKING
 
 from clc.action.action_candidate import ActionCandidate
 from clc.action.action_scoring import score_breakdown
 from clc.core.pattern_registry import PatternRegistry
 from clc.system.system_state import SystemState
+
+if TYPE_CHECKING:
+    from clc.actuation.remembered_action_execution import MaterializedNFPActionIntent
 
 
 MIN_CONSOLIDATION_TICKS = 3
@@ -36,6 +40,23 @@ class ModeActionGuard:
 
     def is_allowed(self, action_pattern_id: str, system_state: SystemState, tick: int) -> bool:
         return self._decision(action_pattern_id, system_state, tick)[0]
+
+    def is_native_action_allowed(
+        self,
+        action_intent: "MaterializedNFPActionIntent",
+        system_state: SystemState,
+        tick: int,
+    ) -> bool:
+        """Allow a current structural ACTION without fabricating legacy semantics."""
+        from clc.actuation.remembered_action_execution import MaterializedNFPActionIntent
+
+        if not isinstance(action_intent, MaterializedNFPActionIntent):
+            raise TypeError("action_intent must be MaterializedNFPActionIntent")
+        if not isinstance(system_state, SystemState):
+            raise TypeError("system_state must be SystemState")
+        if action_intent.action_frame.active_tick != tick:
+            return False
+        return system_state.mode == "active"
 
     def adjust_candidate(
         self,

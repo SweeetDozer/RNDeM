@@ -360,7 +360,11 @@ replay scheduling, cross-modal causal episodes, audio consequences, propriocepti
 body-state consequences, long-term NFP persistence, compression, pattern
 abstraction and stable entity formation.
 
-The isolated implementation adds typed Context support and ShortMemory.
+The isolated implementation adds typed Context support and ShortMemory. The
+remembered-action coordinator now captures the exact immutable before-context
+before world mutation, rejects occupied pending slots, and reuses the existing
+PendingCausalTransition to RecentCausalTransition path for real T+1 evidence.
+It creates no parallel causal format.
 No runtime behavior changes or automatic ContextMemory placement are added. No edits to
 clc/patterns/, clc/transduction/, clc/actuation/, Memory, semantic_core.json or
 technical_feedback_patterns.json. No apply_pending moves, retention timing

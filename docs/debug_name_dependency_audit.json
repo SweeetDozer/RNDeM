@@ -6234,7 +6234,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 20,
+      "line": 24,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6245,7 +6245,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 21,
+      "line": 25,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6256,7 +6256,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 22,
+      "line": 26,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6267,7 +6267,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 23,
+      "line": 27,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6278,7 +6278,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 24,
+      "line": 28,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6289,7 +6289,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 25,
+      "line": 29,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6300,7 +6300,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 26,
+      "line": 30,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6311,7 +6311,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 27,
+      "line": 31,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6322,7 +6322,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 28,
+      "line": 32,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6333,7 +6333,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 29,
+      "line": 33,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6344,7 +6344,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 30,
+      "line": 34,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6355,7 +6355,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 31,
+      "line": 35,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6366,7 +6366,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 32,
+      "line": 36,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -6377,7 +6377,7 @@
     {
       "classification": "debug_or_report_label",
       "kind": "debug_name_call",
-      "line": 115,
+      "line": 136,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "keep for report/debug payloads; do not use as semantic control input",
       "risk": "low",
@@ -6388,7 +6388,7 @@
     {
       "classification": "debug_output_only",
       "kind": "debug_name_call+direct_semantic_name_literal",
-      "line": 142,
+      "line": 163,
       "path": "clc/system/mode_action_guard.py",
       "recommendation": "keep debug_name for display/logging only",
       "risk": "low",

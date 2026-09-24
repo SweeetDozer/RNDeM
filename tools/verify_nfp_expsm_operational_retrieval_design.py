@@ -241,6 +241,12 @@ def main() -> int:
         "docs/design_first_closed_loop_action_consequence.md",
         "docs/design_nfp_context_and_short_memory.md",
         "tools/verify_nfp_action_materialization_guarded_execution_design.py",
+        "clc/actuation/__init__.py",
+        "clc/actuation/remembered_action_execution.py",
+        "clc/system/mode_action_guard.py",
+        "scenarios/nfp_remembered_action_guarded_execution.json",
+        "tools/verify_nfp_remembered_action_guarded_execution.py",
+        "tools/verify_first_closed_loop_action_consequence.py",
     }
     unexpected = sorted(set(changed) - allowed)
     if unexpected:

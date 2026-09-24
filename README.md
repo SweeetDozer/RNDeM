@@ -366,8 +366,10 @@ architecture/design branches should be reviewed and merged manually.
 
 ## Remembered Action Guarded-Execution Design
 
-`docs/design_nfp_action_materialization_guarded_execution.md` defines the next
-design-only NFP boundary: selection freshness, fresh ACTION_GENERATED identity,
-typed guard approval, strict actuator compatibility, world acceptance, and real
-T+1 ContextMemory closure. Execution, Feedback, writes, automatic
-retrieval-to-execution, and `_run_tick()` wiring remain unimplemented.
+`docs/design_nfp_action_materialization_guarded_execution.md` defines the isolated
+NFP boundary, now implemented behind an explicit coordinator call. Selection
+stays inert; execution creates a fresh current-tick ACTION_GENERATED occurrence,
+keeps source and frame identities separate, uses the existing typed guard and
+transducer, applies the world exactly once, and reuses real T+1 ContextMemory
+closure. Feedback, persistent writes, automatic retrieval-to-execution, and
+`_run_tick()` wiring remain unimplemented.

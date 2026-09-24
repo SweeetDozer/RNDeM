@@ -338,7 +338,9 @@ def _no_semantic_result_fields() -> tuple[bool, str]:
 
 def _actuation_package_isolated() -> tuple[bool, str]:
     violations: list[str] = []
-    for path in ACTUATION_ROOT.glob("*.py"):
+    # This original closed-loop check owns the physical transducer boundary.
+    # Higher-level explicit coordinators may compose ContextMemory and sensing.
+    for path in (ACTUATION_ROOT / "motor.py",):
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):

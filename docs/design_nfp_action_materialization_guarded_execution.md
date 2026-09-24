@@ -2,7 +2,8 @@
 
 ## Status And Scope
 
-This design-only pass starts from `v1.8.0` (`f7bbf5e`). It defines the first
+This design started from `v1.8.0` (`f7bbf5e`) and now has an explicitly invoked,
+isolated implementation in `clc/actuation/remembered_action_execution.py`. It defines the first
 isolated boundary after `SelectedNFPExpSMExperience`; it implements no executor,
 scenario, Feedback, memory mutation, automatic retrieval-to-execution, or
 `_run_tick()` wiring.
@@ -273,7 +274,7 @@ designed.
 
 ## Required Isolated Scenarios
 
-Future `scenarios/nfp_remembered_action_guarded_execution.json` covers selected
+`scenarios/nfp_remembered_action_guarded_execution.json` covers selected
 data being non-executable; freshness/staleness; fresh ID, current tick and
 ACTION_GENERATED; source ID distinct from frame ID; repeated fresh occurrences;
 distinct source IDs for equal structures; structural and actuator validation;

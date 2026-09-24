@@ -937,7 +937,8 @@ proposal/no-effect safety rather than canonical phase output.
 ## Remembered Action Guarded-Execution Design
 
 `docs/design_nfp_action_materialization_guarded_execution.md` audits the actual
-pattern-ID guard, `(2,)` transducer, world acceptance point, and pending
-lifecycle. It defines fresh identity, transient selection freshness, typed
-allow/deny guarding, and real T+1 completion. No execution, Feedback, runtime
-wiring, or memory mutation authority has been added.
+guard, `(2,)` transducer, world acceptance point, and pending lifecycle. The
+explicit isolated implementation now provides fresh identity, transient
+selection freshness, typed allow/deny guarding, exactly-once world application,
+explicit post-world tracking failure, and real T+1 completion. It has no
+Feedback, runtime wiring, or persistent-memory mutation authority.

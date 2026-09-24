@@ -21,7 +21,7 @@ The checkpoint sequence is:
 | v1.6.0 | persistent NFP-native representation survives restart |
 | v1.7.0 | policy-gated authoritative NFP-native ExpSM CREATE |
 | v1.8.0 | read-only persistent operational retrieval and competition |
-| Next | fresh materialization and guarded execution of remembered ACTION structure |
+| Implemented isolated boundary | fresh materialization and guarded execution of remembered ACTION structure |
 
 ## Actual SimilarityObserver Audit
 
@@ -350,7 +350,7 @@ the later action-materialization/execution design. Selection here means
 Remembered `SerializedNFPActionV1` is memory content, not a live ACTION
 occurrence. Selection does not open a ContextMemory causal transition, call
 `ActionTransducer`, mutate the world, or create `ACTION + ACTION_GENERATED`.
-The next separate boundary is:
+The separately implemented, explicitly invoked boundary is:
 
 ```text
 SelectedNFPExpSMExperience

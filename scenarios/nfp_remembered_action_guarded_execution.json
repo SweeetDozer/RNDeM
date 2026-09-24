@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "name": "nfp_remembered_action_guarded_execution",
+  "description": "Scenario metadata for explicitly invoked isolated guarded execution of a selected NFP-native remembered action.",
+  "runtime": {"profile": "safe_demo", "memory_is_temporary": true, "max_ticks": 0},
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "nfp_remembered_action_guarded_execution": {
+      "isolated": true,
+      "runtime_wiring": false,
+      "feedback": false,
+      "persistent_writes": false,
+      "serialized_single_threaded": true,
+      "cases": {
+        "stale_selection": true,
+        "invalid_selected_experience": true,
+        "causal_slot_occupied": true,
+        "actuator_incompatible_without_reshaping": true,
+        "guard_denied": true,
+        "transduction_rejected": true,
+        "world_execution_failed": true,
+        "post_world_tracking_failure_executed_once": true,
+        "observation_pending": true,
+        "executed_and_observed_at_t_plus_one": true,
+        "exact_before_context_retained": true,
+        "prediction_does_not_affect_physics": true,
+        "fresh_occurrence_identity": true
+      }
+    }
+  }
+}

@@ -627,8 +627,10 @@ in a later packaging pass.
 
 ## Remembered Action Guarded-Execution Design
 
-- The new design is mechanically checked by its dedicated verifier.
-- Runtime, scenarios, Memory, retrieval, selection, guard, and actuation source
-  remain unchanged.
+- The design and isolated production implementation are mechanically checked by
+  dedicated verifiers and scenario metadata.
+- Retrieval, selection, normal runtime orchestration, phase order, and Memory
+  remain unchanged; the existing guard has only a typed native allow/deny entry.
 - Persistent source identity stays distinct from fresh occurrence identity;
-  no Feedback, writes, automatic execution, or `_run_tick()` wiring is added.
+  exact before-context and exactly-once post-world failure are tested. No
+  Feedback, writes, automatic execution, or `_run_tick()` wiring is added.

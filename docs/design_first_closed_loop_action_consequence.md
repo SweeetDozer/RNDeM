@@ -762,6 +762,12 @@ Deferred:
 
 ## Safety Boundary
 
+The later isolated remembered-action implementation reuses this world and
+transducer. Successful world application is its point of no return: subsequent
+causal-tracking failure remains explicitly executed, with no rollback or
+reapplication. Actual consequence still comes only from real T+1 sensing and
+the existing `RecentCausalTransition`; stored prediction remains metadata.
+
 This design pass is documentation and verifier only. It does not implement
 actuation, does not modify `clc/patterns/`, does not modify `clc/transduction/`,
 does not create `clc/actuation/`, does not modify `_run_tick()`, does not wire
