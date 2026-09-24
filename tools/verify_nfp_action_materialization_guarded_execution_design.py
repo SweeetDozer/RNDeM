@@ -39,6 +39,51 @@ TERMS = (
     "Feedback evaluation", "writes no ExpSM, AKBSM", "does not change `_run_tick()`",
     "never call execution automatically",
 )
+HARDENED_CONTRACTS = {
+    "pre-action context capture": (
+        "captures `before_context_at_T` as the exact current",
+        "before any call to `world.apply_actuator_signal()`",
+        "frozen immutable dataclasses",
+        "retaining that exact reference is reference-safe",
+        "same object used for post-execution pending causal tracking",
+        "must never sense the mutated world or reread a replacement context",
+        "selection_context_end_tick == before_context_at_T.end_tick",
+    ),
+    "pending-slot preflight": (
+        "pending_causal_transition is None",
+        "CAUSAL_SLOT_OCCUPIED",
+        "no pending overwrite/new pending",
+        "Before world mutation, a read-only slot preflight",
+        "serialized and single-threaded",
+        "no reservation or lock",
+    ),
+    "post-execution tracking failure": (
+        "If post-world `observe_action_frame()` fails",
+        "ACTION_EXECUTED_CAUSAL_TRACKING_FAILED",
+        "execution remains true",
+        "no pending/recent transition is claimed",
+        "World success followed by tracking failure cannot become a not-executed status",
+        "`ACTION_EXECUTED_OBSERVATION_PENDING` means pending creation succeeded",
+    ),
+    "no rollback or reapplication": (
+        "no automatic rollback",
+        "actuator-signal reapplication",
+        "rematerialization, guard/transducer rerun, or remembered-action retry",
+        "world apply count == 1",
+        "no rollback or retry",
+    ),
+    "execution-boundary taxonomy": (
+        "PRE-EXECUTION / NOT EXECUTED",
+        "POST-EXECUTION / EXECUTED",
+        "`WORLD_EXECUTION_FAILED` is pre-execution only",
+    ),
+    "future injected scenarios": (
+        "injected post-world pending-creation failure",
+        "identical object is reused for pending creation",
+        "preserves the old pending",
+        "creates no fake transition",
+    ),
+}
 ALLOWED = {
     "README.md", "docs/design_nfp_action_materialization_guarded_execution.md",
     "docs/design_nfp_expsm_operational_retrieval.md",
@@ -72,6 +117,10 @@ def main() -> int:
     for required in (*SECTIONS, *TERMS):
         if " ".join(required.split()) not in normalized:
             failures.append(f"missing design contract: {required}")
+    for group, contracts in HARDENED_CONTRACTS.items():
+        for contract in contracts:
+            if " ".join(contract.split()) not in normalized:
+                failures.append(f"missing {group} contract: {contract}")
 
     guard = GUARD.read_text(encoding="utf-8")
     transducer = TRANSDUCER.read_text(encoding="utf-8")
@@ -101,7 +150,8 @@ def main() -> int:
             print(f"- {failure}")
         return 1
     print("PASS: NFP remembered-action guarded-execution design")
-    print(f"contracts={len(SECTIONS) + len(TERMS)} changed_files={len(_changed())}")
+    hardened_count = sum(len(contracts) for contracts in HARDENED_CONTRACTS.values())
+    print(f"contracts={len(SECTIONS) + len(TERMS) + hardened_count} changed_files={len(_changed())}")
     return 0
 
 

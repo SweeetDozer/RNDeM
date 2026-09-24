@@ -70,13 +70,35 @@ evidence clears without completing. `expire_pending_if_overdue()` clears after
 T+1. There is no explicit abort/clear API.
 
 The older isolated harness opens pending before world application, assuming
-validated calls succeed. That is not a general failure protocol. Remembered
-execution preflights current window, absent pending state, and equal manager,
-selection, action and world ticks; it calls the world first and opens pending
-only after normal return confirms external execution. Thus denied, rejected,
-or non-executed actions never open pending. If post-world pending registration
-still fails, report the action as executed and never reapply it; the current API
-has no transactional world handshake.
+validated calls succeed. That is not a general failure protocol. The remembered
+execution coordinator captures `before_context_at_T` as the exact current
+external sensory `NFPWindow` reference before any call to
+`world.apply_actuator_signal()`. `NFPWindow`, its frame tuple, and its
+`NFPFrame` members are frozen immutable dataclasses, so retaining that exact
+reference is reference-safe; no copy is required. It survives world mutation
+and is the same object used for post-execution pending causal tracking. The
+coordinator must never sense the mutated world or reread a replacement context
+to reconstruct "before".
+
+Before world mutation, a read-only slot preflight requires
+`ContextMemoryManager.pending_causal_transition is None`. An unresolved pending
+relation returns `CAUSAL_SLOT_OCCUPIED`: no transduction or signal application,
+no world mutation, no pending overwrite/new pending, no automatic retry, and no
+Feedback. Authoritative pending creation remains after world execution, so
+denied/rejected actions leave no pending transition.
+
+The first isolated coordinator is serialized and single-threaded: no concurrent
+actor may occupy the slot between preflight and post-world pending creation.
+Current ContextMemory has no reservation or lock, so concurrent execution is
+outside this first contract.
+
+The preflight also checks equal manager, selection, action, and world ticks. The
+world is called first and pending opens only after normal return confirms
+external execution. If post-world `observe_action_frame()` fails, return
+`ACTION_EXECUTED_CAUSAL_TRACKING_FAILED`: execution remains true, while no
+pending/recent transition is claimed. Preserve `source_experience_id`, fresh
+frame ID, action tick, and safely retained `before_context_at_T`. The current
+API has no transactional world handshake.
 
 ## Selection Freshness Contract
 
@@ -86,7 +108,8 @@ persistent ExpSM data. The first invariant is:
 
 ```text
 selection_context_end_tick
-== current ContextMemory external window end_tick
+== before_context_at_T.end_tick
+== current ContextMemory external window end_tick at capture time
 == requested action active_tick
 == external world current_tick
 ```
@@ -127,7 +150,9 @@ truncated, padded, remapped, or translated into semantic commands.
 
 ```text
 selection + tick binding
--> freshness and Context/world preflight
+-> freshness validation
+-> capture exact immutable before_context_at_T
+-> read-only pending-slot availability and Context/world tick preflight
 -> fresh ACTION occurrence
 -> actuator compatibility
 -> typed ModeActionGuard allow/deny
@@ -149,10 +174,22 @@ is `WORLD_EXECUTION_FAILED`; the first synthetic harness relies on its
 validation-before-mutation behavior. Partial-failure worlds need a later
 execution-receipt protocol.
 
+Normal return from `world.apply_actuator_signal()` is authoritative: the
+synthetic world validates all failure conditions before mutation, then mutates
+and advances its tick before returning. After this boundary there is no
+automatic rollback, world restoration, actuator-signal reapplication,
+rematerialization, guard/transducer rerun, or remembered-action retry. Any later
+recovery starts separately from a freshly observed current world state.
+
 ## Observation And Pending Semantics
 
 After normal world return, the action is executed and pending records that
-fresh occurrence against the preflighted before window. Next state comes only
+fresh occurrence against the already captured exact `before_context_at_T`.
+Pending creation must not reread or reconstruct pre-action state. If creation
+fails, `ACTION_EXECUTED_CAUSAL_TRACKING_FAILED` preserves physical execution
+truth but claims no `PendingCausalTransition`, `RecentCausalTransition`, or
+observed consequence. A later ordinary observation may occur, but this result
+cannot call it `EXECUTED_AND_OBSERVED` or guess an association. Next state comes only
 from world snapshot -> `VisualFieldTransducer` -> qualifying EXTERNAL_SENSORY
 window. Strict ACTION T -> observation T+1 remains. Reuse
 `PendingCausalTransition -> RecentCausalTransition` and explicit
@@ -164,6 +201,12 @@ and preserves unresolved pending causality. Do not pretend execution did not
 happen, clear automatically, reapply the signal, or fabricate after-state.
 Exact-T+1 delayed evidence may close it; `expire_pending_if_overdue()` handles
 time advancing past T+1.
+
+`ACTION_EXECUTED_OBSERVATION_PENDING` means pending creation succeeded but T+1
+evidence is absent. `ACTION_EXECUTED_CAUSAL_TRACKING_FAILED` means pending
+creation itself failed. Neither permits signal reapplication. Pending expiry
+releases tracking according to current manager semantics; it never rewrites
+history as "the action never happened".
 
 ## Predicted Effect And Actual Consequence
 
@@ -182,12 +225,34 @@ Future immutable `NFPRememberedActionExecutionResult` distinguishes:
 EXECUTED_AND_OBSERVED
 STALE_SELECTION
 INVALID_SELECTED_EXPERIENCE
+CAUSAL_SLOT_OCCUPIED
 ACTUATOR_INCOMPATIBLE
 GUARD_DENIED
 TRANSDUCTION_REJECTED
 WORLD_EXECUTION_FAILED
+ACTION_EXECUTED_CAUSAL_TRACKING_FAILED
 ACTION_EXECUTED_OBSERVATION_PENDING
 ```
+
+```text
+PRE-EXECUTION / NOT EXECUTED:
+    STALE_SELECTION
+    INVALID_SELECTED_EXPERIENCE
+    CAUSAL_SLOT_OCCUPIED
+    ACTUATOR_INCOMPATIBLE
+    GUARD_DENIED
+    TRANSDUCTION_REJECTED
+    WORLD_EXECUTION_FAILED
+
+POST-EXECUTION / EXECUTED:
+    ACTION_EXECUTED_CAUSAL_TRACKING_FAILED
+    ACTION_EXECUTED_OBSERVATION_PENDING
+    EXECUTED_AND_OBSERVED
+```
+
+`WORLD_EXECUTION_FAILED` is pre-execution only because the audited synthetic
+world validates failures before mutation. World success followed by tracking
+failure cannot become a not-executed status or "nothing happened" fallback.
 
 Executed results retain exact source experience ID, fresh frame ID, action
 tick, selection/activation provenance, prediction and optional real transition.
@@ -201,6 +266,10 @@ stored predicted effect + actual `RecentCausalTransition`/`ObservedEffect`, and
 may update only that source after separate review. Prediction comparison and
 hit/miss semantics are deferred. This layer writes no ExpSM, AKBSM,
 Chronicle/Letopis, hits, misses, confidence, or repeatability.
+`ACTION_EXECUTED_CAUSAL_TRACKING_FAILED` also causes no Feedback: prediction
+cannot fabricate its missing actual consequence or count as hit/miss. Even
+`EXECUTED_AND_OBSERVED` remains read-only until native Feedback is separately
+designed.
 
 ## Required Isolated Scenarios
 
@@ -213,6 +282,16 @@ or pending effect; allowed real world/sensor T+1 path; prediction/physics
 independence; pending only after execution; unresolved post-execution sensing;
 RecentCausalTransition reuse; exact source-ID preservation; and no Feedback,
 memory write, automatic execution, or `_run_tick()` wiring.
+
+Additional required future scenarios are: occupied pending returns
+`CAUSAL_SLOT_OCCUPIED` before transduction/world mutation and preserves the old
+pending; exact immutable `before_context_at_T` is captured before mutation and
+the identical object is reused for pending creation; injected post-world
+pending-creation failure returns `ACTION_EXECUTED_CAUSAL_TRACKING_FAILED`,
+retains source/frame/tick identity, creates no fake transition, and proves
+world apply count == 1 with no rollback or retry; withheld T+1 evidence after
+successful pending creation returns `ACTION_EXECUTED_OBSERVATION_PENDING`; and
+normal success closes the captured-before pending into `RecentCausalTransition`.
 
 ## Runtime And Authority Boundaries
 
