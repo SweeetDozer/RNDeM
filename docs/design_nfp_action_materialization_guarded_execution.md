@@ -301,3 +301,11 @@ no normal runtime phase/helper and does not change `_run_tick()`, selection,
 retrieval, or Feedback. Retrieval/selection never call execution automatically.
 The world sees only `ActuatorSignal`, never memory identity/history/prediction.
 The execution layer has no ExpSM, AKBSM or Chronicle writer authority.
+
+## Native Feedback Handoff
+
+`docs/design_nfp_native_feedback.md` consumes only an explicit
+`EXECUTED_AND_OBSERVED` result plus its identity-matching
+`RecentCausalTransition`. Tracking failure, pending observation and every
+non-executed status remain no-evidence, never an automatic miss. Execution does
+not invoke evaluation or persistence.

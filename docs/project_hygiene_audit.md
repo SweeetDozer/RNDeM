@@ -634,3 +634,12 @@ in a later packaging pass.
 - Persistent source identity stays distinct from fresh occurrence identity;
   exact before-context and exactly-once post-world failure are tested. No
   Feedback, writes, automatic execution, or `_run_tick()` wiring is added.
+
+## NFP-Native Feedback Design
+
+- The design audits legacy formulas, ObservedEffect bounds, policy modes,
+  transaction recovery and bounded replay behavior against current source.
+- Native HIT/MISS is structural prediction reliability only; no utility,
+  reward, neighbor reinforcement or structural rule rewrite is introduced.
+- Evaluation and mutation are separate, and no production source, scenario,
+  runtime phase or Memory file changes in this pass.

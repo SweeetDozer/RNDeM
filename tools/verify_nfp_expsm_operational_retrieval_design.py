@@ -247,6 +247,8 @@ def main() -> int:
         "scenarios/nfp_remembered_action_guarded_execution.json",
         "tools/verify_nfp_remembered_action_guarded_execution.py",
         "tools/verify_first_closed_loop_action_consequence.py",
+        "docs/design_nfp_native_feedback.md",
+        "tools/verify_nfp_native_feedback_design.py",
     }
     unexpected = sorted(set(changed) - allowed)
     if unexpected:

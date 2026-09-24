@@ -373,3 +373,12 @@ keeps source and frame identities separate, uses the existing typed guard and
 transducer, applies the world exactly once, and reuses real T+1 ContextMemory
 closure. Feedback, persistent writes, automatic retrieval-to-execution, and
 `_run_tick()` wiring remain unimplemented.
+
+## NFP-Native Feedback Design
+
+`docs/design_nfp_native_feedback.md` defines the next design-only boundary:
+actual `RecentCausalTransition` evidence is compared directly with the selected
+record's stored structural prediction. HIT/MISS means prediction reliability,
+not utility or reward. Evaluation and policy-gated persistence stay separate;
+only the exact `source_experience_id` may eventually update. No implementation,
+automatic Feedback, `_run_tick()` wiring, or persistent write is added.

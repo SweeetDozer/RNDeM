@@ -422,3 +422,11 @@ mutation authority described here: retrieval imports/calls no policy, CREATE,
 transaction, commit, update, or Feedback writer. It leaves all operational
 counters and store bytes unchanged. Native Feedback/UPDATE, action
 materialization/execution, and `_run_tick()` wiring remain deferred.
+
+## Native Feedback Update Handoff
+
+`docs/design_nfp_native_feedback.md` requires a fresh exact-ID authoritative
+read and reuse of `ExpSMStoreTransaction` for any future native operational
+update. `safe_demo` and `draft_only` deny it; `mutating_memory` may permit it.
+Post-replace `READBACK_FAILED` remains indeterminate and forbids blind retry.
+This pass implements no update writer.

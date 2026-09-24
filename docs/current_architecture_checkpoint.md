@@ -942,3 +942,12 @@ explicit isolated implementation now provides fresh identity, transient
 selection freshness, typed allow/deny guarding, exactly-once world application,
 explicit post-world tracking failure, and real T+1 completion. It has no
 Feedback, runtime wiring, or persistent-memory mutation authority.
+
+## NFP-Native Feedback Design
+
+The post-v1.9 design in `docs/design_nfp_native_feedback.md` separates real
+causal observation, signed structural effect comparison, typed reliability
+evidence and eventual exact-record mutation. Legacy semantic outcome labels are
+not reused for native classification. The current design adds no implementation,
+runtime wiring or Memory write, and autonomous use remains blocked until
+durable replay handling is designed.

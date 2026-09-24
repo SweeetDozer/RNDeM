@@ -99,6 +99,10 @@ ALLOWED = {
     "tools/verify_nfp_remembered_action_guarded_execution.py",
     "docs/debug_name_dependency_audit.json",
     "tools/verify_first_closed_loop_action_consequence.py",
+    "docs/design_nfp_native_feedback.md",
+    "docs/design_nfp_expsm_mutation_path.md",
+    "docs/design_persistent_nfp_expsm_representation.md",
+    "tools/verify_nfp_native_feedback_design.py",
 }
 
 

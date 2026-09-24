@@ -443,3 +443,8 @@ through existing Activation/top-N and typed DecisionSelector entry points.
 Transient processing IDs remain separate and equal-content records are not
 deduplicated. The consumer has no write authority, Feedback, ACTION
 materialization, guard invocation, execution, or normal runtime wiring.
+
+`docs/design_nfp_native_feedback.md` preserves V1's immutable context, ACTION,
+predicted effect and creation metadata. A future accepted event may alter only
+operational hits, misses, confidence and repeatability for the exact selected
+record; durable replay metadata is not silently added to V1.

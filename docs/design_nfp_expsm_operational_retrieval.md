@@ -470,3 +470,8 @@ authority and invokes no Feedback, ModeActionGuard, ActionTransducer, runtime,
 or writer. The real verifier AST-audits those boundaries and uses freshly
 reopened temporary mixed stores. ACTION materialization remains deferred; a
 future executable occurrence must pass the appropriate guard before execution.
+
+The guarded occurrence boundary now exists at v1.9. The next design-only
+consumer is `docs/design_nfp_native_feedback.md`: it preserves the exact
+selected `source_experience_id`; retrieval neighbors and top-N losers receive
+no Feedback merely for participating in competition.
