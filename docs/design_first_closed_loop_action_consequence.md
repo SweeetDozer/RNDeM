@@ -4,6 +4,11 @@
 
 Post-v1.2 isolated implementation complete.
 
+The later remembered-action boundary is designed separately in
+`docs/design_nfp_action_materialization_guarded_execution.md`. It reuses this
+transducer/world/sensor loop with selection freshness, a fresh occurrence,
+typed guard approval, and pending state only after world acceptance.
+
 The first mechanical action/consequence causal path is implemented under
 `clc/actuation/` with external scenario/test support in
 `scenarios/support/synthetic_closed_loop_visual_world.py`. It implements only

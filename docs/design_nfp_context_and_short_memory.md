@@ -13,6 +13,12 @@ memory layer and not active ExpSM.
 
 ## Status And Checkpoints
 
+The remembered-action design in
+`docs/design_nfp_action_materialization_guarded_execution.md` reuses this
+single pending/recent model. Since the manager has expiry but no explicit
+abort API, pending opens only after external execution and remains unresolved
+when the T+1 observation fails.
+
 Initially a design-only audit after v1.3.0 (`a72f1c2`); isolated implementation
 now exists in `clc/context/causal_transition.py`, `clc/context/short_memory.py`
 and additive methods on the existing ContextMemoryManager.

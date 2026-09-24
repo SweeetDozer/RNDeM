@@ -624,3 +624,11 @@ in a later packaging pass.
 28. Review `docs/design_first_natural_pattern_transduction.md` before
     implementing any isolated synthetic visual environment, label-free
     `VisualFieldTransducer`, or `NFPWindowAssembler`.
+
+## Remembered Action Guarded-Execution Design
+
+- The new design is mechanically checked by its dedicated verifier.
+- Runtime, scenarios, Memory, retrieval, selection, guard, and actuation source
+  remain unchanged.
+- Persistent source identity stays distinct from fresh occurrence identity;
+  no Feedback, writes, automatic execution, or `_run_tick()` wiring is added.

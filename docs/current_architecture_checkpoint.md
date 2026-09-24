@@ -933,3 +933,11 @@ proposal/no-effect safety rather than canonical phase output.
    proposal implementation pass.
 6. Review `docs/post_v0_0_2_safety_architecture_checkpoint.md` before any
    post-v0.0.2 safety tag or enabled behavior pass.
+
+## Remembered Action Guarded-Execution Design
+
+`docs/design_nfp_action_materialization_guarded_execution.md` audits the actual
+pattern-ID guard, `(2,)` transducer, world acceptance point, and pending
+lifecycle. It defines fresh identity, transient selection freshness, typed
+allow/deny guarding, and real T+1 completion. No execution, Feedback, runtime
+wiring, or memory mutation authority has been added.

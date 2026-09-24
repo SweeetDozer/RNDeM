@@ -237,6 +237,10 @@ def main() -> int:
         "clc/expsm/nfp_operational_retrieval.py",
         "scenarios/nfp_expsm_operational_retrieval.json",
         "tools/verify_nfp_expsm_operational_retrieval.py",
+        "docs/design_nfp_action_materialization_guarded_execution.md",
+        "docs/design_first_closed_loop_action_consequence.md",
+        "docs/design_nfp_context_and_short_memory.md",
+        "tools/verify_nfp_action_materialization_guarded_execution_design.py",
     }
     unexpected = sorted(set(changed) - allowed)
     if unexpected:

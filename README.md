@@ -363,3 +363,11 @@ tags `v0.0.1`, `v0.0.2`, `v0.0.3`, `v0.0.4`, `v0.0.5`, `v0.0.6`, `v0.0.7`,
 `v0.0.8`, `v0.0.9`, `v0.0.10`, `v0.0.11`, `v0.1.0`, `v0.2.0`, `v0.3.0`,
 and `v0.4.0`;
 architecture/design branches should be reviewed and merged manually.
+
+## Remembered Action Guarded-Execution Design
+
+`docs/design_nfp_action_materialization_guarded_execution.md` defines the next
+design-only NFP boundary: selection freshness, fresh ACTION_GENERATED identity,
+typed guard approval, strict actuator compatibility, world acceptance, and real
+T+1 ContextMemory closure. Execution, Feedback, writes, automatic
+retrieval-to-execution, and `_run_tick()` wiring remain unimplemented.

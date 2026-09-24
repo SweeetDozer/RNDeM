@@ -20,7 +20,8 @@ The checkpoint sequence is:
 | v1.5.0 | observed-experience evaluation and grouping |
 | v1.6.0 | persistent NFP-native representation survives restart |
 | v1.7.0 | policy-gated authoritative NFP-native ExpSM CREATE |
-| Next | read-only persistent operational retrieval and competition |
+| v1.8.0 | read-only persistent operational retrieval and competition |
+| Next | fresh materialization and guarded execution of remembered ACTION structure |
 
 ## Actual SimilarityObserver Audit
 
