@@ -481,3 +481,10 @@ The isolated Feedback-evaluation implementation now adds an inert
 authoritative record. Activation and typed selection preserve it without using
 it in similarity, thresholds, scoring, viability, ordering or top-N. Retrieval
 still invokes neither evaluation nor persistence.
+
+The separate explicit native Feedback apply boundary consumes evidence only
+after evaluation. It never receives retrieval neighbors or top-N losers: it
+fresh-loads the exact selected `source_experience_id`, requires exact
+TargetCore continuity, and updates that record alone when
+`allow_expsm_update` permits. Retrieval scoring, Activation, top-N, and
+DecisionSelector remain unchanged and never invoke apply automatically.

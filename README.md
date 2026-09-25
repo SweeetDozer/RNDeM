@@ -380,8 +380,12 @@ closure. Feedback, persistent writes, automatic retrieval-to-execution, and
 actual `RecentCausalTransition` evidence is compared directly with the selected
 record's stored structural prediction. HIT/MISS means prediction reliability,
 not utility or reward. Evaluation and policy-gated persistence stay separate;
-only the exact `source_experience_id` may eventually update. The isolated
+only the exact `source_experience_id` may update. The isolated
 implementation now carries an exact transient ten-field TargetCore from fresh
 retrieval through selection and guarded execution and exposes pure structural
-evaluation. No native apply, automatic Feedback, `_run_tick()` wiring, or
-persistent write exists.
+evaluation. A separate explicit apply writer now fresh-reads that exact ID,
+requires TargetCore continuity, and updates one hit or miss plus
+confidence/repeatability from fresh counters. `safe_demo` and `draft_only`
+deny; `mutating_memory` may write through the shared atomic transaction. There
+is no automatic Feedback/apply path, `_run_tick()` wiring, durable replay
+protection, AKBSM write, or Chronicle write.

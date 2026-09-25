@@ -253,6 +253,9 @@ def main() -> int:
         "clc/expsm/nfp_native_feedback.py",
         "scenarios/nfp_native_feedback_evaluation.json",
         "tools/verify_nfp_native_feedback_evaluation.py",
+        "clc/expsm/nfp_native_feedback_apply.py",
+        "scenarios/nfp_native_feedback_apply.json",
+        "tools/verify_nfp_native_feedback_apply.py",
     }
     unexpected = sorted(set(changed) - allowed)
     if unexpected:

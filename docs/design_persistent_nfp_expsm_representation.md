@@ -453,4 +453,9 @@ record; durable replay metadata is not silently added to V1.
 ten-field continuity projection of a parsed V1 record. It does not alter this
 persistent schema and excludes identity, lifecycle/update metadata and mutable
 operational metrics. Canonical JSON round-trip equality is covered by the real
-evaluation verifier; no native update writer exists yet.
+evaluation verifier. The explicit native Feedback apply writer now updates
+only operational `hits`, `misses`, `confidence`, `repeatability`, and
+`updated_at_world` on the exact existing ID after TargetCore continuity
+succeeds. It does not change the V1 schema, context, ACTION, prediction,
+creation provenance, status, or `created_at_world`, and adds no replay field or
+runtime wiring.

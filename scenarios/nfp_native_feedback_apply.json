@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "name": "nfp_native_feedback_apply",
+  "description": "Explicit policy-gated exact-record NFP-native Feedback apply using temporary stores only.",
+  "runtime": {"profile": "safe_demo", "memory_is_temporary": true, "max_ticks": 0},
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [17, 20, 32, 36],
+    "memory_unchanged": true,
+    "nfp_native_feedback_apply": {
+      "isolated": true,
+      "runtime_wiring": false,
+      "durable_idempotency": false,
+      "cases": {
+        "hit_and_miss_exact_counter_updates": true,
+        "exact_source_id_only": true,
+        "target_core_exact_continuity": true,
+        "stale_structural_target_rejected": true,
+        "operational_drift_accepted": true,
+        "fresh_metrics_used": true,
+        "confidence_from_updated_counters": true,
+        "repeatability_from_updated_counters": true,
+        "immutable_core_preserved": true,
+        "same_content_neighbor_unchanged": true,
+        "similar_neighbor_unchanged": true,
+        "safe_demo_denied": true,
+        "draft_only_denied": true,
+        "mutating_memory_updated": true,
+        "pre_replace_write_failed_preserves_bytes": true,
+        "post_replace_readback_failed_is_indeterminate": true,
+        "read_only_reconciliation": true,
+        "no_blind_retry": true,
+        "explicit_caller_only": true,
+        "no_automatic_evaluator_apply": true,
+        "no_execution_apply": true,
+        "no_run_tick_wiring": true
+      }
+    }
+  }
+}

@@ -950,5 +950,10 @@ causal observation, signed structural effect comparison, typed reliability
 evidence and eventual exact-record mutation. Legacy semantic outcome labels are
 not reused for native classification. Isolated production types now propagate
 the exact transient TargetCore and perform explicitly invoked pure evaluation.
-There is still no native apply, runtime wiring or Memory write, and autonomous
-use remains blocked until durable replay handling is designed.
+The explicit isolated native apply now fresh-reads the exact selected record,
+checks canonical TargetCore continuity, enforces `allow_expsm_update`, and uses
+fresh counters plus the shared atomic transaction/readback contract. It changes
+only one hit or miss and recomputed confidence/repeatability; immutable learned
+structure and neighboring records remain unchanged. There is still no
+automatic execution-to-evaluation-to-apply path, runtime wiring, durable replay
+protection, or autonomous use.

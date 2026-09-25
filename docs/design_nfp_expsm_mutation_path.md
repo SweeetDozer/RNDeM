@@ -429,4 +429,16 @@ materialization/execution, and `_run_tick()` wiring remain deferred.
 read and reuse of `ExpSMStoreTransaction` for any future native operational
 update. `safe_demo` and `draft_only` deny it; `mutating_memory` may permit it.
 Post-replace `READBACK_FAILED` remains indeterminate and forbids blind retry.
-This pass implements no update writer.
+The isolated `NFPFeedbackApplyWriter` now implements this exact-record
+operational UPDATE using the shared transaction. It fresh-loads and parses the
+source ID, requires exact TargetCore continuity, then enforces
+`allow_expsm_update`. Mutable metric drift is accepted and fresh counters are
+authoritative. One HIT or MISS increments one counter; confidence and
+repeatability use updated counters. Immutable learned structure and all other
+records are preserved.
+
+`safe_demo` and `draft_only` deny while `mutating_memory` may write.
+`WRITE_FAILED` is pre-replace and retry-safe; `READBACK_FAILED` is post-replace
+and indeterminate, with read-only reconciliation and no blind retry. No CREATE
+fallback, replay ledger, automatic Feedback path, runtime wiring, AKBSM write,
+or Chronicle write is added.

@@ -641,6 +641,12 @@ in a later packaging pass.
   transaction recovery and bounded replay behavior against current source.
 - Native HIT/MISS is structural prediction reliability only; no utility,
   reward, neighbor reinforcement or structural rule rewrite is introduced.
-- Evaluation and mutation remain separate. The isolated TargetCore/evaluator
-  production modules and scenario verifier are read-only; no runtime phase,
-  mutation policy, writer, transaction, or Memory file changed.
+- Evaluation and mutation remain separate. TargetCore/evaluator modules remain
+  read-only. The isolated apply module is the only new mutation authority: it
+  uses existing policy and transaction APIs against temporary stores in tests,
+  updates only the exact source record, and has no runtime phase or automatic
+  caller. Production Memory remains hash-guarded and unchanged.
+- Native apply intentionally has serialized caller-once semantics only. It
+  provides read-only post-readback reconciliation but no blind retry, durable
+  replay ledger, crash-safe idempotency claim, AKBSM/Chronicle authority, or
+  `_run_tick()` wiring.

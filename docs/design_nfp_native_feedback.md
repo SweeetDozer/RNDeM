@@ -267,7 +267,7 @@ continuity checking.
 
 ## Exact Target And Fresh Read
 
-Future `apply_native_feedback(...)` is a separate explicit mutation boundary.
+`NFPFeedbackApplyWriter.apply(...)` is a separate explicit mutation boundary.
 Its only target key is the selected `source_experience_id`; there is no lookup
 by similarity, context, action/effect content, hash, adjacency or top-N
 membership. Similar neighbors, top-N losers and records with identical ACTION
@@ -338,7 +338,7 @@ Evaluation is always read-only. Apply requires `allow_expsm_update`; therefore
 `safe_demo` and `draft_only` deny authoritative native Feedback while
 `mutating_memory` may permit it. No native draft mechanism is invented.
 
-The future native writer must reuse `ExpSMStoreTransaction`: path-local lock,
+The native writer reuses `ExpSMStoreTransaction`: path-local lock,
 fresh strict load, unique same-directory temporary file, complete JSON
 serialization, flush and file fsync, atomic replace, best-effort directory
 fsync and cleanup. It must add fresh readback verification around that shared
@@ -347,9 +347,27 @@ transaction rather than reuse the legacy direct writer.
 Pre-replace failure is `WRITE_FAILED` and preserves old authoritative bytes.
 Failure after replace during fresh readback is `READBACK_FAILED`: the update may
 already be authoritative, so there is no rollback and no blind retry. Read-only
-reconciliation must distinguish `CONFIRMED_PERSISTED`, `CONFIRMED_ABSENT` (not
-applied), and `UNRESOLVED_OR_STORE_INVALID`, following the existing v1.7
-contract. A confirmed persisted result must not apply the increment again.
+reconciliation distinguishes `CONFIRMED_PERSISTED`,
+`CONFIRMED_NOT_APPLIED`, and `UNRESOLVED_OR_STORE_INVALID`. A confirmed
+persisted result must not apply the increment again.
+
+## Isolated Apply Implementation Status
+
+`clc/expsm/nfp_native_feedback_apply.py` implements this explicit boundary.
+It accepts only typed HIT/MISS evidence, fresh-loads the exact source ID,
+derives the current TargetCore canonically, and requires exact equality before
+checking `allow_expsm_update`. Operational drift is accepted and calculations
+start from fresh hits, misses, confidence, and repeatability. Exactly one
+counter increments; confidence and repeatability use updated counters;
+viability is not persisted; status is preserved; and `updated_at_world` uses
+the existing UTC ISO convention.
+
+The writer builds a new frozen native record and delegates replacement to
+`ExpSMStoreTransaction`. Pre-replace failure is retry-safe `WRITE_FAILED`;
+post-replace readback failure is indeterminate and has read-only
+reconciliation. There is no blind retry, durable replay ledger, automatic
+evaluation/execution call, runtime phase, `_run_tick()` hook, AKBSM authority,
+or Chronicle authority.
 
 ## Replay Decision And Concurrency Scope
 

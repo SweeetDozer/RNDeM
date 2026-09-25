@@ -23,7 +23,8 @@ SECTIONS = (
     "## Persistent V1 Field Audit", "## NFPFeedbackTargetCore Exact Schema",
     "## TargetCore Origin, Propagation, And Lifetime",
     "## Exact Target And Fresh Read", "## Native Operational Update",
-    "## Policy And Transaction Boundary", "## Replay Decision And Concurrency Scope",
+    "## Policy And Transaction Boundary", "## Isolated Apply Implementation Status",
+    "## Replay Decision And Concurrency Scope",
     "## Required Isolated Scenarios", "## Authority Boundary",
 )
 TERMS = (
@@ -47,7 +48,7 @@ TERMS = (
     "-> remembered-action execution result", "-> native Feedback evidence",
     "-> fresh authoritative apply read of record R",
     "WRITE_FAILED", "READBACK_FAILED", "no blind retry", "CONFIRMED_PERSISTED",
-    "CONFIRMED_ABSENT", "UNRESOLVED_OR_STORE_INVALID", "serialized single application",
+    "CONFIRMED_NOT_APPLIED", "UNRESOLVED_OR_STORE_INVALID", "serialized single application",
     "no claim of crash-safe idempotency", "BLOCKS `_run_tick()`",
     "INTERNAL_REACTIVATION", "No replay field is silently added",
 )
@@ -69,6 +70,9 @@ ALLOWED = {
     "clc/actuation/remembered_action_execution.py",
     "scenarios/nfp_native_feedback_evaluation.json",
     "tools/verify_nfp_native_feedback_evaluation.py",
+    "clc/expsm/nfp_native_feedback_apply.py",
+    "scenarios/nfp_native_feedback_apply.json",
+    "tools/verify_nfp_native_feedback_apply.py",
 }
 
 V1_FIELDS = {

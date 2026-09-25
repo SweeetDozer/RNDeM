@@ -315,3 +315,9 @@ the materialized intent and every execution result while keeping it invisible
 to ACTION values, guard, transduction, actuator signal and world physics. A
 separate explicit caller may pass an eligible result and matching transition to
 the pure native evaluator; the coordinator still never invokes Feedback.
+
+An explicit policy-gated native apply writer now exists downstream of typed
+HIT/MISS evidence, but execution remains fully separated from it. The
+coordinator does not evaluate or apply Feedback, and fresh action frame/tick
+identity is evidence provenance rather than persistent mutation authority.
+There is no automatic execution-to-apply path or `_run_tick()` wiring.
