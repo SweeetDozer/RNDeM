@@ -13,6 +13,7 @@ DESIGN = ROOT / "docs/design_nfp_native_feedback_replay_idempotency.md"
 SECTIONS = (
     "## Current Duplicate-Application Failure",
     "## Execution Occurrence Identity Audit",
+    "## Execution-Status / Occurrence-ID Matrix",
     "## Canonical Feedback Event Identity",
     "## Evidence Digest Semantics",
     "## Event-Key Vs Payload Distinction",
@@ -22,11 +23,14 @@ SECTIONS = (
     "## Crash Matrix",
     "## READBACK_FAILED Retry/Reconciliation",
     "## Concurrency / Lock Scope",
+    "## Authoritative ExpSM Writer Inventory",
+    "## Two-Stage Writer / Format Migration",
     "## Event Conflict Semantics",
     "## Policy Interaction",
     "## TargetCore Interaction",
     "## Storage Growth",
     "## Backward Compatibility / Migration",
+    "## Durable Duplicate Protection Vs Pending-Event Durability",
     "## Runtime Integration Gate",
 )
 
@@ -34,12 +38,19 @@ CONTRACTS = (
     "durable at-most-once mutation per canonical Feedback event",
     "execution_occurrence_id",
     "UUIDv4",
+    "created exactly when the fresh current ACTION occurrence is successfully materialized",
+    "execution **attempt**",
+    "The ID is not proof that the world was changed",
+    "Failures before successful materialization have no occurrence ID",
+    "world.apply_actuator_signal()",
+    "never regenerated at world execution, observation, evaluation, apply, reconciliation, or retry",
     "feedback_event_identity_version = 1",
     "source_experience_id",
     "Event identity answers **which observation**",
     "FeedbackEvidenceDigestV1",
     "feedback_evidence_digest_version = 1",
     "same key + same digest -> `ALREADY_APPLIED`",
+    "`updated_at_world` remain byte/value unchanged",
     "same key + different digest -> `EVENT_CONFLICT`",
     "same occurrence + different source -> `EVENT_CONFLICT`",
     "same atomic authoritative ExpSM envelope",
@@ -54,6 +65,10 @@ CONTRACTS = (
     "`RECONCILIATION_CONFLICT`",
     "`threading.RLock`",
     "`fcntl.flock(LOCK_EX)`",
+    "`Memory/ExpSM/ExpSM_data.lock`",
+    "never on the replaceable data file inode",
+    "Linux/Fedora scoped",
+    "no RLock-only fallback",
     "same event, two threads",
     "same event, two processes",
     "persist no receipt",
@@ -62,8 +77,78 @@ CONTRACTS = (
     "retained without eviction",
     "`applied_feedback_keys[-24:]`",
     "Production Memory migration remains deferred",
+    "Stage 1 - persistence infrastructure compatibility",
+    "Stage 2 - envelope v2 and durable receipts",
+    "all authoritative writes remain in the current unversioned",
+    "downgrading it or serializing only familiar record sections is prohibited",
+    "stale S0-derived candidate as S2 and erase B",
+    "unapplied event may be lost",
+    "A receipt ledger is not a pending-event queue",
+    "pre-apply event loss is acceptable or requires a durable outbox",
+    "generated exactly once",
+    "never call the clock again",
     "automatic learning, or `_run_tick()` wiring",
 )
+
+EXECUTION_STATUSES = (
+    "STALE_SELECTION", "INVALID_SELECTED_EXPERIENCE", "CAUSAL_SLOT_OCCUPIED",
+    "ACTUATOR_INCOMPATIBLE", "GUARD_DENIED", "TRANSDUCTION_REJECTED",
+    "WORLD_EXECUTION_FAILED", "ACTION_EXECUTED_CAUSAL_TRACKING_FAILED",
+    "ACTION_EXECUTED_OBSERVATION_PENDING", "EXECUTED_AND_OBSERVED",
+)
+
+STATUS_ROWS = (
+    "| `STALE_SELECTION` | No | No | No | No |",
+    "| `INVALID_SELECTED_EXPERIENCE` | No | No | No | No |",
+    "| `CAUSAL_SLOT_OCCUPIED` | No | No | No | No |",
+    "| `ACTUATOR_INCOMPATIBLE` | Yes | Yes, same attempt UUID | No | No |",
+    "| `GUARD_DENIED` | Yes | Yes, same attempt UUID | No | No |",
+    "| `TRANSDUCTION_REJECTED` | Yes | Yes, same attempt UUID | No | No |",
+    "| `WORLD_EXECUTION_FAILED` | Yes | Yes, same attempt UUID | No successful execution | No |",
+    "| `ACTION_EXECUTED_CAUSAL_TRACKING_FAILED` | Yes | Yes, fixed physical UUID | Yes | No grounded observation, so no |",
+    "| `ACTION_EXECUTED_OBSERVATION_PENDING` | Yes | Yes, fixed physical UUID | Yes | Not yet; only after a matching completed transition |",
+    "| `EXECUTED_AND_OBSERVED` | Yes | Yes, fixed physical UUID | Yes | Yes, subject to valid evaluator evidence |",
+)
+
+CRASH_POINTS = (
+    "Before transaction begins",
+    "After in-process RLock acquisition",
+    "After interprocess flock acquisition",
+    "After fresh authoritative read",
+    "After receipt lookup confirms absent",
+    "After target lookup / representation validation",
+    "After TargetCore validation",
+    "After policy validation",
+    "After fresh operational metrics read",
+    "After intended record + receipt constructed",
+    "During temp-file write",
+    "After file flush, before file fsync",
+    "After file fsync, before atomic replace",
+    "Immediately before atomic replace",
+    "Immediately after atomic replace",
+    "After replace, before directory fsync",
+    "After best-effort directory fsync, before readback",
+    "During readback",
+    "After successful readback",
+    "After result construction, before caller receives it",
+)
+
+MATRIX_COLUMNS = (
+    "Crash point", "Authoritative record", "Authoritative receipt",
+    "Mutation may already be authoritative?", "Blind mutation retry safe?",
+    "Reconciliation required?", "Later retry behavior",
+    "Visible result / uncertainty",
+)
+
+WRITER_INVENTORY = {
+    "NFPExpSMCreateWriter": ("clc/experience/expsm_native_create.py", "write_complete_store"),
+    "NFPFeedbackApplyWriter": ("clc/expsm/nfp_native_feedback_apply.py", "write_complete_store"),
+    "ExpSMCommitWriter": ("clc/consolidation/expsm_commit_writer.py", "write_complete_store"),
+    "ExpSMUpdateWriter": ("clc/consolidation/expsm_update_writer.py", "temp_path.replace(path)"),
+    "ValueFeedbackUpdateWriter": ("clc/evaluation/value_feedback_update_writer.py", "temp_path.replace(path)"),
+    "ExpSMOutcomeFeedback": ("clc/expsm/expsm_outcome_feedback.py", "tmp_path.replace(self.expsm_path)"),
+    "ExpSMCRUD": ("Memory/ExpSM/Exp_CRUD.py", 'self.data_file.open("w"'),
+}
 
 ALLOWED = {
     "docs/design_nfp_native_feedback_replay_idempotency.md",
@@ -119,6 +204,39 @@ def main() -> int:
     for requirement in (*SECTIONS, *CONTRACTS):
         if " ".join(requirement.split()) not in normalized:
             failures.append(f"missing design contract: {requirement}")
+    for status in EXECUTION_STATUSES:
+        if f"`{status}`" not in design:
+            failures.append(f"execution-status matrix missing: {status}")
+    for row in STATUS_ROWS:
+        if row not in design:
+            failures.append(f"execution-status matrix semantics drifted: {row}")
+    for point in CRASH_POINTS:
+        if point not in design:
+            failures.append(f"crash matrix missing point: {point}")
+            continue
+        matrix_row = next((line for line in design.splitlines() if line.startswith(f"| {point} |")), "")
+        if len(matrix_row.strip().strip("|").split("|")) != len(MATRIX_COLUMNS):
+            failures.append(f"crash matrix row has wrong dimension count: {point}")
+    for column in MATRIX_COLUMNS:
+        if column not in design:
+            failures.append(f"crash matrix missing dimension: {column}")
+    lock_order = (
+        "acquire the existing process-wide/path-local in-process `RLock`",
+        "open the stable sibling lock file",
+        "acquire `fcntl.flock(lock_fd, LOCK_EX)`",
+        "fresh-read",
+        "release flock",
+        "close the lock file",
+        "release the in-process `RLock`",
+    )
+    positions = [design.find(term) for term in lock_order]
+    if any(position < 0 for position in positions) or positions != sorted(positions):
+        failures.append("canonical lock acquisition/release order is missing or inconsistent")
+    for writer in WRITER_INVENTORY:
+        if f"`{writer}`" not in design and writer != "ExpSMCRUD":
+            failures.append(f"writer migration inventory missing: {writer}")
+        if writer == "ExpSMCRUD" and "ExpSMCRUD" not in design:
+            failures.append("writer migration inventory missing: ExpSMCRUD")
 
     ids = _source("clc/core/ids.py")
     runtime = _source("clc/runtime/clc_runtime.py")
@@ -168,6 +286,9 @@ def main() -> int:
             "transition_id: str", "action_frame: NFPFrame", "action_tick: int",
             "observation_tick: int",
         )),
+        "all guarded execution statuses audited": all(
+            f"{status} =" in execution for status in EXECUTION_STATUSES
+        ),
         "evidence currently lacks occurrence UUID": "execution_occurrence_id" not in evidence_fields,
         "current apply has no durable receipt": (
             "native_feedback_receipts" not in apply
@@ -204,6 +325,11 @@ def main() -> int:
         )),
         "runtime has no native Feedback wiring": "NFPFeedback" not in runtime,
     }
+    for writer, (relative, write_marker) in WRITER_INVENTORY.items():
+        writer_source = _source(relative)
+        facts[f"authoritative writer exists: {writer}"] = (
+            f"class {writer}" in writer_source and write_marker in writer_source
+        )
     failures.extend(f"source fact drifted: {name}" for name, ok in facts.items() if not ok)
 
     store = json.loads((ROOT / "Memory/ExpSM/ExpSM_data.json").read_text(encoding="utf-8"))
