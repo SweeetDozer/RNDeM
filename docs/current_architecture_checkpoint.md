@@ -945,6 +945,13 @@ Feedback, runtime wiring, or persistent-memory mutation authority.
 
 ## NFP-Native Feedback Design
 
+Checkpoint `v1.10.0` (`e5b703b`) marks the first complete explicit grounded
+NFP-native learning loop: persistent experience -> retrieval/competition ->
+exact selected experience -> guarded physical action -> real causal observation
+-> structural prediction/reality Feedback -> policy-gated exact-record
+operational update. It has no autonomous wiring and no durable duplicate
+protection; apply still assumes caller-serialized single application.
+
 The post-v1.9 design in `docs/design_nfp_native_feedback.md` separates real
 causal observation, signed structural effect comparison, typed reliability
 evidence and eventual exact-record mutation. Legacy semantic outcome labels are
@@ -957,3 +964,10 @@ only one hit or miss and recomputed confidence/repeatability; immutable learned
 structure and neighboring records remain unchanged. There is still no
 automatic execution-to-evaluation-to-apply path, runtime wiring, durable replay
 protection, or autonomous use.
+
+`docs/design_nfp_native_feedback_replay_idempotency.md` is the design-only next
+gate. Source audit rejects process-local frame/tick identity and chooses an
+execution-originated occurrence UUID plus a separate evidence digest. The
+future persistence architecture is a versioned top-level ExpSM receipt ledger
+committed atomically with the exact record update under shared process and OS
+locks. `NFP_NATIVE_V1`, production Memory, and `_run_tick()` remain unchanged.

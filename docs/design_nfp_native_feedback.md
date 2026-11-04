@@ -371,16 +371,22 @@ or Chronicle authority.
 
 ## Replay Decision And Concurrency Scope
 
-No current mechanism provides unbounded durable native execution-evidence
-deduplication. The first isolated implementation therefore uses explicit path
-B: serialized single application by the caller, no automatic retry, and no
-claim of crash-safe idempotency. The occurrence identity is conceptually
-`(source_experience_id, action_frame_id, action_tick)` plus canonical transition
-identity, never effect content alone.
+`v1.10.0` contains the explicit policy-gated apply boundary. No current
+mechanism provides unbounded durable native execution-evidence deduplication.
+The implementation therefore still requires serialized single application by
+the caller, no automatic retry, and no claim of crash-safe idempotency. Source
+audit subsequently proved that action frame ID, transition ID, and active tick
+are process-local/restart-reusable; their tuple is not an approved durable
+occurrence identity.
 
 This limitation is mechanically required and BLOCKS `_run_tick()` or autonomous
 Feedback wiring until durable replay protection and schema/version consequences
 are separately designed. No replay field is silently added to NFP_NATIVE_V1.
+The concrete next-gate design is
+`docs/design_nfp_native_feedback_replay_idempotency.md`: an
+execution-originated occurrence UUID, separate canonical evidence digest, and
+an atomic versioned ExpSM-envelope receipt ledger. It is not implemented in
+this pass, so automatic runtime learning remains prohibited.
 
 ## Required Isolated Scenarios
 

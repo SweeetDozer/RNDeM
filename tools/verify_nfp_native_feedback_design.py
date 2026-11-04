@@ -73,6 +73,8 @@ ALLOWED = {
     "clc/expsm/nfp_native_feedback_apply.py",
     "scenarios/nfp_native_feedback_apply.json",
     "tools/verify_nfp_native_feedback_apply.py",
+    "docs/design_nfp_native_feedback_replay_idempotency.md",
+    "tools/verify_nfp_native_feedback_replay_idempotency_design.py",
 }
 
 V1_FIELDS = {
