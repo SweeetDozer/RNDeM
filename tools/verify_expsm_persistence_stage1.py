@@ -49,6 +49,32 @@ WRITER_MUTATION_METHODS = {
     "ExpSMCRUD": "create_experience",
 }
 
+CRUD_DECORATED_MUTATION_METHODS = {
+    "create_experience",
+    "update_experience",
+    "delete_experience",
+    "create_reflex",
+    "update_reflex",
+    "delete_reflex",
+    "experience_to_reflex",
+    "reflex_to_experience",
+    "record_experience_hit",
+    "record_experience_miss",
+    "record_reflex_hit",
+    "record_reflex_miss",
+}
+
+CRUD_READ_ONLY_METHODS = {
+    "load",
+    "get_all",
+    "get_experience",
+    "get_reflexes",
+    "read_experience",
+    "find_experience",
+    "read_reflex",
+    "find_reflexes",
+}
+
 PREFLIGHT_WRITERS = {
     "ExpSMCommitWriter",
     "ExpSMUpdateWriter",
@@ -78,6 +104,23 @@ class ASTAuditResult:
     transaction_violations: tuple[str, ...]
     preflight_violations: tuple[str, ...]
     store_order_violations: tuple[str, ...]
+    decorator_helpers_resolved: int
+    decorator_wrappers_audited: int
+    decorator_boundaries_verified: int
+    decorator_fresh_loads_verified: int
+    decorator_orderings_verified: int
+    crud_mutation_methods_audited: int
+    crud_read_only_methods_excluded: int
+
+
+@dataclass(frozen=True)
+class DecoratorAuditResult:
+    helpers_resolved: int
+    wrappers_audited: int
+    boundaries_verified: int
+    fresh_loads_verified: int
+    orderings_verified: int
+    violations: tuple[str, ...]
 
 
 def _call_name(node: ast.Call) -> str | None:
@@ -116,6 +159,134 @@ def _decorator_names(method: ast.FunctionDef) -> set[str]:
     return names
 
 
+def _is_self_transaction_call(node: ast.Call, method_name: str) -> bool:
+    function = node.func
+    return (
+        isinstance(function, ast.Attribute)
+        and function.attr == method_name
+        and isinstance(function.value, ast.Attribute)
+        and function.value.attr == "transaction"
+        and isinstance(function.value.value, ast.Name)
+        and function.value.value.id == "self"
+    )
+
+
+def _matching_transaction_with(node: ast.AST) -> ast.With | None:
+    for candidate in ast.walk(node):
+        if not isinstance(candidate, ast.With):
+            continue
+        for item in candidate.items:
+            expression = item.context_expr
+            if isinstance(expression, ast.Call) and _is_self_transaction_call(expression, "mutation"):
+                return candidate
+    return None
+
+
+def _statement_call_index(statements: list[ast.stmt], predicate: object) -> int | None:
+    for index, statement in enumerate(statements):
+        for candidate in ast.walk(statement):
+            if isinstance(candidate, ast.Call) and predicate(candidate):
+                return index
+    return None
+
+
+def _audit_authoritative_mutation_helper(tree: ast.Module) -> DecoratorAuditResult:
+    violations: list[str] = []
+    helpers = [
+        node for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "authoritative_mutation"
+    ]
+    if len(helpers) != 1:
+        return DecoratorAuditResult(0, 0, 0, 0, 0, ("authoritative_mutation: expected one helper",))
+    helper = helpers[0]
+    helpers_resolved = 1
+    if not helper.args.args:
+        return DecoratorAuditResult(1, 0, 0, 0, 0, ("authoritative_mutation: missing method parameter",))
+    original_name = helper.args.args[0].arg
+    wrappers = [
+        node for node in helper.body
+        if isinstance(node, ast.FunctionDef) and node.name == "wrapped"
+    ]
+    if len(wrappers) != 1:
+        return DecoratorAuditResult(1, 0, 0, 0, 0, ("authoritative_mutation: expected one wrapped function",))
+    wrapper = wrappers[0]
+    wrappers_audited = 1
+    boundary = _matching_transaction_with(wrapper)
+    if boundary is None:
+        return DecoratorAuditResult(1, 1, 0, 0, 0, ("authoritative_mutation.wrapped: missing transaction boundary",))
+    boundaries_verified = 1
+
+    boundary_index = next(
+        index for index, statement in enumerate(wrapper.body)
+        if boundary is statement or boundary in tuple(ast.walk(statement))
+    )
+    before_boundary = wrapper.body[:boundary_index]
+    if _statement_call_index(
+        before_boundary,
+        lambda call: _is_self_transaction_call(call, "load_for_mutation_strict"),
+    ) is not None:
+        violations.append("authoritative_mutation.wrapped: fresh load occurs before transaction")
+    if _statement_call_index(
+        before_boundary,
+        lambda call: isinstance(call.func, ast.Name) and call.func.id == original_name,
+    ) is not None:
+        violations.append("authoritative_mutation.wrapped: original method called before transaction")
+
+    fresh_index: int | None = None
+    for index, statement in enumerate(boundary.body):
+        for candidate in ast.walk(statement):
+            if not isinstance(candidate, (ast.Assign, ast.AnnAssign)):
+                continue
+            value = candidate.value
+            targets = candidate.targets if isinstance(candidate, ast.Assign) else [candidate.target]
+            if not isinstance(value, ast.Call) or not _is_self_transaction_call(value, "load_for_mutation_strict"):
+                continue
+            if any(
+                isinstance(target, ast.Attribute)
+                and target.attr == "data"
+                and isinstance(target.value, ast.Name)
+                and target.value.id == "self"
+                for target in targets
+            ):
+                fresh_index = index
+                break
+        if fresh_index is not None:
+            break
+    fresh_loads_verified = 1 if fresh_index is not None else 0
+    if fresh_index is None:
+        violations.append("authoritative_mutation.wrapped: fresh load is not assigned to self.data inside transaction")
+
+    original_index = _statement_call_index(
+        boundary.body,
+        lambda call: isinstance(call.func, ast.Name) and call.func.id == original_name,
+    )
+    if original_index is None:
+        violations.append("authoritative_mutation.wrapped: original method is not called inside transaction")
+    orderings_verified = 0
+    if fresh_index is not None and original_index is not None:
+        if fresh_index < original_index:
+            orderings_verified = 1
+        else:
+            violations.append("authoritative_mutation.wrapped: original method is called before fresh load")
+
+    returned_wrapped = any(
+        isinstance(statement, ast.Return)
+        and isinstance(statement.value, ast.Name)
+        and statement.value.id == wrapper.name
+        for statement in helper.body
+    )
+    if not returned_wrapped:
+        violations.append("authoritative_mutation: audited wrapper is not returned")
+    return DecoratorAuditResult(
+        helpers_resolved,
+        wrappers_audited,
+        boundaries_verified,
+        fresh_loads_verified,
+        orderings_verified,
+        tuple(violations),
+    )
+
+
 def _low_level_write_calls(method: ast.FunctionDef) -> list[str]:
     calls: list[str] = []
     for node in ast.walk(method):
@@ -148,6 +319,13 @@ def _audit_writer_ast() -> ASTAuditResult:
     transaction_violations: list[str] = []
     preflight_violations: list[str] = []
     store_order_violations: list[str] = []
+    decorator_helpers_resolved = 0
+    decorator_wrappers_audited = 0
+    decorator_boundaries_verified = 0
+    decorator_fresh_loads_verified = 0
+    decorator_orderings_verified = 0
+    crud_mutation_methods_audited = 0
+    crud_read_only_methods_excluded = 0
 
     for class_name, relative in WRITERS.items():
         tree = ast.parse((ROOT / relative).read_text(encoding="utf-8"), filename=relative)
@@ -172,7 +350,42 @@ def _audit_writer_ast() -> ASTAuditResult:
             continue
 
         boundary_index = _mutation_with_index(mutation_method)
-        decorator_boundary = "authoritative_mutation" in _decorator_names(mutation_method)
+        decorator_boundary = False
+        if class_name == "ExpSMCRUD":
+            decorator_audit = _audit_authoritative_mutation_helper(tree)
+            decorator_helpers_resolved += decorator_audit.helpers_resolved
+            decorator_wrappers_audited += decorator_audit.wrappers_audited
+            decorator_boundaries_verified += decorator_audit.boundaries_verified
+            decorator_fresh_loads_verified += decorator_audit.fresh_loads_verified
+            decorator_orderings_verified += decorator_audit.orderings_verified
+            transaction_violations.extend(decorator_audit.violations)
+            for name in CRUD_DECORATED_MUTATION_METHODS:
+                method = methods.get(name)
+                if not isinstance(method, ast.FunctionDef):
+                    transaction_violations.append(f"ExpSMCRUD.{name}: missing mutation method")
+                    continue
+                if _decorator_names(method) != {"authoritative_mutation"}:
+                    transaction_violations.append(f"ExpSMCRUD.{name}: exact decorator missing")
+                    continue
+                crud_mutation_methods_audited += 1
+            save = methods.get("save")
+            if not isinstance(save, ast.FunctionDef) or _mutation_with_index(save) is None:
+                transaction_violations.append("ExpSMCRUD.save: direct transaction boundary missing")
+            else:
+                crud_mutation_methods_audited += 1
+            for name in CRUD_READ_ONLY_METHODS:
+                method = methods.get(name)
+                if not isinstance(method, ast.FunctionDef):
+                    transaction_violations.append(f"ExpSMCRUD.{name}: missing read-only method")
+                    continue
+                if "authoritative_mutation" in _decorator_names(method) or _mutation_with_index(method) is not None:
+                    transaction_violations.append(f"ExpSMCRUD.{name}: read-only method enters mutation boundary")
+                    continue
+                crud_read_only_methods_excluded += 1
+            decorator_boundary = (
+                not decorator_audit.violations
+                and crud_mutation_methods_audited == len(CRUD_DECORATED_MUTATION_METHODS) + 1
+            )
         if boundary_index is None and not decorator_boundary:
             transaction_violations.append(f"{class_name}.{mutation_name}: no transaction boundary")
         else:
@@ -212,6 +425,13 @@ def _audit_writer_ast() -> ASTAuditResult:
         transaction_violations=tuple(transaction_violations),
         preflight_violations=tuple(preflight_violations),
         store_order_violations=tuple(store_order_violations),
+        decorator_helpers_resolved=decorator_helpers_resolved,
+        decorator_wrappers_audited=decorator_wrappers_audited,
+        decorator_boundaries_verified=decorator_boundaries_verified,
+        decorator_fresh_loads_verified=decorator_fresh_loads_verified,
+        decorator_orderings_verified=decorator_orderings_verified,
+        crud_mutation_methods_audited=crud_mutation_methods_audited,
+        crud_read_only_methods_excluded=crud_read_only_methods_excluded,
     )
 
 
@@ -434,6 +654,62 @@ class ExpSMStage1Tests(unittest.TestCase):
         self.assertEqual(production_store.read_bytes(), before)
         self.assertFalse(production_lock.exists())
 
+    def test_crud_decorator_ast_rejects_broken_helper_ordering(self) -> None:
+        snippets = {
+            "no_transaction": """
+def authoritative_mutation(method):
+    def wrapped(self, *args, **kwargs):
+        return method(self, *args, **kwargs)
+    return wrapped
+""",
+            "no_fresh_load": """
+def authoritative_mutation(method):
+    def wrapped(self, *args, **kwargs):
+        with self.transaction.mutation():
+            return method(self, *args, **kwargs)
+    return wrapped
+""",
+            "fresh_before_transaction": """
+def authoritative_mutation(method):
+    def wrapped(self, *args, **kwargs):
+        self.data = self.transaction.load_for_mutation_strict()
+        with self.transaction.mutation():
+            return method(self, *args, **kwargs)
+    return wrapped
+""",
+            "method_before_fresh": """
+def authoritative_mutation(method):
+    def wrapped(self, *args, **kwargs):
+        with self.transaction.mutation():
+            result = method(self, *args, **kwargs)
+            self.data = self.transaction.load_for_mutation_strict()
+            return result
+    return wrapped
+""",
+        }
+        for name, source in snippets.items():
+            with self.subTest(name=name):
+                audit = _audit_authoritative_mutation_helper(ast.parse(source))
+                self.assertTrue(audit.violations)
+
+        correct = ast.parse(
+            """
+def authoritative_mutation(method):
+    def wrapped(self, *args, **kwargs):
+        with self.transaction.mutation():
+            self.data = self.transaction.load_for_mutation_strict()
+            return method(self, *args, **kwargs)
+    return wrapped
+"""
+        )
+        audit = _audit_authoritative_mutation_helper(correct)
+        self.assertEqual(audit.violations, ())
+        self.assertEqual(audit.helpers_resolved, 1)
+        self.assertEqual(audit.wrappers_audited, 1)
+        self.assertEqual(audit.boundaries_verified, 1)
+        self.assertEqual(audit.fresh_loads_verified, 1)
+        self.assertEqual(audit.orderings_verified, 1)
+
     def test_spawned_processes_preserve_same_and_different_record_updates(self) -> None:
         context = multiprocessing.get_context("spawn")
         for records, jobs, expected in (
@@ -475,6 +751,16 @@ class ExpSMStage1Tests(unittest.TestCase):
         self.assertEqual(audit.transaction_violations, ())
         self.assertEqual(audit.preflight_violations, ())
         self.assertEqual(audit.store_order_violations, ())
+        self.assertEqual(audit.decorator_helpers_resolved, 1)
+        self.assertEqual(audit.decorator_wrappers_audited, 1)
+        self.assertEqual(audit.decorator_boundaries_verified, 1)
+        self.assertEqual(audit.decorator_fresh_loads_verified, 1)
+        self.assertEqual(audit.decorator_orderings_verified, 1)
+        self.assertEqual(
+            audit.crud_mutation_methods_audited,
+            len(CRUD_DECORATED_MUTATION_METHODS) + 1,
+        )
+        self.assertEqual(audit.crud_read_only_methods_excluded, len(CRUD_READ_ONLY_METHODS))
         for class_name, relative in WRITERS.items():
             source = (ROOT / relative).read_text(encoding="utf-8")
             self.assertNotIn("execution_occurrence_id", source)
@@ -505,7 +791,14 @@ def main() -> int:
         f"direct_write_violations={len(audit.direct_write_violations)} "
         f"transaction_violations={len(audit.transaction_violations)} "
         f"preflight_violations={len(audit.preflight_violations)} "
-        f"store_order_violations={len(audit.store_order_violations)}"
+        f"store_order_violations={len(audit.store_order_violations)} "
+        f"decorator_helpers_resolved={audit.decorator_helpers_resolved} "
+        f"decorator_wrappers_audited={audit.decorator_wrappers_audited} "
+        f"decorator_boundaries_verified={audit.decorator_boundaries_verified} "
+        f"decorator_fresh_loads_verified={audit.decorator_fresh_loads_verified} "
+        f"decorator_orderings_verified={audit.decorator_orderings_verified} "
+        f"crud_mutation_methods_audited={audit.crud_mutation_methods_audited} "
+        f"crud_read_only_methods_excluded={audit.crud_read_only_methods_excluded}"
     )
     return 0
 
