@@ -8,6 +8,7 @@ import sys
 import tempfile
 import time
 import unittest
+from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -38,9 +39,188 @@ WRITERS = {
     "ExpSMCRUD": "Memory/ExpSM/Exp_CRUD.py",
 }
 
+WRITER_MUTATION_METHODS = {
+    "NFPExpSMCreateWriter": "create",
+    "NFPFeedbackApplyWriter": "apply",
+    "ExpSMCommitWriter": "run",
+    "ExpSMUpdateWriter": "run",
+    "ValueFeedbackUpdateWriter": "run",
+    "ExpSMOutcomeFeedback": "run",
+    "ExpSMCRUD": "create_experience",
+}
+
+PREFLIGHT_WRITERS = {
+    "ExpSMCommitWriter",
+    "ExpSMUpdateWriter",
+    "ValueFeedbackUpdateWriter",
+    "ExpSMOutcomeFeedback",
+}
+
+APPROVED_DRAFT_WRITE_HELPERS = {
+    ("ExpSMCommitWriter", "_atomic_write_json"),
+    ("ExpSMUpdateWriter", "_atomic_write_json"),
+}
+
+AUTHORITATIVE_ACCESS_CALLS = {
+    "load_for_mutation_strict",
+    "load_state_strict",
+    "_load_expsm_store",
+    "_load_data",
+    "write_complete_store",
+}
+
+
+@dataclass(frozen=True)
+class ASTAuditResult:
+    writer_definitions: int
+    mutation_paths: int
+    direct_write_violations: tuple[str, ...]
+    transaction_violations: tuple[str, ...]
+    preflight_violations: tuple[str, ...]
+    store_order_violations: tuple[str, ...]
+
+
+def _call_name(node: ast.Call) -> str | None:
+    function = node.func
+    if isinstance(function, ast.Name):
+        return function.id
+    if isinstance(function, ast.Attribute):
+        return function.attr
+    return None
+
+
+def _contains_call(node: ast.AST, names: set[str]) -> bool:
+    return any(
+        isinstance(candidate, ast.Call) and _call_name(candidate) in names
+        for candidate in ast.walk(node)
+    )
+
+
+def _mutation_with_index(method: ast.FunctionDef) -> int | None:
+    for index, statement in enumerate(method.body):
+        for candidate in ast.walk(statement):
+            if not isinstance(candidate, (ast.With, ast.AsyncWith)):
+                continue
+            if any(_contains_call(item.context_expr, {"mutation"}) for item in candidate.items):
+                return index
+    return None
+
+
+def _decorator_names(method: ast.FunctionDef) -> set[str]:
+    names: set[str] = set()
+    for decorator in method.decorator_list:
+        if isinstance(decorator, ast.Name):
+            names.add(decorator.id)
+        elif isinstance(decorator, ast.Attribute):
+            names.add(decorator.attr)
+    return names
+
+
+def _low_level_write_calls(method: ast.FunctionDef) -> list[str]:
+    calls: list[str] = []
+    for node in ast.walk(method):
+        if not isinstance(node, ast.Call):
+            continue
+        name = _call_name(node)
+        if name in {"replace", "rename"} and len(node.args) == 1:
+            calls.append(name)
+        elif name in {"write_text", "write_bytes"}:
+            calls.append(name)
+        elif name == "open" and node.args:
+            mode_index = 0 if isinstance(node.func, ast.Attribute) else 1
+            mode = node.args[mode_index] if len(node.args) > mode_index else None
+            if isinstance(mode, ast.Constant) and isinstance(mode.value, str):
+                if "w" in mode.value or "a" in mode.value:
+                    calls.append("open_write")
+        elif name == "open":
+            for keyword in node.keywords:
+                if keyword.arg == "mode" and isinstance(keyword.value, ast.Constant):
+                    value = keyword.value.value
+                    if isinstance(value, str) and ("w" in value or "a" in value):
+                        calls.append("open_write")
+    return calls
+
+
+def _audit_writer_ast() -> ASTAuditResult:
+    definitions = 0
+    mutation_paths = 0
+    direct_write_violations: list[str] = []
+    transaction_violations: list[str] = []
+    preflight_violations: list[str] = []
+    store_order_violations: list[str] = []
+
+    for class_name, relative in WRITERS.items():
+        tree = ast.parse((ROOT / relative).read_text(encoding="utf-8"), filename=relative)
+        classes = [
+            node for node in tree.body
+            if isinstance(node, ast.ClassDef) and node.name == class_name
+        ]
+        if len(classes) != 1:
+            transaction_violations.append(f"{class_name}: expected one class definition")
+            continue
+        definitions += 1
+        class_node = classes[0]
+        methods = {
+            node.name: node
+            for node in class_node.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+        mutation_name = WRITER_MUTATION_METHODS[class_name]
+        mutation_method = methods.get(mutation_name)
+        if not isinstance(mutation_method, ast.FunctionDef):
+            transaction_violations.append(f"{class_name}.{mutation_name}: missing method")
+            continue
+
+        boundary_index = _mutation_with_index(mutation_method)
+        decorator_boundary = "authoritative_mutation" in _decorator_names(mutation_method)
+        if boundary_index is None and not decorator_boundary:
+            transaction_violations.append(f"{class_name}.{mutation_name}: no transaction boundary")
+        else:
+            mutation_paths += 1
+
+        if class_name in PREFLIGHT_WRITERS:
+            if boundary_index is None or boundary_index == 0:
+                preflight_violations.append(f"{class_name}.{mutation_name}: no early preflight")
+            else:
+                preflight = mutation_method.body[:boundary_index]
+                if not any(isinstance(statement, ast.If) for statement in preflight):
+                    preflight_violations.append(f"{class_name}.{mutation_name}: preflight lacks early if")
+                for statement in preflight:
+                    if _contains_call(statement, AUTHORITATIVE_ACCESS_CALLS):
+                        store_order_violations.append(
+                            f"{class_name}.{mutation_name}: authoritative access before transaction"
+                        )
+
+        for method_name, method in methods.items():
+            low_level = _low_level_write_calls(method)
+            if not low_level:
+                continue
+            if (class_name, method_name) not in APPROVED_DRAFT_WRITE_HELPERS:
+                direct_write_violations.append(
+                    f"{class_name}.{method_name}: {','.join(sorted(low_level))}"
+                )
+                continue
+            if not _contains_call(method, {"write_complete_store"}):
+                direct_write_violations.append(
+                    f"{class_name}.{method_name}: draft helper lacks authoritative delegation"
+                )
+
+    return ASTAuditResult(
+        writer_definitions=definitions,
+        mutation_paths=mutation_paths,
+        direct_write_violations=tuple(direct_write_violations),
+        transaction_violations=tuple(transaction_violations),
+        preflight_violations=tuple(preflight_violations),
+        store_order_violations=tuple(store_order_violations),
+    )
+
 
 class _ForbiddenTransaction:
+    def __init__(self) -> None:
+        self.entries = 0
+
     def mutation(self) -> object:
+        self.entries += 1
         raise AssertionError("denied/no-work call entered ExpSM transaction")
 
 
@@ -133,8 +313,13 @@ class ExpSMStage1Tests(unittest.TestCase):
             {"store_schema_version": 2, **legacy, "native_feedback_receipts": []},
         ):
             self._write(invalid)
+            before = self.path.read_bytes()
             with self.assertRaises(ExpSMStoreInvalidError):
                 transaction.load_state_strict()
+            with transaction.mutation():
+                with self.assertRaises(ExpSMStoreInvalidError):
+                    transaction.load_for_mutation_strict()
+            self.assertEqual(self.path.read_bytes(), before)
 
     def test_legacy_write_stays_legacy_and_v2_write_is_denied(self) -> None:
         self._write(_legacy({"42": {"hits": 0}}))
@@ -203,7 +388,8 @@ class ExpSMStage1Tests(unittest.TestCase):
         before = production_store.read_bytes()
 
         commit = object.__new__(ExpSMCommitWriter)
-        commit.transaction = _ForbiddenTransaction()
+        commit_transaction = _ForbiddenTransaction()
+        commit.transaction = commit_transaction
         commit.memory_mutation_policy = SimpleNamespace(allow_expsm_commit=False)
         commit._has_recent_commit_decision = lambda tick, memory: True
         commit._policy_blocked_update = lambda *args: "commit_denied"
@@ -211,9 +397,11 @@ class ExpSMStage1Tests(unittest.TestCase):
             commit.run(1, object(), object(), SimpleNamespace(mode="consolidation")),
             ["commit_denied"],
         )
+        self.assertEqual(commit_transaction.entries, 0)
 
         update = object.__new__(ExpSMUpdateWriter)
-        update.transaction = _ForbiddenTransaction()
+        update_transaction = _ForbiddenTransaction()
+        update.transaction = update_transaction
         update.memory_mutation_policy = SimpleNamespace(allow_expsm_update=False)
         update._has_recent_update_decision = lambda tick, memory: True
         update._policy_blocked_update = lambda *args: "update_denied"
@@ -221,22 +409,27 @@ class ExpSMStage1Tests(unittest.TestCase):
             update.run(1, object(), object(), SimpleNamespace(mode="consolidation")),
             ["update_denied"],
         )
+        self.assertEqual(update_transaction.entries, 0)
 
         value = object.__new__(ValueFeedbackUpdateWriter)
-        value.transaction = _ForbiddenTransaction()
+        value_transaction = _ForbiddenTransaction()
+        value.transaction = value_transaction
         value.memory_mutation_policy = SimpleNamespace(allow_value_feedback_update=True)
         self.assertEqual(
             value.run(1, _NoValueReviews(), SimpleNamespace(mode="consolidation")),
             [],
         )
+        self.assertEqual(value_transaction.entries, 0)
 
         outcome = object.__new__(ExpSMOutcomeFeedback)
-        outcome.transaction = _ForbiddenTransaction()
+        outcome_transaction = _ForbiddenTransaction()
+        outcome.transaction = outcome_transaction
         outcome._has_feedback_work = lambda tick, memory: False
         self.assertEqual(
             outcome.run(1, object(), object(), SimpleNamespace(mode="active")),
             [],
         )
+        self.assertEqual(outcome_transaction.entries, 0)
 
         self.assertEqual(production_store.read_bytes(), before)
         self.assertFalse(production_lock.exists())
@@ -275,11 +468,15 @@ class ExpSMStage1Tests(unittest.TestCase):
                     self.assertEqual(final[record_id][field], value)
 
     def test_writer_inventory_and_no_stage2_or_runtime_leakage(self) -> None:
+        audit = _audit_writer_ast()
+        self.assertEqual(audit.writer_definitions, len(WRITERS))
+        self.assertEqual(audit.mutation_paths, len(WRITERS))
+        self.assertEqual(audit.direct_write_violations, ())
+        self.assertEqual(audit.transaction_violations, ())
+        self.assertEqual(audit.preflight_violations, ())
+        self.assertEqual(audit.store_order_violations, ())
         for class_name, relative in WRITERS.items():
             source = (ROOT / relative).read_text(encoding="utf-8")
-            self.assertIn(f"class {class_name}", source)
-            self.assertIn("ExpSMStoreTransaction", source)
-            self.assertIn(".mutation()", source)
             self.assertNotIn("execution_occurrence_id", source)
             self.assertNotIn("ALREADY_APPLIED", source)
             self.assertNotIn("EVENT_CONFLICT", source)
@@ -298,8 +495,18 @@ def main() -> int:
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful():
         return 1
+    audit = _audit_writer_ast()
     print("PASS: ExpSM persistence Stage 1 dual-format and shared locking")
     print(f"writers={len(WRITERS)} stage2_enabled=false runtime_wiring=false")
+    print(
+        "ast_audit "
+        f"writer_definitions={audit.writer_definitions} "
+        f"mutation_paths={audit.mutation_paths} "
+        f"direct_write_violations={len(audit.direct_write_violations)} "
+        f"transaction_violations={len(audit.transaction_violations)} "
+        f"preflight_violations={len(audit.preflight_violations)} "
+        f"store_order_violations={len(audit.store_order_violations)}"
+    )
     return 0
 
 
