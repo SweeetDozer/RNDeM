@@ -9,6 +9,7 @@ import tempfile
 import time
 import unittest
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -111,6 +112,11 @@ class ASTAuditResult:
     decorator_orderings_verified: int
     crud_mutation_methods_audited: int
     crud_read_only_methods_excluded: int
+    filesystem_replace_calls_audited: int
+    filesystem_rename_calls_audited: int
+    json_dump_calls_audited: int
+    approved_draft_json_dumps: int
+    central_persistence_primitives: int
 
 
 @dataclass(frozen=True)
@@ -121,6 +127,18 @@ class DecoratorAuditResult:
     fresh_loads_verified: int
     orderings_verified: int
     violations: tuple[str, ...]
+
+
+class WritePrimitive(str, Enum):
+    PATH_REPLACE = "path_replace"
+    PATH_RENAME = "path_rename"
+    OS_REPLACE = "os_replace"
+    OS_RENAME = "os_rename"
+    JSON_DUMP = "json_dump"
+    PATH_WRITE_TEXT = "path_write_text"
+    PATH_WRITE_BYTES = "path_write_bytes"
+    OPEN_WRITE = "open_write"
+    NAMED_TEMP_WRITE = "named_temp_write"
 
 
 def _call_name(node: ast.Call) -> str | None:
@@ -287,29 +305,141 @@ def _audit_authoritative_mutation_helper(tree: ast.Module) -> DecoratorAuditResu
     )
 
 
-def _low_level_write_calls(method: ast.FunctionDef) -> list[str]:
-    calls: list[str] = []
-    for node in ast.walk(method):
-        if not isinstance(node, ast.Call):
-            continue
-        name = _call_name(node)
-        if name in {"replace", "rename"} and len(node.args) == 1:
-            calls.append(name)
-        elif name in {"write_text", "write_bytes"}:
-            calls.append(name)
-        elif name == "open" and node.args:
-            mode_index = 0 if isinstance(node.func, ast.Attribute) else 1
-            mode = node.args[mode_index] if len(node.args) > mode_index else None
-            if isinstance(mode, ast.Constant) and isinstance(mode.value, str):
-                if "w" in mode.value or "a" in mode.value:
-                    calls.append("open_write")
-        elif name == "open":
-            for keyword in node.keywords:
-                if keyword.arg == "mode" and isinstance(keyword.value, ast.Constant):
-                    value = keyword.value.value
-                    if isinstance(value, str) and ("w" in value or "a" in value):
-                        calls.append("open_write")
-    return calls
+def _looks_like_path(expression: ast.AST) -> bool:
+    if isinstance(expression, ast.Name):
+        return "path" in expression.id.lower()
+    if isinstance(expression, ast.Attribute):
+        return "path" in expression.attr.lower() or _looks_like_path(expression.value)
+    return False
+
+
+def _write_mode(call: ast.Call) -> str | None:
+    mode_index = 0 if isinstance(call.func, ast.Attribute) else 1
+    if len(call.args) > mode_index:
+        mode = call.args[mode_index]
+        if isinstance(mode, ast.Constant) and isinstance(mode.value, str):
+            return mode.value
+    for keyword in call.keywords:
+        if keyword.arg == "mode" and isinstance(keyword.value, ast.Constant):
+            return keyword.value.value if isinstance(keyword.value.value, str) else None
+    return None
+
+
+def _classify_write_call(call: ast.Call) -> WritePrimitive | None:
+    function = call.func
+    if isinstance(function, ast.Attribute):
+        receiver = function.value
+        if (
+            isinstance(receiver, ast.Name)
+            and receiver.id == "os"
+            and function.attr in {"replace", "rename"}
+            and len(call.args) == 2
+        ):
+            return WritePrimitive.OS_REPLACE if function.attr == "replace" else WritePrimitive.OS_RENAME
+        if function.attr in {"replace", "rename"} and len(call.args) == 1 and _looks_like_path(receiver):
+            return WritePrimitive.PATH_REPLACE if function.attr == "replace" else WritePrimitive.PATH_RENAME
+        if function.attr == "dump" and isinstance(receiver, ast.Name) and receiver.id == "json":
+            return WritePrimitive.JSON_DUMP
+        if function.attr in {"write_text", "write_bytes"} and _looks_like_path(receiver):
+            return (
+                WritePrimitive.PATH_WRITE_TEXT
+                if function.attr == "write_text"
+                else WritePrimitive.PATH_WRITE_BYTES
+            )
+        if function.attr == "open" and _looks_like_path(receiver):
+            mode = _write_mode(call)
+            if isinstance(mode, str) and any(flag in mode for flag in "wax+"):
+                return WritePrimitive.OPEN_WRITE
+        if (
+            function.attr == "NamedTemporaryFile"
+            and isinstance(receiver, ast.Name)
+            and receiver.id == "tempfile"
+        ):
+            mode = _write_mode(call)
+            if isinstance(mode, str) and any(flag in mode for flag in "wax+"):
+                return WritePrimitive.NAMED_TEMP_WRITE
+    elif isinstance(function, ast.Name) and function.id == "open":
+        mode = _write_mode(call)
+        if isinstance(mode, str) and any(flag in mode for flag in "wax+"):
+            return WritePrimitive.OPEN_WRITE
+    return None
+
+
+def _classified_write_calls(node: ast.AST) -> list[WritePrimitive]:
+    return [
+        primitive
+        for candidate in ast.walk(node)
+        if isinstance(candidate, ast.Call)
+        for primitive in [_classify_write_call(candidate)]
+        if primitive is not None
+    ]
+
+
+def _approved_draft_helper_contract(method: ast.FunctionDef) -> bool:
+    if not method.body or not isinstance(method.body[0], ast.If):
+        return False
+    authoritative_branch = method.body[0]
+    if not _contains_call(authoritative_branch, {"write_complete_store"}):
+        return False
+    if not any(isinstance(statement, ast.Return) for statement in authoritative_branch.body):
+        return False
+    draft_calls = [
+        primitive
+        for statement in method.body[1:]
+        for primitive in _classified_write_calls(statement)
+    ]
+    required = {
+        WritePrimitive.OPEN_WRITE,
+        WritePrimitive.JSON_DUMP,
+        WritePrimitive.PATH_REPLACE,
+    }
+    return required.issubset(set(draft_calls)) and not any(
+        primitive in {WritePrimitive.OS_REPLACE, WritePrimitive.OS_RENAME}
+        for primitive in draft_calls
+    )
+
+
+def _writer_method_write_violations(
+    class_name: str,
+    method_name: str,
+    method: ast.FunctionDef,
+) -> tuple[str, ...]:
+    primitives = _classified_write_calls(method)
+    if not primitives:
+        return ()
+    if (class_name, method_name) in APPROVED_DRAFT_WRITE_HELPERS:
+        if _approved_draft_helper_contract(method):
+            return ()
+        return (f"{class_name}.{method_name}: invalid approved draft-helper contract",)
+    return (
+        f"{class_name}.{method_name}: "
+        f"{','.join(sorted(primitive.value for primitive in primitives))}",
+    )
+
+
+def _audit_central_persistence() -> tuple[int, tuple[str, ...]]:
+    relative = "clc/consolidation/expsm_store_transaction.py"
+    tree = ast.parse((ROOT / relative).read_text(encoding="utf-8"), filename=relative)
+    classes = [
+        node for node in tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "ExpSMStoreTransaction"
+    ]
+    if len(classes) != 1:
+        return 0, ("central persistence class not found exactly once",)
+    methods = [
+        node for node in classes[0].body
+        if isinstance(node, ast.FunctionDef) and node.name == "write_complete_store"
+    ]
+    if len(methods) != 1:
+        return 0, ("central write_complete_store not found exactly once",)
+    primitives = _classified_write_calls(methods[0])
+    required = {
+        WritePrimitive.NAMED_TEMP_WRITE,
+        WritePrimitive.JSON_DUMP,
+        WritePrimitive.PATH_REPLACE,
+    }
+    missing = required.difference(primitives)
+    return len(primitives), tuple(f"central persistence missing {item.value}" for item in sorted(missing, key=str))
 
 
 def _audit_writer_ast() -> ASTAuditResult:
@@ -326,6 +456,10 @@ def _audit_writer_ast() -> ASTAuditResult:
     decorator_orderings_verified = 0
     crud_mutation_methods_audited = 0
     crud_read_only_methods_excluded = 0
+    filesystem_replace_calls_audited = 0
+    filesystem_rename_calls_audited = 0
+    json_dump_calls_audited = 0
+    approved_draft_json_dumps = 0
 
     for class_name, relative in WRITERS.items():
         tree = ast.parse((ROOT / relative).read_text(encoding="utf-8"), filename=relative)
@@ -405,18 +539,25 @@ def _audit_writer_ast() -> ASTAuditResult:
                         )
 
         for method_name, method in methods.items():
-            low_level = _low_level_write_calls(method)
+            low_level = _classified_write_calls(method)
             if not low_level:
                 continue
-            if (class_name, method_name) not in APPROVED_DRAFT_WRITE_HELPERS:
-                direct_write_violations.append(
-                    f"{class_name}.{method_name}: {','.join(sorted(low_level))}"
-                )
-                continue
-            if not _contains_call(method, {"write_complete_store"}):
-                direct_write_violations.append(
-                    f"{class_name}.{method_name}: draft helper lacks authoritative delegation"
-                )
+            filesystem_replace_calls_audited += sum(
+                primitive in {WritePrimitive.PATH_REPLACE, WritePrimitive.OS_REPLACE}
+                for primitive in low_level
+            )
+            filesystem_rename_calls_audited += sum(
+                primitive in {WritePrimitive.PATH_RENAME, WritePrimitive.OS_RENAME}
+                for primitive in low_level
+            )
+            json_dump_calls_audited += low_level.count(WritePrimitive.JSON_DUMP)
+            violations = _writer_method_write_violations(class_name, method_name, method)
+            direct_write_violations.extend(violations)
+            if not violations and (class_name, method_name) in APPROVED_DRAFT_WRITE_HELPERS:
+                approved_draft_json_dumps += low_level.count(WritePrimitive.JSON_DUMP)
+
+    central_persistence_primitives, central_violations = _audit_central_persistence()
+    direct_write_violations.extend(central_violations)
 
     return ASTAuditResult(
         writer_definitions=definitions,
@@ -432,6 +573,11 @@ def _audit_writer_ast() -> ASTAuditResult:
         decorator_orderings_verified=decorator_orderings_verified,
         crud_mutation_methods_audited=crud_mutation_methods_audited,
         crud_read_only_methods_excluded=crud_read_only_methods_excluded,
+        filesystem_replace_calls_audited=filesystem_replace_calls_audited,
+        filesystem_rename_calls_audited=filesystem_rename_calls_audited,
+        json_dump_calls_audited=json_dump_calls_audited,
+        approved_draft_json_dumps=approved_draft_json_dumps,
+        central_persistence_primitives=central_persistence_primitives,
     )
 
 
@@ -710,6 +856,79 @@ def authoritative_mutation(method):
         self.assertEqual(audit.fresh_loads_verified, 1)
         self.assertEqual(audit.orderings_verified, 1)
 
+    def test_direct_write_ast_classifier_and_allowlists(self) -> None:
+        cases = {
+            "path_replace": ("target_path.replace(authoritative_path)", WritePrimitive.PATH_REPLACE),
+            "path_rename": ("target_path.rename(authoritative_path)", WritePrimitive.PATH_RENAME),
+            "os_replace": ("os.replace(temp_path, authoritative_path)", WritePrimitive.OS_REPLACE),
+            "os_rename": ("os.rename(temp_path, authoritative_path)", WritePrimitive.OS_RENAME),
+            "json_dump": ("json.dump(data, handle)", WritePrimitive.JSON_DUMP),
+        }
+        for name, (expression, expected) in cases.items():
+            with self.subTest(name=name):
+                tree = ast.parse(f"def write(self):\n    {expression}\n")
+                method = tree.body[0]
+                self.assertIsInstance(method, ast.FunctionDef)
+                self.assertIn(expected, _classified_write_calls(method))
+                self.assertTrue(_writer_method_write_violations("UnauthorizedWriter", "write", method))
+
+        dumps_tree = ast.parse("def encode(self):\n    payload = json.dumps(data)\n")
+        dumps_method = dumps_tree.body[0]
+        self.assertIsInstance(dumps_method, ast.FunctionDef)
+        self.assertEqual(_classified_write_calls(dumps_method), [])
+
+        direct_dump_tree = ast.parse(
+            """
+def write(self, authoritative_path, data):
+    with open(authoritative_path, "w") as handle:
+        json.dump(data, handle)
+"""
+        )
+        direct_dump = direct_dump_tree.body[0]
+        self.assertIsInstance(direct_dump, ast.FunctionDef)
+        self.assertEqual(
+            set(_classified_write_calls(direct_dump)),
+            {WritePrimitive.OPEN_WRITE, WritePrimitive.JSON_DUMP},
+        )
+        self.assertTrue(_writer_method_write_violations("UnauthorizedWriter", "write", direct_dump))
+
+        approved_tree = ast.parse(
+            """
+def _atomic_write_json(self, path, data):
+    if path == self.expsm_path:
+        self.transaction.write_complete_store(data)
+        return
+    temp_path = path.with_suffix(".tmp")
+    with temp_path.open("w") as handle:
+        json.dump(data, handle)
+    temp_path.replace(path)
+"""
+        )
+        approved = approved_tree.body[0]
+        self.assertIsInstance(approved, ast.FunctionDef)
+        self.assertEqual(
+            _writer_method_write_violations("ExpSMCommitWriter", "_atomic_write_json", approved),
+            (),
+        )
+
+        bypass_tree = ast.parse(
+            """
+def _atomic_write_json(self, path, data):
+    with path.open("w") as handle:
+        json.dump(data, handle)
+    os.replace(path, self.expsm_path)
+"""
+        )
+        bypass = bypass_tree.body[0]
+        self.assertIsInstance(bypass, ast.FunctionDef)
+        self.assertTrue(
+            _writer_method_write_violations("ExpSMCommitWriter", "_atomic_write_json", bypass)
+        )
+
+        central_count, central_violations = _audit_central_persistence()
+        self.assertGreaterEqual(central_count, 3)
+        self.assertEqual(central_violations, ())
+
     def test_spawned_processes_preserve_same_and_different_record_updates(self) -> None:
         context = multiprocessing.get_context("spawn")
         for records, jobs, expected in (
@@ -761,6 +980,11 @@ def authoritative_mutation(method):
             len(CRUD_DECORATED_MUTATION_METHODS) + 1,
         )
         self.assertEqual(audit.crud_read_only_methods_excluded, len(CRUD_READ_ONLY_METHODS))
+        self.assertGreaterEqual(audit.filesystem_replace_calls_audited, 2)
+        self.assertEqual(audit.filesystem_rename_calls_audited, 0)
+        self.assertEqual(audit.json_dump_calls_audited, 2)
+        self.assertEqual(audit.approved_draft_json_dumps, 2)
+        self.assertGreaterEqual(audit.central_persistence_primitives, 3)
         for class_name, relative in WRITERS.items():
             source = (ROOT / relative).read_text(encoding="utf-8")
             self.assertNotIn("execution_occurrence_id", source)
@@ -798,7 +1022,12 @@ def main() -> int:
         f"decorator_fresh_loads_verified={audit.decorator_fresh_loads_verified} "
         f"decorator_orderings_verified={audit.decorator_orderings_verified} "
         f"crud_mutation_methods_audited={audit.crud_mutation_methods_audited} "
-        f"crud_read_only_methods_excluded={audit.crud_read_only_methods_excluded}"
+        f"crud_read_only_methods_excluded={audit.crud_read_only_methods_excluded} "
+        f"filesystem_replace_calls_audited={audit.filesystem_replace_calls_audited} "
+        f"filesystem_rename_calls_audited={audit.filesystem_rename_calls_audited} "
+        f"json_dump_calls_audited={audit.json_dump_calls_audited} "
+        f"approved_draft_json_dumps={audit.approved_draft_json_dumps} "
+        f"central_persistence_primitives={audit.central_persistence_primitives}"
     )
     return 0
 
