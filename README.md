@@ -389,3 +389,14 @@ confidence/repeatability from fresh counters. `safe_demo` and `draft_only`
 deny; `mutating_memory` may write through the shared atomic transaction. There
 is no automatic Feedback/apply path, `_run_tick()` wiring, durable replay
 protection, AKBSM write, or Chronicle write.
+
+## ExpSM Persistence Stage 1
+
+`ExpSMStoreTransaction` now normalizes the current unversioned store and the
+approved future envelope-v2 shape for reading. Authoritative writes remain in
+the current `{experience, reflexes}` format; a v2 source fails closed with
+`ENVELOPE_V2_WRITE_NOT_ENABLED`, so opaque future receipt metadata cannot be
+downgraded or erased. All seven authoritative writers share one canonical-path
+`RLock` plus Linux/Fedora `flock(LOCK_EX)` on the stable sibling
+`ExpSM_data.lock`, with fresh read and readback inside the lock scope. This
+stage adds no receipts, occurrence UUID, replay guarantee, or runtime wiring.

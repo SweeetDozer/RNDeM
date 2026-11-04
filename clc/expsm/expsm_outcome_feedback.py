@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from clc.context.context_memory import ContextMemory
+from clc.consolidation.expsm_store_transaction import ExpSMStoreTransaction
 from clc.core.ids import IdGenerator
 from clc.core.markers import OperationMarker
 from clc.core.operations import ContextOperation
@@ -32,10 +33,24 @@ class ExpSMOutcomeFeedback:
         self.id_gen = id_gen
         self.pattern_registry = pattern_registry
         self.expsm_path = Path(expsm_path)
+        self.transaction = ExpSMStoreTransaction(self.expsm_path)
         self.feedback_kind = pattern_registry.id("expsm_feedback")
         self._processed_keys: set[tuple[str, str, str]] = set()
 
     def run(
+        self,
+        tick: int,
+        memory: ContextMemory,
+        active_field: ActiveContextField,
+        system_state: SystemState,
+    ) -> list[ContextOperation]:
+        try:
+            with self.transaction.mutation():
+                return self._run_locked(tick, memory, active_field, system_state)
+        except (OSError, ValueError):
+            return []
+
+    def _run_locked(
         self,
         tick: int,
         memory: ContextMemory,
@@ -402,22 +417,11 @@ class ExpSMOutcomeFeedback:
         return False
 
     def _load_data(self) -> dict[str, Any]:
-        if not self.expsm_path.exists():
-            return {}
-        try:
-            with self.expsm_path.open("r", encoding="utf-8") as handle:
-                data = json.load(handle)
-        except (OSError, json.JSONDecodeError):
-            return {}
-        return data if isinstance(data, dict) else {}
+        return self.transaction.load_for_mutation_strict()
 
     def _write_data(self, data: dict[str, Any]) -> None:
-        self.expsm_path.parent.mkdir(parents=True, exist_ok=True)
-        tmp_path = self.expsm_path.with_suffix(self.expsm_path.suffix + ".tmp")
-        with tmp_path.open("w", encoding="utf-8") as handle:
-            json.dump(data, handle, indent=2)
-            handle.write("\n")
-        tmp_path.replace(self.expsm_path)
+        self.transaction.write_complete_store(data)
+        self.transaction.load_strict()
 
 
 def _as_set(value: Any) -> set[str]:

@@ -971,3 +971,12 @@ execution-originated occurrence UUID plus a separate evidence digest. The
 future persistence architecture is a versioned top-level ExpSM receipt ledger
 committed atomically with the exact record update under shared process and OS
 locks. `NFP_NATIVE_V1`, production Memory, and `_run_tick()` remain unchanged.
+
+## ExpSM Persistence Stage 1
+
+The prerequisite persistence layer is implemented. Seven authoritative ExpSM
+writers share a canonical-path reentrant `RLock` and Linux/Fedora stable sibling
+`flock`; mutation reads occur after both locks and readback occurs before their
+release. A normalized state reads current stores and future envelope v2, but
+all writes remain current unversioned format. V2 mutation fails closed to
+prevent receipt loss. No Stage-2 replay metadata or automatic learning exists.

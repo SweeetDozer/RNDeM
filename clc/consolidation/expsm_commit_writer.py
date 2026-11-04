@@ -32,6 +32,7 @@ class ExpSMCommitWriter:
         self.pattern_registry = pattern_registry
         self.draft_store_path = Path(draft_store_path)
         self.expsm_path = Path(expsm_path)
+        self.transaction = ExpSMStoreTransaction(self.expsm_path)
         self.memory_mutation_policy = memory_mutation_policy or policy_for_profile(RuntimeProfile.MUTATING_MEMORY)
         self.commit_action_id = pattern_registry.id("action_commit_memory_draft")
         self.commit_kind = pattern_registry.id("memory_committed")
@@ -41,6 +42,19 @@ class ExpSMCommitWriter:
         self._reported_duplicate_draft_ids: set[str] = set()
 
     def run(
+        self,
+        tick: int,
+        memory: ContextMemory,
+        active_field: ActiveContextField,
+        system_state: SystemState,
+    ) -> list[ContextOperation]:
+        try:
+            with self.transaction.mutation():
+                return self._run_locked(tick, memory, active_field, system_state)
+        except (OSError, ValueError) as exc:
+            return [self._module_update(tick, "expsm_commit_failed", self.failed_id, str(exc))]
+
+    def _run_locked(
         self,
         tick: int,
         memory: ContextMemory,
@@ -139,14 +153,7 @@ class ExpSMCommitWriter:
         return self._load_json_object(self.draft_store_path)
 
     def _load_expsm_store(self) -> dict[str, Any]:
-        if not self.expsm_path.exists():
-            return {"experience": {}, "reflexes": {}}
-        store = self._load_json_object(self.expsm_path)
-        if not isinstance(store.get("experience", {}), dict):
-            store["experience"] = {}
-        if not isinstance(store.get("reflexes", {}), dict):
-            store["reflexes"] = {}
-        return store
+        return self.transaction.load_for_mutation_strict()
 
     def _load_json_object(self, path: Path) -> dict[str, Any]:
         try:
@@ -159,7 +166,16 @@ class ExpSMCommitWriter:
         return data
 
     def _atomic_write_json(self, path: Path, data: dict[str, Any]) -> None:
-        ExpSMStoreTransaction(path).write_complete_store(data)
+        if path == self.expsm_path:
+            self.transaction.write_complete_store(data)
+            self.transaction.load_strict()
+            return
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = path.with_suffix(path.suffix + ".tmp")
+        with temp_path.open("w", encoding="utf-8") as handle:
+            json.dump(data, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+        temp_path.replace(path)
 
     def _validate_draft(self, draft: dict[str, Any]) -> tuple[bool, str | None]:
         if draft.get("draft_status") != "draft_ready_to_commit":

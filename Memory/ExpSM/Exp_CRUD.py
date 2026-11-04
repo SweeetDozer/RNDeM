@@ -12,8 +12,11 @@ from __future__ import annotations
 import json
 from copy import deepcopy
 from datetime import UTC, datetime
+from functools import wraps
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
+
+from clc.consolidation.expsm_store_transaction import ExpSMStoreTransaction
 
 
 DATA_FILE = Path(__file__).resolve().with_name("ExpSM_data.json")
@@ -31,32 +34,36 @@ class ReflexNotFoundError(ExpSMError):
     """Raised when a requested reflex does not exist."""
 
 
+def authoritative_mutation(method: Callable[..., Any]) -> Callable[..., Any]:
+    """Fresh-load CRUD state only after the shared writer locks are held."""
+
+    @wraps(method)
+    def wrapped(self: "ExpSMCRUD", *args: Any, **kwargs: Any) -> Any:
+        with self.transaction.mutation():
+            self.data = self.transaction.load_for_mutation_strict()
+            return method(self, *args, **kwargs)
+
+    return wrapped
+
+
 class ExpSMCRUD:
     """JSON-backed CRUD layer for experience and reflex records."""
 
     def __init__(self, data_file: str | Path = DATA_FILE) -> None:
         self.data_file = Path(data_file)
+        self.transaction = ExpSMStoreTransaction(self.data_file)
         self.data = self.load()
 
     def load(self) -> dict[str, dict[str, dict[str, Any]]]:
         """Load ExpSM data from disk."""
-        if not self.data_file.exists():
-            return {"experience": {}, "reflexes": {}}
-
-        with self.data_file.open("r", encoding="utf-8-sig") as file:
-            data = json.load(file)
-
-        data.setdefault("experience", {})
-        data.setdefault("reflexes", {})
-        return data
+        return self.transaction.load_strict()
 
     def save(self) -> None:
         """Save ExpSM data to disk."""
-        self.data_file.parent.mkdir(parents=True, exist_ok=True)
-
-        with self.data_file.open("w", encoding="utf-8") as file:
-            json.dump(self.data, file, ensure_ascii=False, indent=2)
-            file.write("\n")
+        with self.transaction.mutation():
+            self.transaction.load_state_strict()
+            self.transaction.write_complete_store(self.data)
+            self.data = self.transaction.load_strict()
 
     def get_all(self) -> dict[str, Any]:
         """Return a copy of all ExpSM data."""
@@ -70,6 +77,7 @@ class ExpSMCRUD:
         """Return all reflex records."""
         return deepcopy(self.data["reflexes"])
 
+    @authoritative_mutation
     def create_experience(
         self,
         condition: list[Any],
@@ -113,6 +121,7 @@ class ExpSMCRUD:
         self._require_experience(experience_id)
         return deepcopy(self.data["experience"][experience_id])
 
+    @authoritative_mutation
     def update_experience(self, experience_id: str | int, **fields: Any) -> dict[str, Any]:
         """Update fields of one experience record."""
         experience_id = str(experience_id)
@@ -127,6 +136,7 @@ class ExpSMCRUD:
         self.save()
         return deepcopy(record)
 
+    @authoritative_mutation
     def delete_experience(self, experience_id: str | int) -> dict[str, Any]:
         """Archive one experience record by id.
 
@@ -150,6 +160,7 @@ class ExpSMCRUD:
         """Find experience records by numeric fields."""
         return self._find_records("experience", level=level, source=source, status=status)
 
+    @authoritative_mutation
     def create_reflex(
         self,
         condition: list[Any],
@@ -197,6 +208,7 @@ class ExpSMCRUD:
         self._require_reflex(reflex_id)
         return deepcopy(self.data["reflexes"][reflex_id])
 
+    @authoritative_mutation
     def update_reflex(self, reflex_id: str | int, **fields: Any) -> dict[str, Any]:
         """Update fields of one reflex record."""
         reflex_id = str(reflex_id)
@@ -213,6 +225,7 @@ class ExpSMCRUD:
         self.save()
         return deepcopy(record)
 
+    @authoritative_mutation
     def delete_reflex(self, reflex_id: str | int) -> dict[str, Any]:
         """Archive one reflex record by id.
 
@@ -243,6 +256,7 @@ class ExpSMCRUD:
             if record.get("priority") == priority
         }
 
+    @authoritative_mutation
     def experience_to_reflex(
         self,
         experience_id: str | int,
@@ -287,6 +301,7 @@ class ExpSMCRUD:
         self.save()
         return reflex_id
 
+    @authoritative_mutation
     def reflex_to_experience(
         self,
         reflex_id: str | int,
@@ -328,18 +343,22 @@ class ExpSMCRUD:
         self.save()
         return experience_id
 
+    @authoritative_mutation
     def record_experience_hit(self, experience_id: str | int) -> dict[str, Any]:
         """Increase experience hits by one."""
         return self._increment_counter("experience", experience_id, "hits")
 
+    @authoritative_mutation
     def record_experience_miss(self, experience_id: str | int) -> dict[str, Any]:
         """Increase experience misses by one."""
         return self._increment_counter("experience", experience_id, "misses")
 
+    @authoritative_mutation
     def record_reflex_hit(self, reflex_id: str | int) -> dict[str, Any]:
         """Increase reflex hits by one."""
         return self._increment_counter("reflexes", reflex_id, "hits")
 
+    @authoritative_mutation
     def record_reflex_miss(self, reflex_id: str | int) -> dict[str, Any]:
         """Increase reflex misses by one."""
         return self._increment_counter("reflexes", reflex_id, "misses")

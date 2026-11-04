@@ -442,3 +442,13 @@ records are preserved.
 and indeterminate, with read-only reconciliation and no blind retry. No CREATE
 fallback, replay ledger, automatic Feedback path, runtime wiring, AKBSM write,
 or Chronicle write is added.
+
+## Stage-1 Persistence Infrastructure
+
+The shared transaction now owns canonical-path in-process serialization,
+stable sibling Linux `flock`, fresh authoritative loading, atomic replacement,
+directory-fsync attempt, and locked readback. The native CREATE and Feedback
+writers and all five legacy writer paths use this boundary. Reads accept the
+current format and future envelope v2, while Stage-1 writes remain current
+format only. A v2 mutation is denied rather than downgraded. Mutation policy,
+ID allocation, Feedback formulas, and record semantics are unchanged.

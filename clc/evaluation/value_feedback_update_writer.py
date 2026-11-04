@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 
 from clc.context.context_memory import ContextMemory
+from clc.consolidation.expsm_store_transaction import ExpSMStoreTransaction
 from clc.core.ids import IdGenerator
 from clc.core.markers import OperationMarker
 from clc.core.operations import ContextOperation
@@ -53,11 +54,24 @@ class ValueFeedbackUpdateWriter:
         self.id_gen = id_gen
         self.pattern_registry = pattern_registry
         self.expsm_path = Path(expsm_path)
+        self.transaction = ExpSMStoreTransaction(self.expsm_path)
         self.memory_mutation_policy = memory_mutation_policy or policy_for_profile(RuntimeProfile.MUTATING_MEMORY)
         self.update_kind = pattern_registry.id("value_feedback_updated")
         self._applied_review_ids: set[str] = set()
 
     def run(
+        self,
+        tick: int,
+        memory: ContextMemory,
+        system_state: SystemState,
+    ) -> list[ContextOperation]:
+        try:
+            with self.transaction.mutation():
+                return self._run_locked(tick, memory, system_state)
+        except (OSError, ValueError) as exc:
+            return [self._module_update(tick, "value_feedback_update_failed", str(exc))]
+
+    def _run_locked(
         self,
         tick: int,
         memory: ContextMemory,
@@ -123,27 +137,13 @@ class ValueFeedbackUpdateWriter:
         )
 
     def _load_expsm_store(self) -> dict[str, Any]:
-        if not self.expsm_path.exists():
-            return {"experience": {}, "reflexes": {}}
-        try:
-            with self.expsm_path.open("r", encoding="utf-8") as handle:
-                data = json.load(handle)
-        except json.JSONDecodeError as exc:
-            raise ValueError(f"{self.expsm_path} is not valid JSON: {exc}") from exc
-        if not isinstance(data, dict):
-            raise ValueError(f"{self.expsm_path} must contain a JSON object")
-        if not isinstance(data.get("experience", {}), dict):
-            data["experience"] = {}
-        if not isinstance(data.get("reflexes", {}), dict):
-            data["reflexes"] = {}
-        return data
+        return self.transaction.load_for_mutation_strict()
 
     def _atomic_write_json(self, path: Path, data: dict[str, Any]) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        temp_path = path.with_name(path.name + ".tmp")
-        with temp_path.open("w", encoding="utf-8") as handle:
-            json.dump(data, handle, indent=2)
-        temp_path.replace(path)
+        if path != self.expsm_path:
+            raise ValueError("value Feedback writer may only write its authoritative ExpSM path")
+        self.transaction.write_complete_store(data)
+        self.transaction.load_strict()
 
     def _apply_value_feedback(self, record: dict[str, Any], review: dict[str, Any], tick: int) -> list[str]:
         value_feedback = _value_feedback_block(record.get("value_feedback"))

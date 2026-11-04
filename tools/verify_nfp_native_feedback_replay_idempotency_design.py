@@ -145,9 +145,9 @@ WRITER_INVENTORY = {
     "NFPFeedbackApplyWriter": ("clc/expsm/nfp_native_feedback_apply.py", "write_complete_store"),
     "ExpSMCommitWriter": ("clc/consolidation/expsm_commit_writer.py", "write_complete_store"),
     "ExpSMUpdateWriter": ("clc/consolidation/expsm_update_writer.py", "temp_path.replace(path)"),
-    "ValueFeedbackUpdateWriter": ("clc/evaluation/value_feedback_update_writer.py", "temp_path.replace(path)"),
-    "ExpSMOutcomeFeedback": ("clc/expsm/expsm_outcome_feedback.py", "tmp_path.replace(self.expsm_path)"),
-    "ExpSMCRUD": ("Memory/ExpSM/Exp_CRUD.py", 'self.data_file.open("w"'),
+    "ValueFeedbackUpdateWriter": ("clc/evaluation/value_feedback_update_writer.py", "self.transaction.write_complete_store(data)"),
+    "ExpSMOutcomeFeedback": ("clc/expsm/expsm_outcome_feedback.py", "self.transaction.write_complete_store(data)"),
+    "ExpSMCRUD": ("Memory/ExpSM/Exp_CRUD.py", "self.transaction.write_complete_store(self.data)"),
 }
 
 ALLOWED = {
@@ -158,6 +158,20 @@ ALLOWED = {
     "tools/verify_nfp_action_materialization_guarded_execution_design.py",
     "tools/verify_nfp_expsm_operational_retrieval_design.py",
     "tools/verify_nfp_native_feedback_replay_idempotency_design.py",
+    "README.md",
+    "docs/design_nfp_expsm_mutation_path.md",
+    "docs/design_persistent_nfp_expsm_representation.md",
+    "docs/project_hygiene_audit.md",
+    "clc/consolidation/expsm_store_transaction.py",
+    "clc/consolidation/expsm_commit_writer.py",
+    "clc/consolidation/expsm_update_writer.py",
+    "clc/evaluation/value_feedback_update_writer.py",
+    "clc/experience/expsm_native_create.py",
+    "clc/expsm/expsm_outcome_feedback.py",
+    "clc/expsm/nfp_native_feedback_apply.py",
+    "Memory/ExpSM/Exp_CRUD.py",
+    "scenarios/expsm_persistence_stage1.json",
+    "tools/verify_expsm_persistence_stage1.py",
 }
 
 V1_FIELDS = {
@@ -297,15 +311,17 @@ def main() -> int:
         ),
         "apply uses fresh strict transaction": (
             "with self.transaction.mutation():" in apply
-            and "store = self.transaction.load_strict()" in apply
+            and "store = self.transaction.load_for_mutation_strict()" in apply
         ),
         "readback recovery is read-only": (
             "def reconcile_nfp_feedback_readback_failure" in apply
             and "CONFIRMED_PERSISTED" in apply
             and "CONFIRMED_NOT_APPLIED" in apply
         ),
-        "transaction lock is process-local": (
-            "threading.RLock" in transaction and "fcntl" not in transaction and "flock" not in transaction
+        "Stage-1 transaction has shared process and stable-file locks": (
+            "threading.RLock" in transaction
+            and "fcntl.flock(descriptor, fcntl.LOCK_EX)" in transaction
+            and 'self.lock_path = self.store_path.with_suffix(".lock")' in transaction
         ),
         "transaction uses atomic complete replacement": all(token in transaction for token in (
             "NamedTemporaryFile", "json.dump(store", "os.fsync", "temp_path.replace(self.store_path)",
@@ -336,13 +352,14 @@ def main() -> int:
     if not isinstance(store, dict) or set(store) != {"experience", "reflexes"}:
         failures.append(f"current ExpSM envelope drifted: {list(store) if isinstance(store, dict) else type(store)}")
 
-    # This pass must remain docs/verifier-only and may not implement any designed type or store field.
-    production_changes = {
-        path for path in _changed()
-        if path.startswith("clc/") or path.startswith("Memory/") or path.startswith("scenarios/")
-    }
-    if production_changes:
-        failures.append(f"design pass changed production scope: {sorted(production_changes)}")
+    # Stage 1 may implement locking and dual-format reads, but Stage 2 remains absent.
+    stage1_production = "\n".join(
+        _source(path) for path in ALLOWED
+        if path.endswith(".py") and (ROOT / path).exists() and not path.startswith("tools/")
+    )
+    for forbidden in ("execution_occurrence_id", "ALREADY_APPLIED", "EVENT_CONFLICT"):
+        if forbidden in stage1_production:
+            failures.append(f"Stage-2 production semantics leaked into Stage 1: {forbidden}")
     unexpected = _changed() - ALLOWED
     if unexpected:
         failures.append(f"unexpected changed files: {sorted(unexpected)}")

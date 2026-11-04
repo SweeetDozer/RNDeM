@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from clc.context.context_memory import ContextMemory
+from clc.consolidation.expsm_store_transaction import ExpSMStoreTransaction
 from clc.core.ids import IdGenerator
 from clc.core.markers import OperationMarker
 from clc.core.operations import ContextOperation
@@ -30,6 +31,7 @@ class ExpSMUpdateWriter:
         self.pattern_registry = pattern_registry
         self.draft_store_path = Path(draft_store_path)
         self.expsm_path = Path(expsm_path)
+        self.transaction = ExpSMStoreTransaction(self.expsm_path)
         self.memory_mutation_policy = memory_mutation_policy or policy_for_profile(RuntimeProfile.MUTATING_MEMORY)
         self.update_action_id = pattern_registry.id("action_update_committed_expsm_record")
         self.update_kind = pattern_registry.id("memory_updated")
@@ -39,6 +41,19 @@ class ExpSMUpdateWriter:
         self._reported_duplicate_review_ids: set[str] = set()
 
     def run(
+        self,
+        tick: int,
+        memory: ContextMemory,
+        active_field: ActiveContextField,
+        system_state: SystemState,
+    ) -> list[ContextOperation]:
+        try:
+            with self.transaction.mutation():
+                return self._run_locked(tick, memory, active_field, system_state)
+        except (OSError, ValueError) as exc:
+            return [self._module_update(tick, "memory_update_failed", self.failed_id, str(exc))]
+
+    def _run_locked(
         self,
         tick: int,
         memory: ContextMemory,
@@ -130,14 +145,7 @@ class ExpSMUpdateWriter:
         return self._load_json_object(self.draft_store_path)
 
     def _load_expsm_store(self) -> dict[str, Any]:
-        if not self.expsm_path.exists():
-            return {"experience": {}, "reflexes": {}}
-        store = self._load_json_object(self.expsm_path)
-        if not isinstance(store.get("experience", {}), dict):
-            store["experience"] = {}
-        if not isinstance(store.get("reflexes", {}), dict):
-            store["reflexes"] = {}
-        return store
+        return self.transaction.load_for_mutation_strict()
 
     def _load_json_object(self, path: Path) -> dict[str, Any]:
         try:
@@ -150,6 +158,10 @@ class ExpSMUpdateWriter:
         return data
 
     def _atomic_write_json(self, path: Path, data: dict[str, Any]) -> None:
+        if path == self.expsm_path:
+            self.transaction.write_complete_store(data)
+            self.transaction.load_strict()
+            return
         path.parent.mkdir(parents=True, exist_ok=True)
         temp_path = path.with_name(path.name + ".tmp")
         with temp_path.open("w", encoding="utf-8") as handle:

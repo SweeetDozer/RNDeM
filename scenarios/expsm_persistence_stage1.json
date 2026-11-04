@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "name": "expsm_persistence_stage1",
+  "description": "Stage-1 ExpSM dual-format reading and shared writer locking, using temporary stores only.",
+  "runtime": {"profile": "safe_demo", "memory_is_temporary": true, "max_ticks": 0},
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [36],
+    "memory_unchanged": true,
+    "expsm_persistence_stage1": {
+      "legacy_read": true,
+      "envelope_v2_read": true,
+      "legacy_writes_remain_legacy": true,
+      "envelope_v2_write_denied": true,
+      "stable_sibling_lock_file": true,
+      "data_file_is_not_lock_target": true,
+      "rlock_before_flock": true,
+      "fresh_read_after_flock": true,
+      "locks_held_through_readback": true,
+      "lock_failure_fails_closed": true,
+      "seven_authoritative_writers_cooperate": true,
+      "no_direct_writer_bypass": true,
+      "cross_process_serialization": true,
+      "no_lost_update": true,
+      "stage2_semantics_absent": true,
+      "runtime_wiring": false
+    }
+  }
+}

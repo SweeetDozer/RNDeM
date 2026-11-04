@@ -1229,7 +1229,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 36,
+      "line": 37,
       "path": "clc/consolidation/expsm_commit_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1240,7 +1240,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 37,
+      "line": 38,
       "path": "clc/consolidation/expsm_commit_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1251,7 +1251,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 38,
+      "line": 39,
       "path": "clc/consolidation/expsm_commit_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1262,7 +1262,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 39,
+      "line": 40,
       "path": "clc/consolidation/expsm_commit_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1273,7 +1273,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 129,
+      "line": 143,
       "path": "clc/consolidation/expsm_commit_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1438,7 +1438,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 34,
+      "line": 36,
       "path": "clc/consolidation/expsm_update_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1449,7 +1449,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 35,
+      "line": 37,
       "path": "clc/consolidation/expsm_update_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1460,7 +1460,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 36,
+      "line": 38,
       "path": "clc/consolidation/expsm_update_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1471,7 +1471,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 37,
+      "line": 39,
       "path": "clc/consolidation/expsm_update_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1482,7 +1482,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 120,
+      "line": 135,
       "path": "clc/consolidation/expsm_update_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -3088,7 +3088,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 57,
+      "line": 59,
       "path": "clc/evaluation/value_feedback_update_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -3374,7 +3374,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 35,
+      "line": 37,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -3385,7 +3385,7 @@
     {
       "classification": "runtime_source_label",
       "kind": "direct_semantic_name_literal",
-      "line": 114,
+      "line": 129,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "keep stable runtime provenance labels separate from PatternRegistry debug names",
       "risk": "low",
@@ -3396,7 +3396,7 @@
     {
       "classification": "runtime_source_label",
       "kind": "direct_semantic_name_literal",
-      "line": 154,
+      "line": 169,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "keep stable runtime provenance labels separate from PatternRegistry debug names",
       "risk": "low",
@@ -3407,7 +3407,7 @@
     {
       "classification": "runtime_source_label",
       "kind": "direct_semantic_name_literal",
-      "line": 174,
+      "line": 189,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "keep stable runtime provenance labels separate from PatternRegistry debug names",
       "risk": "low",
@@ -3418,7 +3418,7 @@
     {
       "classification": "runtime_source_label",
       "kind": "direct_semantic_name_literal",
-      "line": 176,
+      "line": 191,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "keep stable runtime provenance labels separate from PatternRegistry debug names",
       "risk": "low",
@@ -3429,7 +3429,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 180,
+      "line": 195,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -3440,7 +3440,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 184,
+      "line": 199,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",

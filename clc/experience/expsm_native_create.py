@@ -126,7 +126,7 @@ class NFPExpSMCreateWriter:
         expected: NFPExpSMRecordV1 | None = None
         with self.transaction.mutation():
             try:
-                store = self.transaction.load_strict()
+                store = self.transaction.load_for_mutation_strict()
             except ExpSMStoreInvalidError as exc:
                 return ExpSMCreateResult(ExpSMCreateStatus.STORE_INVALID, str(exc))
             attempted_id = str(max((int(key) for key in store["experience"]), default=0) + 1)
@@ -143,18 +143,18 @@ class NFPExpSMCreateWriter:
             except (OSError, TypeError, ValueError) as exc:
                 return ExpSMCreateResult(ExpSMCreateStatus.WRITE_FAILED, str(exc))
 
-        try:
-            self._inject("post_replace_readback")
-            confirmed = _fresh_matching_record(self.transaction, attempted_id, request)
-            if confirmed is None:
-                raise ValueError("fresh readback did not match the creation request")
-        except (OSError, TypeError, ValueError, ExpSMStoreInvalidError) as exc:
-            return ExpSMCreateResult(
-                ExpSMCreateStatus.READBACK_FAILED,
-                str(exc),
-                attempted_record_id=attempted_id,
-                authority_state=ExpSMAuthorityState.INDETERMINATE_FROM_CALLER_PERSPECTIVE,
-            )
+            try:
+                self._inject("post_replace_readback")
+                confirmed = _fresh_matching_record(self.transaction, attempted_id, request)
+                if confirmed is None:
+                    raise ValueError("fresh readback did not match the creation request")
+            except (OSError, TypeError, ValueError, ExpSMStoreInvalidError) as exc:
+                return ExpSMCreateResult(
+                    ExpSMCreateStatus.READBACK_FAILED,
+                    str(exc),
+                    attempted_record_id=attempted_id,
+                    authority_state=ExpSMAuthorityState.INDETERMINATE_FROM_CALLER_PERSPECTIVE,
+                )
         return ExpSMCreateResult(
             ExpSMCreateStatus.CREATED,
             "fresh_readback_confirmed",

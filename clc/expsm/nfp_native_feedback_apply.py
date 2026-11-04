@@ -110,7 +110,7 @@ class NFPFeedbackApplyWriter:
         intended: NFPExpSMRecordV1 | None = None
         with self.transaction.mutation():
             try:
-                store = self.transaction.load_strict()
+                store = self.transaction.load_for_mutation_strict()
             except ExpSMStoreInvalidError as exc:
                 return self._result(evidence, NFPFeedbackApplyStatus.STORE_INVALID, str(exc))
 
@@ -155,20 +155,20 @@ class NFPFeedbackApplyWriter:
                     intended_record=intended,
                 )
 
-        try:
-            self._inject("post_replace_readback")
-            confirmed = _fresh_record(self.transaction, source_id)
-            if confirmed is None or confirmed.to_json_data() != intended.to_json_data():
-                raise ValueError("fresh readback did not match intended native Feedback update")
-        except (OSError, TypeError, ValueError, ExpSMStoreInvalidError) as exc:
-            return self._result(
-                evidence,
-                NFPFeedbackApplyStatus.READBACK_FAILED,
-                str(exc),
-                previous_record=previous,
-                intended_record=intended,
-                authority_state=NFPFeedbackApplyAuthorityState.INDETERMINATE_FROM_CALLER_PERSPECTIVE,
-            )
+            try:
+                self._inject("post_replace_readback")
+                confirmed = _fresh_record(self.transaction, source_id)
+                if confirmed is None or confirmed.to_json_data() != intended.to_json_data():
+                    raise ValueError("fresh readback did not match intended native Feedback update")
+            except (OSError, TypeError, ValueError, ExpSMStoreInvalidError) as exc:
+                return self._result(
+                    evidence,
+                    NFPFeedbackApplyStatus.READBACK_FAILED,
+                    str(exc),
+                    previous_record=previous,
+                    intended_record=intended,
+                    authority_state=NFPFeedbackApplyAuthorityState.INDETERMINATE_FROM_CALLER_PERSPECTIVE,
+                )
         return self._result(
             evidence,
             NFPFeedbackApplyStatus.UPDATED,

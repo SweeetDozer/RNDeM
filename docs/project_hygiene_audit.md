@@ -650,3 +650,14 @@ in a later packaging pass.
   provides read-only post-readback reconciliation but no blind retry, durable
   replay ledger, crash-safe idempotency claim, AKBSM/Chronicle authority, or
   `_run_tick()` wiring.
+
+## ExpSM Stage-1 Persistence Audit
+
+- Low-level authoritative replacement is centralized in
+  `ExpSMStoreTransaction`; seven writer paths use its common mutation scope.
+- Lock identity is a stable sibling `.lock` inode, separate from the atomically
+  replaced data inode. Lock-open and `flock` failures fail closed.
+- Spawned-process tests cover same-record and different-record updates and
+  demonstrate fresh-state serialization without lost updates.
+- Envelope-v2 reads are supported, while Stage-1 v2 writes and downgrades are
+  prohibited. Production Memory and `_run_tick()` remain unchanged.

@@ -381,3 +381,17 @@ until duplicate suppression is implemented/reviewed **and** the project decides
 whether pre-apply event loss is acceptable or requires a durable outbox. Replay
 receipts alone do not complete autonomous crash recovery; runtime integration
 requires its own later design pass.
+
+## Stage-1 Implementation Status
+
+Persistence compatibility is now implemented without Stage-2 semantics.
+`ExpSMStoreState` normalizes current unversioned stores and structurally valid
+envelope v2 stores. Every authoritative writer uses the same canonical-path
+reentrant `RLock` and stable sibling `fcntl.flock(LOCK_EX)` coordinator; fresh
+mutation reads and verification readback remain under both locks. Current-store
+writes remain unversioned. Mutation of a v2 source fails closed with
+`ENVELOPE_V2_WRITE_NOT_ENABLED`, preserving all bytes and opaque receipt data.
+
+This does not implement occurrence identity, evidence digests, receipts,
+`ALREADY_APPLIED`, `EVENT_CONFLICT`, pending-event durability, or automatic
+Feedback. Those remain Stage 2 or later work.

@@ -115,6 +115,15 @@ ALLOWED = {
     "clc/expsm/nfp_operational_retrieval.py",
     "clc/expsm/expsm_activation_module.py",
     "clc/action/decision_selector.py",
+    "clc/consolidation/expsm_store_transaction.py",
+    "clc/consolidation/expsm_commit_writer.py",
+    "clc/consolidation/expsm_update_writer.py",
+    "clc/evaluation/value_feedback_update_writer.py",
+    "clc/experience/expsm_native_create.py",
+    "clc/expsm/expsm_outcome_feedback.py",
+    "Memory/ExpSM/Exp_CRUD.py",
+    "scenarios/expsm_persistence_stage1.json",
+    "tools/verify_expsm_persistence_stage1.py",
 }
 
 

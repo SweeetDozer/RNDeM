@@ -459,3 +459,11 @@ only operational `hits`, `misses`, `confidence`, `repeatability`, and
 succeeds. It does not change the V1 schema, context, ACTION, prediction,
 creation provenance, status, or `created_at_world`, and adds no replay field or
 runtime wiring.
+
+## Store Envelope Compatibility
+
+`NFP_NATIVE_V1` remains the same 17-field record representation. The new
+`ExpSMStoreState` concerns only the containing store: it can read current
+unversioned `{experience, reflexes}` data and the approved future envelope v2.
+Stage 1 never writes v2 and never adds record-local replay metadata. Existing
+v2 input is read-only until Stage 2 and cannot be downgraded by a writer.
