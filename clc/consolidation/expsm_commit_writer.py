@@ -48,6 +48,18 @@ class ExpSMCommitWriter:
         active_field: ActiveContextField,
         system_state: SystemState,
     ) -> list[ContextOperation]:
+        if system_state.mode != "consolidation":
+            return []
+        if not self._has_recent_commit_decision(tick, memory):
+            return []
+        if not self.memory_mutation_policy.allow_expsm_commit:
+            return [
+                self._policy_blocked_update(
+                    tick,
+                    "expsm_commit_blocked_by_policy",
+                    "policy_disallows_expsm_commit",
+                )
+            ]
         try:
             with self.transaction.mutation():
                 return self._run_locked(tick, memory, active_field, system_state)

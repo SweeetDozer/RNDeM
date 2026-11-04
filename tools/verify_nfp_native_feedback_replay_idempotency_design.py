@@ -154,6 +154,7 @@ ALLOWED = {
     "docs/design_nfp_native_feedback_replay_idempotency.md",
     "docs/design_nfp_native_feedback.md",
     "docs/current_architecture_checkpoint.md",
+    "docs/debug_name_dependency_audit.json",
     "tools/verify_nfp_native_feedback_design.py",
     "tools/verify_nfp_action_materialization_guarded_execution_design.py",
     "tools/verify_nfp_expsm_operational_retrieval_design.py",

@@ -47,6 +47,18 @@ class ExpSMUpdateWriter:
         active_field: ActiveContextField,
         system_state: SystemState,
     ) -> list[ContextOperation]:
+        if system_state.mode != "consolidation":
+            return []
+        if not self._has_recent_update_decision(tick, memory):
+            return []
+        if not self.memory_mutation_policy.allow_expsm_update:
+            return [
+                self._policy_blocked_update(
+                    tick,
+                    "memory_update_blocked_by_policy",
+                    "policy_disallows_expsm_update",
+                )
+            ]
         try:
             with self.transaction.mutation():
                 return self._run_locked(tick, memory, active_field, system_state)

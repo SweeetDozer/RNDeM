@@ -41,7 +41,7 @@ def main() -> int:
             json.dumps(
                 {
                     "experience": {
-                        "mechanism_1": {
+                        "1": {
                             "if": [registry.id("internal_tension")],
                             "then": [action],
                             "result": [target],
@@ -76,7 +76,7 @@ def main() -> int:
                     "target_score": 0.8,
                     "mechanisms": [
                         {
-                            "experience_id": "mechanism_1",
+                            "experience_id": "1",
                             "mechanism_purpose": "preserve_target",
                             "mechanism_score": 0.72,
                             "viability": 0.75,
@@ -99,7 +99,7 @@ def main() -> int:
         decision_ok = bool(
             decision_op is not None
             and decision_op.payload.get("source") == "expsm_mechanism_search"
-            and decision_op.payload.get("source_experience_id") == "mechanism_1"
+            and decision_op.payload.get("source_experience_id") == "1"
         )
         if decision_op is not None:
             memory.add_event(decision_op)
@@ -140,7 +140,7 @@ def main() -> int:
         feedback_ops = feedback_module.run(4, memory, ActiveContextField(), SystemState())
         feedback_ok = any(
             op.payload.get("trace_source") == "direct_decision_mechanism_source"
-            and op.payload.get("experience_id") == "mechanism_1"
+            and op.payload.get("experience_id") == "1"
             for op in feedback_ops
         )
     unchanged = before_hash == _sha256(REAL_EXPSM)

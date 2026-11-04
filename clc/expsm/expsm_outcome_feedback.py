@@ -44,6 +44,10 @@ class ExpSMOutcomeFeedback:
         active_field: ActiveContextField,
         system_state: SystemState,
     ) -> list[ContextOperation]:
+        if system_state.mode != "active":
+            return []
+        if not self._has_feedback_work(tick, memory):
+            return []
         try:
             with self.transaction.mutation():
                 return self._run_locked(tick, memory, active_field, system_state)
@@ -160,6 +164,51 @@ class ExpSMOutcomeFeedback:
                     self._processed_keys.add(key)
                     self._write_data(data)
         return operations
+
+    def _has_feedback_work(self, tick: int, memory: ContextMemory) -> bool:
+        """Return whether in-memory evidence could reach authoritative feedback."""
+        events_by_id = {event.op_id: event for event in memory.events}
+        for decision_event in self._direct_mechanism_decisions(tick, memory):
+            decision = dict(decision_event.payload)
+            outcome_event = self._linked_outcome(tick, memory, decision_event)
+            if outcome_event is None:
+                continue
+            activation = {
+                "result_patterns": [decision.get("source_target_pattern_id")],
+                "recommendation_patterns": [],
+            }
+            if self._feedback_status(
+                activation,
+                decision,
+                memory,
+                decision_event,
+                outcome_event,
+                events_by_id,
+            ) != "no_feedback":
+                return True
+        for activation_event in memory.events:
+            if activation_event.marker != OperationMarker.EXPSM_ACTIVATION:
+                continue
+            if tick - activation_event.tick < FEEDBACK_DELAY_TICKS:
+                continue
+            activation = dict(activation_event.payload)
+            then_patterns = _as_set(activation.get("then_patterns"))
+            if not then_patterns:
+                continue
+            for decision_event in self._selected_decisions(memory, activation_event, then_patterns):
+                outcome_event = self._linked_outcome(tick, memory, decision_event)
+                if outcome_event is None:
+                    continue
+                if self._feedback_status(
+                    activation,
+                    dict(decision_event.payload),
+                    memory,
+                    decision_event,
+                    outcome_event,
+                    events_by_id,
+                ) != "no_feedback":
+                    return True
+        return False
 
     def _direct_mechanism_decisions(self, tick: int, memory: ContextMemory) -> list[ContextOperation]:
         return [

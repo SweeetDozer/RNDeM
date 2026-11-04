@@ -65,6 +65,23 @@ class ValueFeedbackUpdateWriter:
         memory: ContextMemory,
         system_state: SystemState,
     ) -> list[ContextOperation]:
+        if system_state.mode != "consolidation":
+            return []
+        reviews = [
+            review
+            for review in memory.get_recent_value_feedback_reviews(16)
+            if self._is_ready_review(review)
+        ]
+        if not reviews:
+            return []
+        if not self.memory_mutation_policy.allow_value_feedback_update:
+            return [
+                self._policy_blocked_update(
+                    tick,
+                    "value_feedback_update_blocked_by_policy",
+                    "policy_disallows_value_feedback_update",
+                )
+            ]
         try:
             with self.transaction.mutation():
                 return self._run_locked(tick, memory, system_state)

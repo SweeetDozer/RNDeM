@@ -9,6 +9,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +22,10 @@ from clc.consolidation.expsm_store_transaction import (
     ExpSMStoreInvalidError,
     ExpSMStoreTransaction,
 )
+from clc.consolidation.expsm_commit_writer import ExpSMCommitWriter
+from clc.consolidation.expsm_update_writer import ExpSMUpdateWriter
+from clc.evaluation.value_feedback_update_writer import ValueFeedbackUpdateWriter
+from clc.expsm.expsm_outcome_feedback import ExpSMOutcomeFeedback
 
 
 WRITERS = {
@@ -32,6 +37,17 @@ WRITERS = {
     "ExpSMOutcomeFeedback": "clc/expsm/expsm_outcome_feedback.py",
     "ExpSMCRUD": "Memory/ExpSM/Exp_CRUD.py",
 }
+
+
+class _ForbiddenTransaction:
+    def mutation(self) -> object:
+        raise AssertionError("denied/no-work call entered ExpSM transaction")
+
+
+class _NoValueReviews:
+    def get_recent_value_feedback_reviews(self, limit: int) -> list[dict[str, object]]:
+        del limit
+        return []
 
 
 def _legacy(records: dict[str, dict[str, object]] | None = None) -> dict[str, object]:
@@ -179,6 +195,51 @@ class ExpSMStage1Tests(unittest.TestCase):
                 with transaction.mutation():
                     pass
         self.assertEqual(self.path.read_bytes(), before)
+
+    def test_denied_and_no_work_writers_do_not_enter_transaction(self) -> None:
+        production_store = ROOT / "Memory/ExpSM/ExpSM_data.json"
+        production_lock = ROOT / "Memory/ExpSM/ExpSM_data.lock"
+        self.assertFalse(production_lock.exists())
+        before = production_store.read_bytes()
+
+        commit = object.__new__(ExpSMCommitWriter)
+        commit.transaction = _ForbiddenTransaction()
+        commit.memory_mutation_policy = SimpleNamespace(allow_expsm_commit=False)
+        commit._has_recent_commit_decision = lambda tick, memory: True
+        commit._policy_blocked_update = lambda *args: "commit_denied"
+        self.assertEqual(
+            commit.run(1, object(), object(), SimpleNamespace(mode="consolidation")),
+            ["commit_denied"],
+        )
+
+        update = object.__new__(ExpSMUpdateWriter)
+        update.transaction = _ForbiddenTransaction()
+        update.memory_mutation_policy = SimpleNamespace(allow_expsm_update=False)
+        update._has_recent_update_decision = lambda tick, memory: True
+        update._policy_blocked_update = lambda *args: "update_denied"
+        self.assertEqual(
+            update.run(1, object(), object(), SimpleNamespace(mode="consolidation")),
+            ["update_denied"],
+        )
+
+        value = object.__new__(ValueFeedbackUpdateWriter)
+        value.transaction = _ForbiddenTransaction()
+        value.memory_mutation_policy = SimpleNamespace(allow_value_feedback_update=True)
+        self.assertEqual(
+            value.run(1, _NoValueReviews(), SimpleNamespace(mode="consolidation")),
+            [],
+        )
+
+        outcome = object.__new__(ExpSMOutcomeFeedback)
+        outcome.transaction = _ForbiddenTransaction()
+        outcome._has_feedback_work = lambda tick, memory: False
+        self.assertEqual(
+            outcome.run(1, object(), object(), SimpleNamespace(mode="active")),
+            [],
+        )
+
+        self.assertEqual(production_store.read_bytes(), before)
+        self.assertFalse(production_lock.exists())
 
     def test_spawned_processes_preserve_same_and_different_record_updates(self) -> None:
         context = multiprocessing.get_context("spawn")
