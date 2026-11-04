@@ -267,6 +267,7 @@ def main() -> int:
         "Memory/ExpSM/Exp_CRUD.py",
         "scenarios/expsm_persistence_stage1.json",
         "tools/verify_expsm_persistence_stage1.py",
+        "tools/verify_expsm_mechanism_action_source.py",
     }
     unexpected = sorted(set(changed) - allowed)
     if unexpected:

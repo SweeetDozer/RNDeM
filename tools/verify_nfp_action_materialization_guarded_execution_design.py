@@ -124,6 +124,7 @@ ALLOWED = {
     "Memory/ExpSM/Exp_CRUD.py",
     "scenarios/expsm_persistence_stage1.json",
     "tools/verify_expsm_persistence_stage1.py",
+    "tools/verify_expsm_mechanism_action_source.py",
 }
 
 
