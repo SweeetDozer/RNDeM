@@ -12,6 +12,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from clc.context.context_memory import ContextMemory
+from clc.consolidation.expsm_store_transaction import ExpSMStoreTransaction
 from clc.core.ids import IdGenerator
 from clc.core.markers import OperationMarker
 from clc.core.operations import ContextOperation
@@ -31,16 +32,18 @@ def main() -> int:
         registry = PatternRegistry(temp_root / "Memory" / "pattern_manifest.json")
         expsm_path = temp_root / "Memory" / "ExpSM" / "ExpSM_data.json"
         expsm_path.parent.mkdir(parents=True, exist_ok=True)
-        _write_json(expsm_path, _demo_store(registry))
+        store = _demo_store(registry)
+        ExpSMStoreTransaction.validate_store(store)
+        _write_json(expsm_path, store)
 
         view = ValueFeedbackMemoryView(registry, expsm_path)
-        positive = view.get("positive")
-        negative = view.get("negative")
-        neutral = view.get("neutral")
-        before_update = view.get("refresh")
+        positive = view.get("101")
+        negative = view.get("102")
+        neutral = view.get("103")
+        before_update = view.get("104")
         _apply_temp_value_feedback_update(registry, expsm_path)
         view.refresh()
-        after_update = view.get("refresh")
+        after_update = view.get("104")
 
         positive_ok = (
             positive is not None
@@ -107,11 +110,15 @@ def _demo_store(registry: PatternRegistry) -> dict[str, Any]:
     avoid_target = registry.id("evaluation_avoidance_target")
     return {
         "experience": {
-            "positive": {
+            "101": {
                 "if": ["pat_if"],
                 "then": ["pat_then"],
                 "result": ["pat_result"],
                 "recommendation": ["pat_recommend"],
+                "hits": 0,
+                "misses": 0,
+                "confidence": 0.5,
+                "repeatability": 0.5,
                 "value_feedback": {
                     "positive_count": 1,
                     "negative_count": 0,
@@ -136,11 +143,15 @@ def _demo_store(registry: PatternRegistry) -> dict[str, Any]:
                     ],
                 },
             },
-            "negative": {
+            "102": {
                 "if": ["pat_if"],
                 "then": ["pat_then"],
                 "result": ["pat_result"],
                 "recommendation": ["pat_recommend"],
+                "hits": 0,
+                "misses": 0,
+                "confidence": 0.5,
+                "repeatability": 0.5,
                 "value_feedback": {
                     "positive_count": 0,
                     "negative_count": 2,
@@ -165,17 +176,25 @@ def _demo_store(registry: PatternRegistry) -> dict[str, Any]:
                     ],
                 },
             },
-            "neutral": {
+            "103": {
                 "if": ["pat_if"],
                 "then": ["pat_then"],
                 "result": ["pat_result"],
                 "recommendation": ["pat_recommend"],
+                "hits": 0,
+                "misses": 0,
+                "confidence": 0.5,
+                "repeatability": 0.5,
             },
-            "refresh": {
+            "104": {
                 "if": ["pat_if"],
                 "then": ["pat_then"],
                 "result": ["pat_result"],
                 "recommendation": ["pat_recommend"],
+                "hits": 0,
+                "misses": 0,
+                "confidence": 0.5,
+                "repeatability": 0.5,
                 "value_feedback": {
                     "positive_count": 0,
                     "negative_count": 0,
@@ -189,7 +208,7 @@ def _demo_store(registry: PatternRegistry) -> dict[str, Any]:
             },
         },
         "reflexes": {
-            "ignored_reflex": {
+            "201": {
                 "value_feedback": {
                     "negative_count": 9,
                     "negative_strength_total": 9.0,
@@ -214,7 +233,7 @@ def _apply_temp_value_feedback_update(registry: PatternRegistry, expsm_path: Pat
                 "value_feedback_review_id": "review_refresh",
                 "source_value_feedback_candidate_id": "candidate_refresh",
                 "source_target_satisfaction_id": "target_satisfaction_refresh",
-                "source_experience_id": "refresh",
+                "source_experience_id": "104",
                 "source_mechanism_search_id": "mechanism_refresh",
                 "source_target_observation_id": "target_observation_refresh",
                 "target_pattern_id": target,
