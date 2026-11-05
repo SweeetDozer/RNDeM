@@ -24,6 +24,7 @@
       "restart_and_lost_ack_do_not_double_apply": true,
       "cross_process_duplicate_and_conflict_are_serialized": true,
       "pre_replace_failure_retry_applies_exactly_once": true,
+      "historical_duplicate_survives_later_legitimate_update_without_mutation": true,
       "receipt_ledger_is_unbounded_and_non_cognitive": true,
       "all_authoritative_writers_preserve_v2_receipts": true,
       "no_outbox": true,

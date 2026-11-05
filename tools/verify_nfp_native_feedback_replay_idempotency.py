@@ -21,25 +21,35 @@ from clc.expsm.nfp_native_feedback_apply import (
     NFPFeedbackApplyRecoveryStatus,
     NFPFeedbackApplyStatus,
     NFPFeedbackApplyWriter,
+    _evidence_digest_payload,
+    _sha256_json,
     reconcile_nfp_feedback_readback_failure,
 )
 from clc.experience.expsm_native_create import ExpSMCreateStatus, NFPExpSMCreateWriter
 from clc.consolidation.expsm_commit_writer import ExpSMCommitWriter
 from clc.consolidation.expsm_store_transaction import ExpSMStoreTransaction
 from clc.consolidation.expsm_update_writer import ExpSMUpdateWriter
+from clc.context.context_memory import ContextMemory
+from clc.core.ids import IdGenerator
+from clc.core.markers import OperationMarker
+from clc.core.operations import ContextOperation
+from clc.core.pattern_registry import PatternRegistry
 from clc.evaluation.value_feedback_update_writer import ValueFeedbackUpdateWriter
 from clc.expsm.expsm_outcome_feedback import ExpSMOutcomeFeedback
+from clc.field.active_context_field import ActiveContextField
 from clc.expsm.nfp_operational_retrieval import (
     NFPExpSMRetrievalConfig,
     NFPExpSMRetrievalQuery,
     NFPExpSMRetriever,
 )
 from clc.runtime.memory_mutation_policy import RuntimeProfile, policy_for_profile
+from clc.system.system_state import SystemState
 from Memory.ExpSM.Exp_CRUD import ExpSMCRUD
 from tools.verify_expsm_persistence_stage1 import _audit_writer_ast
 from tools.verify_nfp_expsm_policy_gated_create import _request
 from tools.verify_nfp_native_feedback_apply import _evidence, _record
 from tools.verify_nfp_native_feedback_evaluation import _window
+from tools.verify_value_feedback_update_writer import _demo_expsm_store, _ready_review
 
 
 OCCURRENCE = "22222222-2222-4222-8222-222222222222"
@@ -103,6 +113,27 @@ class ReplayIdempotencyTests(unittest.TestCase):
         self.assertEqual(self.writer.apply(self.evidence()).status, NFPFeedbackApplyStatus.UPDATED)
         return json.loads(self.path.read_text(encoding="utf-8"))["native_feedback_receipts"]
 
+    def v2_with_records(self, records: dict[str, object]) -> dict[str, object]:
+        receipts = self.seed_v2()
+        store = json.loads(self.path.read_text(encoding="utf-8"))
+        store["experience"].update(records)
+        self.path.write_text(json.dumps(store), encoding="utf-8")
+        ExpSMStoreTransaction(self.path).load_state_strict()
+        return receipts
+
+    def writer_context(self):
+        root = Path(self.temp.name)
+        registry = PatternRegistry(root / "pattern_manifest.json")
+        ids = IdGenerator()
+        return registry, ids, ContextMemory(ids, registry)
+
+    @staticmethod
+    def add_decision(memory, ids, tick: int, pattern_id: str) -> None:
+        memory.add_event(ContextOperation(
+            ids.next("op"), OperationMarker.INTERNAL_DECISION, tick, "test", None,
+            {"decision_pattern_id": pattern_id, "system_mode_at_selection": "consolidation"},
+        ))
+
     def test_duplicate_survives_reopen_without_second_increment(self) -> None:
         first = self.writer.apply(self.evidence())
         after_first = self.path.read_bytes()
@@ -127,6 +158,30 @@ class ReplayIdempotencyTests(unittest.TestCase):
             FeedbackEvidenceDigestV1("not-a-digest")
         with self.assertRaises(ValueError):
             FeedbackEvidenceDigestV1("0" * 64, 2)
+
+    def test_production_evidence_digest_is_deterministic_and_sensitive(self) -> None:
+        evidence_a = self.evidence()
+        evidence_b = replace(_evidence(_record("42"), NFPFeedbackEvaluationStatus.HIT),
+                             execution_occurrence_id=OCCURRENCE)
+        payload = _evidence_digest_payload(evidence_a)
+        reordered_payload = dict(reversed(tuple(payload.items())))
+        self.assertEqual(_sha256_json(payload), _sha256_json(reordered_payload))
+        first = self.writer.apply(evidence_a)
+        duplicate = self.writer.apply(evidence_b)
+        self.assertEqual(duplicate.status, NFPFeedbackApplyStatus.ALREADY_APPLIED)
+        self.assertEqual(first.evidence_digest, duplicate.evidence_digest)
+        variants = (
+            replace(evidence_b, agreement_threshold=0.5000001),
+            replace(evidence_b, effect_similarity=0.9000001),
+            replace(evidence_b, classification=NFPFeedbackEvaluationStatus.MISS),
+            replace(evidence_b, predicted_effect=replace(evidence_b.predicted_effect, delta_values=(0.4, -0.4))),
+            replace(evidence_b, actual_effect=replace(evidence_b.actual_effect, delta_values=(0.4, -0.4))),
+            replace(evidence_b, target_core=replace(evidence_b.target_core, source_support_count=99)),
+        )
+        for variant in variants:
+            result = self.writer.apply(variant)
+            self.assertEqual(result.status, NFPFeedbackApplyStatus.EVENT_CONFLICT)
+            self.assertNotEqual(result.evidence_digest, first.evidence_digest)
 
     def test_same_key_different_payload_conflicts_without_mutation(self) -> None:
         original = self.evidence()
@@ -269,27 +324,92 @@ class ReplayIdempotencyTests(unittest.TestCase):
         self.assertEqual(replacements, 1)
 
     def test_v2_receipts_survive_other_authoritative_writer_families(self) -> None:
-        def helper_write(kind: str) -> None:
-            transaction = ExpSMStoreTransaction(self.path)
-            with transaction.mutation():
-                store = transaction.load_for_mutation_strict()
-                store["experience"]["43"]["hits"] += 1
-                if kind == "commit":
-                    writer = object.__new__(ExpSMCommitWriter)
-                    writer.expsm_path, writer.transaction = self.path, transaction
-                    writer._atomic_write_json(self.path, store)
-                elif kind == "update":
-                    writer = object.__new__(ExpSMUpdateWriter)
-                    writer.expsm_path, writer.transaction = self.path, transaction
-                    writer._atomic_write_json(self.path, store)
-                elif kind == "value":
-                    writer = object.__new__(ValueFeedbackUpdateWriter)
-                    writer.expsm_path, writer.transaction = self.path, transaction
-                    writer._atomic_write_json(self.path, store)
-                else:
-                    writer = object.__new__(ExpSMOutcomeFeedback)
-                    writer.transaction = transaction
-                    writer._write_data(store)
+        def commit() -> None:
+            receipts = self.v2_with_records({})
+            registry, ids, memory = self.writer_context()
+            draft_path = Path(self.temp.name) / "commit_drafts.json"
+            draft_path.write_text(json.dumps({"drafts": [{
+                "draft_id": "draft:commit", "draft_status": "draft_ready_to_commit",
+                "target": "ExpSM", "draft_signature": ["if", "then", "result"],
+                "if_patterns": [registry.id("state_integrity_preservation")],
+                "then_patterns": [registry.id("action_preserve_integrity")],
+                "result_patterns": [registry.id("state_integrity_preservation")],
+                "seen_count": 3, "metrics": {"avg_confidence": 0.8, "support_count": 3},
+                "commit_review": {"review_status": "ready_to_commit", "last_review_id": "review:commit"},
+            }]}), encoding="utf-8")
+            writer = ExpSMCommitWriter(ids, registry, draft_path, self.path,
+                policy_for_profile(RuntimeProfile.MUTATING_MEMORY, memory_is_temporary=True))
+            self.add_decision(memory, ids, 1, writer.commit_action_id)
+            before = len(json.loads(self.path.read_text())["experience"])
+            operations = writer.run(2, memory, ActiveContextField(), SystemState(mode="consolidation"))
+            after = json.loads(self.path.read_text())
+            self.assertTrue(any(op.marker == OperationMarker.MEMORY_COMMITTED for op in operations), operations)
+            self.assertEqual(len(after["experience"]), before + 1)
+            self.assert_v2_receipts(after, receipts)
+
+        def update() -> None:
+            base = _demo_expsm_store()["experience"]["2"]
+            receipts = self.v2_with_records({"2": base})
+            registry, ids, memory = self.writer_context()
+            draft_path = Path(self.temp.name) / "update_drafts.json"
+            draft_path.write_text(json.dumps({"drafts": [{
+                "draft_id": "draft:update", "draft_status": "draft_committed",
+                "committed_experience_id": "2", "seen_count": 5,
+                "metrics": {"avg_confidence": 0.9, "support_count": 5},
+                "post_commit": {"pending_expsm_update": True,
+                    "update_status": "approved_pending_update_writer", "post_commit_seen_count": 2,
+                    "update_review": {"review_status": "approved_for_expsm_update", "last_review_id": "review:update"}},
+            }]}), encoding="utf-8")
+            writer = ExpSMUpdateWriter(ids, registry, draft_path, self.path,
+                policy_for_profile(RuntimeProfile.MUTATING_MEMORY, memory_is_temporary=True))
+            self.add_decision(memory, ids, 1, writer.update_action_id)
+            old_confidence = base["confidence"]
+            operations = writer.run(2, memory, ActiveContextField(), SystemState(mode="consolidation"))
+            after = json.loads(self.path.read_text())
+            self.assertTrue(any(op.marker == OperationMarker.MEMORY_UPDATED for op in operations))
+            self.assertNotEqual(after["experience"]["2"]["confidence"], old_confidence)
+            self.assert_v2_receipts(after, receipts)
+
+        def value() -> None:
+            receipts = self.v2_with_records(_demo_expsm_store()["experience"])
+            registry, ids, memory = self.writer_context()
+            memory.add_event(ContextOperation(ids.next("op"), OperationMarker.VALUE_FEEDBACK_REVIEW,
+                1, "test", None, _ready_review(registry)))
+            writer = ValueFeedbackUpdateWriter(ids, registry, self.path,
+                policy_for_profile(RuntimeProfile.MUTATING_MEMORY, memory_is_temporary=True))
+            operations = writer.run(2, memory, SystemState(mode="consolidation"))
+            after = json.loads(self.path.read_text())
+            self.assertTrue(any(op.marker == OperationMarker.VALUE_FEEDBACK_UPDATED for op in operations))
+            self.assertEqual(after["experience"]["2"]["value_feedback"]["positive_count"], 1)
+            self.assert_v2_receipts(after, receipts)
+
+        def outcome() -> None:
+            registry, ids, memory = self.writer_context()
+            target, action = registry.id("state_integrity_preservation"), registry.id("action_preserve_integrity")
+            record = {"if": [registry.id("internal_tension")], "then": [action],
+                "result": [target], "recommendation": [target], "confidence": 0.7,
+                "repeatability": 0.6, "hits": 1, "misses": 0, "status": 2}
+            receipts = self.v2_with_records({"1": record})
+            decision_id = "decision:outcome"
+            memory.add_event(ContextOperation(ids.next("op"), OperationMarker.INTERNAL_DECISION, 1, "test", None,
+                {"decision_id": decision_id, "decision_pattern_id": action, "source": "expsm_mechanism_search",
+                 "source_experience_id": "1", "source_mechanism_search_id": "search:1",
+                 "source_target_pattern_id": target}))
+            effect_id = ids.next("op")
+            memory.add_event(ContextOperation(effect_id, OperationMarker.INTERNAL_ACTION_EFFECT, 2, "test", None,
+                {"effect_id": effect_id, "source_decision_id": decision_id, "effect_pattern_id": target, "effect_kind": target}))
+            memory.add_event(ContextOperation(ids.next("op"), OperationMarker.OUTCOME_EVALUATION, 3, "test", None,
+                {"outcome_id": "outcome:1", "source_event_id": effect_id, "source_decision_id": decision_id,
+                 "outcome_status": "confirmed", "outcome_pattern_id": target, "matched_patterns": [target]}))
+            operations = ExpSMOutcomeFeedback(ids, registry, self.path).run(4, memory, ActiveContextField(), SystemState())
+            after = json.loads(self.path.read_text())
+            self.assertTrue(operations)
+            self.assertEqual(after["experience"]["1"]["hits"], 2)
+            self.assert_v2_receipts(after, receipts)
+
+        commit(); update(); value(); outcome()
+
+        receipt_before = self.seed_v2()
 
         writers = {
             "NFPExpSMCreateWriter": lambda: self.assertEqual(
@@ -306,10 +426,6 @@ class ReplayIdempotencyTests(unittest.TestCase):
                 )).status,
                 NFPFeedbackApplyStatus.UPDATED,
             ),
-            "ExpSMCommitWriter": lambda: helper_write("commit"),
-            "ExpSMUpdateWriter": lambda: helper_write("update"),
-            "ValueFeedbackUpdateWriter": lambda: helper_write("value"),
-            "ExpSMOutcomeFeedback": lambda: helper_write("outcome"),
             "ExpSMCRUD": lambda: ExpSMCRUD(self.path).create_experience(
                 ["a"], ["b"], ["c"], ["b"], experience_id="100"
             ),
@@ -335,6 +451,10 @@ class ReplayIdempotencyTests(unittest.TestCase):
         self.assertEqual(audit.direct_write_violations, ())
         self.assertEqual(audit.transaction_violations, ())
         self.assertEqual(audit.store_order_violations, ())
+
+    def assert_v2_receipts(self, store, receipts) -> None:
+        self.assertEqual(store["store_schema_version"], 2)
+        self.assertEqual(store["native_feedback_receipts"], receipts)
 
     def test_receipts_are_not_cognitive_retrieval_records(self) -> None:
         self.writer.apply(self.evidence())
