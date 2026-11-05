@@ -135,7 +135,7 @@ class NFPExpSMCreateWriter:
             candidate["experience"] = dict(store["experience"])
             candidate["experience"][attempted_id] = expected.to_json_data()
             try:
-                ExpSMStoreTransaction.validate_store(candidate)
+                ExpSMStoreTransaction.normalize_store(candidate)
                 self.transaction.write_complete_store(
                     candidate,
                     before_replace=lambda: self._inject("pre_replace"),

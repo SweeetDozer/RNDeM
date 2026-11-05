@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from uuid import UUID, uuid4
 
 from clc.actuation.motor import ACTION_MOTOR_TOPOLOGY, ActionTransducer, ActuatorSignal
 from clc.context.causal_transition import PendingCausalTransition, RecentCausalTransition
@@ -64,6 +65,7 @@ class MaterializedNFPActionIntent:
     selection_context_end_tick: int
     before_context_at_T: NFPWindow
     target_core: NFPFeedbackTargetCore | None = None
+    execution_occurrence_id: str = ""
 
     def __post_init__(self) -> None:
         if not isinstance(self.action_frame, NFPFrame):
@@ -91,6 +93,13 @@ class MaterializedNFPActionIntent:
             raise ValueError("fresh action frame identity must be independent")
         if not isinstance(self.predicted_effect, SerializedObservedEffectV1):
             raise TypeError("predicted_effect must be SerializedObservedEffectV1")
+        if not self.execution_occurrence_id:
+            raise ValueError("materialized action requires execution_occurrence_id")
+        try:
+            if str(UUID(self.execution_occurrence_id, version=4)) != self.execution_occurrence_id:
+                raise ValueError
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ValueError("execution_occurrence_id must be a canonical UUIDv4") from exc
 
 
 @dataclass(frozen=True)
@@ -105,6 +114,7 @@ class NFPRememberedActionExecutionResult:
     recent_transition: RecentCausalTransition | None = None
     detail: str = ""
     target_core: NFPFeedbackTargetCore | None = None
+    execution_occurrence_id: str | None = None
 
     @property
     def executed(self) -> bool:
@@ -145,6 +155,7 @@ class NFPActionOccurrenceMaterializer:
             selection_context_end_tick=request.selection_context_end_tick,
             before_context_at_T=before_context_at_T,
             target_core=selected.target_core,
+            execution_occurrence_id=str(uuid4()),
         )
 
 
@@ -236,6 +247,7 @@ class NFPRememberedActionExecutionCoordinator:
             **common,
             "action_frame": frame,
             "before_context_at_T": before_context_at_T,
+            "execution_occurrence_id": intent.execution_occurrence_id,
         }
         if frame.topology != ACTION_MOTOR_TOPOLOGY:
             return NFPRememberedActionExecutionResult(
@@ -269,7 +281,9 @@ class NFPRememberedActionExecutionCoordinator:
 
         executed = {**materialized, "actuator_signal": signal}
         try:
-            pending = context_manager.observe_action_frame(frame)
+            pending = context_manager.observe_action_frame(
+                frame, execution_occurrence_id=intent.execution_occurrence_id,
+            )
         except Exception as exc:
             return NFPRememberedActionExecutionResult(
                 NFPRememberedActionExecutionStatus.ACTION_EXECUTED_CAUSAL_TRACKING_FAILED,

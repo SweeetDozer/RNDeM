@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import Enum
+from uuid import UUID
 
 from clc.actuation.remembered_action_execution import (
     NFPRememberedActionExecutionResult,
@@ -48,12 +49,18 @@ class NFPFeedbackEvidence:
     effect_similarity: float
     agreement_threshold: float
     classification: NFPFeedbackEvaluationStatus
+    execution_occurrence_id: str
 
     def __post_init__(self) -> None:
         if self.classification not in {
             NFPFeedbackEvaluationStatus.HIT, NFPFeedbackEvaluationStatus.MISS,
         }:
             raise ValueError("evidence classification must be HIT or MISS")
+        try:
+            if str(UUID(self.execution_occurrence_id, version=4)) != self.execution_occurrence_id:
+                raise ValueError
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ValueError("execution_occurrence_id must be a canonical UUIDv4") from exc
 
 
 @dataclass(frozen=True)
@@ -140,6 +147,10 @@ class NFPFeedbackEvaluator:
             or frame.active_tick != current_transition.action_frame.active_tick
             or current_transition.action_tick != frame.active_tick
             or current_transition.observation_tick != current_transition.action_tick + 1
+            or (
+                execution.execution_occurrence_id is not None
+                or current_transition.execution_occurrence_id is not None
+            ) and current_transition.execution_occurrence_id != execution.execution_occurrence_id
         ):
             return NFPFeedbackEvaluationResult(
                 NFPFeedbackEvaluationStatus.TRANSITION_MISMATCH,
@@ -154,6 +165,7 @@ class NFPFeedbackEvaluator:
             or predicted != target_core.effect
             or not isinstance(execution.source_experience_id, str)
             or not execution.source_experience_id.strip()
+            or execution.execution_occurrence_id is None
         ):
             return NFPFeedbackEvaluationResult(
                 NFPFeedbackEvaluationStatus.INVALID_PREDICTION,
@@ -194,6 +206,7 @@ class NFPFeedbackEvaluator:
             effect_similarity=similarity,
             agreement_threshold=config.native_effect_agreement_threshold,
             classification=classification,
+            execution_occurrence_id=execution.execution_occurrence_id,
         )
         return NFPFeedbackEvaluationResult(classification, evidence, similarity)
 

@@ -56,18 +56,18 @@ class ExpSMCRUD:
 
     def load(self) -> dict[str, dict[str, dict[str, Any]]]:
         """Load ExpSM data from disk."""
-        return self.transaction.load_strict()
+        return self.transaction.load_complete_strict()
 
     def save(self) -> None:
         """Save ExpSM data to disk."""
         with self.transaction.mutation():
             self.transaction.load_state_strict()
             self.transaction.write_complete_store(self.data)
-            self.data = self.transaction.load_strict()
+            self.data = self.transaction.load_complete_strict()
 
     def get_all(self) -> dict[str, Any]:
         """Return a copy of all ExpSM data."""
-        return deepcopy(self.data)
+        return deepcopy({"experience": self.data["experience"], "reflexes": self.data["reflexes"]})
 
     def get_experience(self) -> dict[str, dict[str, Any]]:
         """Return all experience records."""

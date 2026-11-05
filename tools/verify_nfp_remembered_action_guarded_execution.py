@@ -145,6 +145,7 @@ class RememberedActionExecutionTests(unittest.TestCase):
         self.assertEqual(result.status, Status.STALE_SELECTION)
         self.assertFalse(result.executed)
         self.assertIsNone(result.action_frame)
+        self.assertIsNone(result.execution_occurrence_id)
         self.assertEqual((transducer.calls, world.apply_count), (0, 0))
         self.assertIsNone(manager.pending_causal_transition)
 
@@ -158,6 +159,7 @@ class RememberedActionExecutionTests(unittest.TestCase):
         ).execute(SelectedNFPExecutionRequest(self._selected(), 3), context_manager=manager,
                   world=world, system_state=SystemState())
         self.assertEqual(result.status, Status.CAUSAL_SLOT_OCCUPIED)
+        self.assertIsNone(result.execution_occurrence_id)
         self.assertIs(manager.pending_causal_transition, pending)
         self.assertIs(pending.before_sensory_window, before)
         self.assertEqual(world.apply_count, 0)
@@ -166,6 +168,7 @@ class RememberedActionExecutionTests(unittest.TestCase):
         malformed = replace(self._selected(), action=None)
         result, world, manager, _ = self._run(malformed)
         self.assertEqual(result.status, Status.INVALID_SELECTED_EXPERIENCE)
+        self.assertIsNone(result.execution_occurrence_id)
         self.assertEqual(world.apply_count, 0)
         self.assertIsNone(manager.pending_causal_transition)
 
@@ -173,6 +176,7 @@ class RememberedActionExecutionTests(unittest.TestCase):
         transducer = CountingTransducer()
         result, world, _, _ = self._run(incompatible, transducer=transducer)
         self.assertEqual(result.status, Status.ACTUATOR_INCOMPATIBLE)
+        self.assertIsNotNone(result.execution_occurrence_id)
         self.assertEqual((transducer.calls, world.apply_count), (0, 0))
 
         transducer = CountingTransducer()
@@ -180,12 +184,14 @@ class RememberedActionExecutionTests(unittest.TestCase):
             state=SystemState(mode="consolidation"), transducer=transducer,
         )
         self.assertEqual(result.status, Status.GUARD_DENIED)
+        self.assertIsNotNone(result.execution_occurrence_id)
         self.assertEqual((transducer.calls, world.apply_count), (0, 0))
         self.assertIsNone(manager.pending_causal_transition)
 
         transducer = CountingTransducer(reject=True)
         result, world, manager, _ = self._run(transducer=transducer)
         self.assertEqual(result.status, Status.TRANSDUCTION_REJECTED)
+        self.assertIsNotNone(result.execution_occurrence_id)
         self.assertEqual((transducer.calls, world.apply_count), (1, 0))
         self.assertIsNone(manager.pending_causal_transition)
 
@@ -193,6 +199,7 @@ class RememberedActionExecutionTests(unittest.TestCase):
         before_position = failed_world.hidden_position
         result, world, manager, _ = self._run(world=failed_world)
         self.assertEqual(result.status, Status.WORLD_EXECUTION_FAILED)
+        self.assertIsNotNone(result.execution_occurrence_id)
         self.assertFalse(result.executed)
         self.assertEqual(world.apply_count, 1)
         self.assertEqual(world.hidden_position, before_position)
@@ -201,6 +208,7 @@ class RememberedActionExecutionTests(unittest.TestCase):
     def test_post_world_tracking_failure_is_executed_exactly_once(self) -> None:
         result, world, manager, before = self._run(manager_type=FailingTrackingManager)
         self.assertEqual(result.status, Status.ACTION_EXECUTED_CAUSAL_TRACKING_FAILED)
+        self.assertIsNotNone(result.execution_occurrence_id)
         self.assertTrue(result.executed)
         self.assertEqual(world.apply_count, 1)
         self.assertEqual(world.current_tick, 4)
@@ -216,6 +224,10 @@ class RememberedActionExecutionTests(unittest.TestCase):
         self.assertTrue(result.executed)
         self.assertEqual(world.apply_count, 1)
         self.assertIs(result.pending_transition, manager.pending_causal_transition)
+        self.assertEqual(
+            result.pending_transition.execution_occurrence_id,
+            result.execution_occurrence_id,
+        )
         self.assertIs(result.pending_transition.before_sensory_window, before)
 
         short = ShortMemory(4, 10)
@@ -225,6 +237,10 @@ class RememberedActionExecutionTests(unittest.TestCase):
         self.assertEqual(world.apply_count, 1)
         self.assertIsNone(manager.pending_causal_transition)
         self.assertIs(result.recent_transition.before_sensory_window, before)
+        self.assertEqual(
+            result.recent_transition.execution_occurrence_id,
+            result.execution_occurrence_id,
+        )
         self.assertEqual(result.recent_transition.action_tick + 1,
                          result.recent_transition.observation_tick)
         self.assertEqual(short.snapshot(), (result.recent_transition,))
@@ -259,6 +275,7 @@ class RememberedActionExecutionTests(unittest.TestCase):
         self.assertEqual(one.source_experience_id, two.source_experience_id)
         self.assertNotEqual(one.action_frame.frame_id, two.action_frame.frame_id)
         self.assertNotEqual(one.action_frame.active_tick, two.action_frame.active_tick)
+        self.assertNotEqual(one.execution_occurrence_id, two.execution_occurrence_id)
 
     def test_fixture_and_authority_boundaries(self) -> None:
         fixture = json.loads((ROOT / "scenarios/nfp_remembered_action_guarded_execution.json").read_text())

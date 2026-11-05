@@ -1273,7 +1273,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 143,
+      "line": 155,
       "path": "clc/consolidation/expsm_commit_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -1482,7 +1482,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 135,
+      "line": 147,
       "path": "clc/consolidation/expsm_update_writer.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -3099,7 +3099,7 @@
     {
       "classification": "debug_output_only",
       "kind": "debug_name_call+direct_semantic_name_literal",
-      "line": 186,
+      "line": 203,
       "path": "clc/evaluation/value_feedback_update_writer.py",
       "recommendation": "keep debug_name for display/logging only",
       "risk": "low",
@@ -3110,7 +3110,7 @@
     {
       "classification": "stable_constant_or_enum",
       "kind": "direct_semantic_name_literal",
-      "line": 188,
+      "line": 205,
       "path": "clc/evaluation/value_feedback_update_writer.py",
       "recommendation": "keep as stable control value unless it starts depending on display/debug pattern names",
       "risk": "low",
@@ -3121,7 +3121,7 @@
     {
       "classification": "stable_constant_or_enum",
       "kind": "direct_semantic_name_literal",
-      "line": 275,
+      "line": 292,
       "path": "clc/evaluation/value_feedback_update_writer.py",
       "recommendation": "keep as stable control value unless it starts depending on display/debug pattern names",
       "risk": "low",
@@ -3132,7 +3132,7 @@
     {
       "classification": "semantic_filter",
       "kind": "direct_semantic_name_literal",
-      "line": 299,
+      "line": 316,
       "path": "clc/evaluation/value_feedback_update_writer.py",
       "recommendation": "replace semantic string filters with PatternRegistry semantic tags/classes",
       "risk": "medium",
@@ -3143,7 +3143,7 @@
     {
       "classification": "stable_constant_or_enum",
       "kind": "direct_semantic_name_literal",
-      "line": 306,
+      "line": 323,
       "path": "clc/evaluation/value_feedback_update_writer.py",
       "recommendation": "keep as stable control value unless it starts depending on display/debug pattern names",
       "risk": "low",
@@ -3154,7 +3154,7 @@
     {
       "classification": "stable_constant_or_enum",
       "kind": "direct_semantic_name_literal",
-      "line": 308,
+      "line": 325,
       "path": "clc/evaluation/value_feedback_update_writer.py",
       "recommendation": "keep as stable control value unless it starts depending on display/debug pattern names",
       "risk": "low",
@@ -3165,7 +3165,7 @@
     {
       "classification": "stable_constant_or_enum",
       "kind": "direct_semantic_name_literal",
-      "line": 310,
+      "line": 327,
       "path": "clc/evaluation/value_feedback_update_writer.py",
       "recommendation": "keep as stable control value unless it starts depending on display/debug pattern names",
       "risk": "low",
@@ -3385,7 +3385,7 @@
     {
       "classification": "runtime_source_label",
       "kind": "direct_semantic_name_literal",
-      "line": 129,
+      "line": 133,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "keep stable runtime provenance labels separate from PatternRegistry debug names",
       "risk": "low",
@@ -3396,7 +3396,7 @@
     {
       "classification": "runtime_source_label",
       "kind": "direct_semantic_name_literal",
-      "line": 169,
+      "line": 218,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "keep stable runtime provenance labels separate from PatternRegistry debug names",
       "risk": "low",
@@ -3407,7 +3407,7 @@
     {
       "classification": "runtime_source_label",
       "kind": "direct_semantic_name_literal",
-      "line": 189,
+      "line": 238,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "keep stable runtime provenance labels separate from PatternRegistry debug names",
       "risk": "low",
@@ -3418,7 +3418,7 @@
     {
       "classification": "runtime_source_label",
       "kind": "direct_semantic_name_literal",
-      "line": 191,
+      "line": 240,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "keep stable runtime provenance labels separate from PatternRegistry debug names",
       "risk": "low",
@@ -3429,7 +3429,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 195,
+      "line": 244,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -3440,7 +3440,7 @@
     {
       "classification": "pattern_id_construction",
       "kind": "direct_semantic_name_literal",
-      "line": 199,
+      "line": 248,
       "path": "clc/expsm/expsm_outcome_feedback.py",
       "recommendation": "review when changing pattern ids, but do not treat as a debug-name semantic decision",
       "risk": "medium",
@@ -8214,7 +8214,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "direct_semantic_name_literal",
-      "line": 107,
+      "line": 110,
       "path": "tools/verify_value_feedback_memory_view.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",
@@ -8225,7 +8225,7 @@
     {
       "classification": "test_or_verifier_only",
       "kind": "debug_name_call+direct_semantic_name_literal",
-      "line": 221,
+      "line": 240,
       "path": "tools/verify_value_feedback_memory_view.py",
       "recommendation": "keep as verifier fixture data unless it starts asserting runtime semantics by display name",
       "risk": "low",

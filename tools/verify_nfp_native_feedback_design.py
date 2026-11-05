@@ -60,6 +60,7 @@ ALLOWED = {
     "docs/design_nfp_expsm_mutation_path.md",
     "docs/current_architecture_checkpoint.md", "docs/project_hygiene_audit.md",
     "docs/debug_name_dependency_audit.json",
+    "docs/debug_name_dependency_audit.md",
     "tools/verify_nfp_native_feedback_design.py",
     "tools/verify_nfp_action_materialization_guarded_execution_design.py",
     "tools/verify_nfp_expsm_operational_retrieval_design.py",
@@ -87,6 +88,11 @@ ALLOWED = {
     "tools/verify_expsm_persistence_stage1.py",
     "tools/verify_expsm_mechanism_action_source.py",
     "tools/verify_value_feedback_memory_view.py",
+    "clc/context/causal_transition.py",
+    "clc/context/context_memory_manager.py",
+    "scenarios/nfp_native_feedback_replay_idempotency.json",
+    "tools/verify_nfp_native_feedback_replay_idempotency.py",
+    "tools/verify_nfp_remembered_action_guarded_execution.py",
 }
 
 V1_FIELDS = {

@@ -98,6 +98,7 @@ ALLOWED = {
     "scenarios/nfp_remembered_action_guarded_execution.json",
     "tools/verify_nfp_remembered_action_guarded_execution.py",
     "docs/debug_name_dependency_audit.json",
+    "docs/debug_name_dependency_audit.md",
     "tools/verify_first_closed_loop_action_consequence.py",
     "docs/design_nfp_native_feedback.md",
     "docs/design_nfp_expsm_mutation_path.md",
@@ -126,6 +127,10 @@ ALLOWED = {
     "tools/verify_expsm_persistence_stage1.py",
     "tools/verify_expsm_mechanism_action_source.py",
     "tools/verify_value_feedback_memory_view.py",
+    "clc/context/causal_transition.py",
+    "clc/context/context_memory_manager.py",
+    "scenarios/nfp_native_feedback_replay_idempotency.json",
+    "tools/verify_nfp_native_feedback_replay_idempotency.py",
 }
 
 

@@ -269,6 +269,10 @@ def main() -> int:
         "tools/verify_expsm_persistence_stage1.py",
         "tools/verify_expsm_mechanism_action_source.py",
         "tools/verify_value_feedback_memory_view.py",
+        "clc/context/causal_transition.py",
+        "clc/context/context_memory_manager.py",
+        "scenarios/nfp_native_feedback_replay_idempotency.json",
+        "tools/verify_nfp_native_feedback_replay_idempotency.py",
     }
     unexpected = sorted(set(changed) - allowed)
     if unexpected:

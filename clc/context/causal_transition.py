@@ -42,6 +42,7 @@ class PendingCausalTransition:
     action_frame: NFPFrame
     action_tick: int
     expected_observation_tick: int
+    execution_occurrence_id: str | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.transition_id, str):
@@ -58,6 +59,8 @@ class PendingCausalTransition:
             raise ValueError("expected observation tick must equal action_tick + 1")
         if self.before_sensory_window.end_tick > self.action_tick:
             raise ValueError("before window must not end after the action")
+        if self.execution_occurrence_id is not None:
+            _validate_occurrence_id(self.execution_occurrence_id)
 
 
 @dataclass(frozen=True)
@@ -70,14 +73,22 @@ class RecentCausalTransition:
     after_sensory_window: NFPWindow
     action_tick: int
     observation_tick: int
+    execution_occurrence_id: str | None = None
 
     def __post_init__(self) -> None:
         PendingCausalTransition(
             self.transition_id, self.before_sensory_window, self.action_frame,
-            self.action_tick, self.observation_tick,
+            self.action_tick, self.observation_tick, self.execution_occurrence_id,
         )
         validate_external_sensory_window(self.after_sensory_window)
         if self.after_sensory_window.end_tick != self.observation_tick:
             raise ValueError("observation_tick must equal after window end_tick")
         if self.before_sensory_window.topology != self.after_sensory_window.topology:
             raise ValueError("before and after visual topologies must match")
+
+
+def _validate_occurrence_id(value: str) -> None:
+    from uuid import UUID
+
+    if not isinstance(value, str) or str(UUID(value, version=4)) != value:
+        raise ValueError("execution_occurrence_id must be a canonical UUIDv4")

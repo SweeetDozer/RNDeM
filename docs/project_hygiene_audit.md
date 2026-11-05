@@ -646,10 +646,10 @@ in a later packaging pass.
   uses existing policy and transaction APIs against temporary stores in tests,
   updates only the exact source record, and has no runtime phase or automatic
   caller. Production Memory remains hash-guarded and unchanged.
-- Native apply intentionally has serialized caller-once semantics only. It
-  provides read-only post-readback reconciliation but no blind retry, durable
-  replay ledger, crash-safe idempotency claim, AKBSM/Chronicle authority, or
-  `_run_tick()` wiring.
+- Native apply remains explicit and unwired, but committed events now have a
+  durable envelope-v2 receipt ledger. Same-digest retry is a no-op and
+  conflicting reuse fails closed. There is no pending-event outbox,
+  AKBSM/Chronicle authority, or `_run_tick()` wiring.
 
 ## ExpSM Stage-1 Persistence Audit
 
@@ -659,5 +659,6 @@ in a later packaging pass.
   replaced data inode. Lock-open and `flock` failures fail closed.
 - Spawned-process tests cover same-record and different-record updates and
   demonstrate fresh-state serialization without lost updates.
-- Envelope-v2 reads are supported, while Stage-1 v2 writes and downgrades are
-  prohibited. Production Memory and `_run_tick()` remain unchanged.
+- Stage 1 historically prohibited envelope-v2 writes. Stage 2 enables validated
+  v2 replacement while prohibiting downgrade and preserving receipts through
+  all seven writer paths. Production Memory and `_run_tick()` remain unchanged.

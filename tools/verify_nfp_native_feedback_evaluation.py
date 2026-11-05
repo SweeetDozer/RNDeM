@@ -119,6 +119,7 @@ def _transition(
     return RecentCausalTransition(
         f"transition:{action_id}", _window("before", before, action_tick), action,
         _window("after", after, action_tick + 1), action_tick, action_tick + 1,
+        "33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -134,6 +135,7 @@ def _execution(
         predicted_effect=predicted or core.effect,
         recent_transition=transition if status is ExecutionStatus.EXECUTED_AND_OBSERVED else None,
         target_core=core,
+        execution_occurrence_id=transition.execution_occurrence_id,
     )
 
 

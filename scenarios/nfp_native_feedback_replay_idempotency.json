@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "name": "nfp_native_feedback_replay_idempotency",
+  "description": "Durable committed-event replay protection on temporary ExpSM stores only.",
+  "runtime": {"profile": "safe_demo", "memory_is_temporary": true, "max_ticks": 0},
+  "inputs": [],
+  "expect": {
+    "required_markers": [],
+    "forbidden_markers": [36],
+    "memory_unchanged": true,
+    "nfp_native_feedback_replay_idempotency": {
+      "stage": 2,
+      "uuid_v4_created_after_fresh_action_materialization": true,
+      "same_occurrence_propagates_through_causal_feedback_evidence": true,
+      "versioned_event_identity_and_evidence_digest": true,
+      "legacy_store_migrates_to_envelope_v2_on_first_feedback_commit": true,
+      "metrics_and_receipt_commit_atomically": true,
+      "same_event_same_digest_is_already_applied": true,
+      "same_event_different_digest_is_event_conflict": true,
+      "same_occurrence_different_source_is_event_conflict": true,
+      "restart_and_lost_ack_do_not_double_apply": true,
+      "receipt_ledger_is_unbounded_and_non_cognitive": true,
+      "all_authoritative_writers_preserve_v2_receipts": true,
+      "no_outbox": true,
+      "runtime_wiring": false
+    }
+  }
+}

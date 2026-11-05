@@ -155,6 +155,7 @@ ALLOWED = {
     "docs/design_nfp_native_feedback.md",
     "docs/current_architecture_checkpoint.md",
     "docs/debug_name_dependency_audit.json",
+    "docs/debug_name_dependency_audit.md",
     "tools/verify_nfp_native_feedback_design.py",
     "tools/verify_nfp_action_materialization_guarded_execution_design.py",
     "tools/verify_nfp_expsm_operational_retrieval_design.py",
@@ -175,6 +176,15 @@ ALLOWED = {
     "tools/verify_expsm_persistence_stage1.py",
     "tools/verify_expsm_mechanism_action_source.py",
     "tools/verify_value_feedback_memory_view.py",
+    "clc/actuation/remembered_action_execution.py",
+    "clc/context/causal_transition.py",
+    "clc/context/context_memory_manager.py",
+    "clc/expsm/nfp_native_feedback.py",
+    "scenarios/nfp_native_feedback_replay_idempotency.json",
+    "tools/verify_nfp_native_feedback_apply.py",
+    "tools/verify_nfp_native_feedback_evaluation.py",
+    "tools/verify_nfp_native_feedback_replay_idempotency.py",
+    "tools/verify_nfp_remembered_action_guarded_execution.py",
 }
 
 V1_FIELDS = {
@@ -271,7 +281,7 @@ def main() -> int:
     expected_evidence = {
         "source_experience_id", "target_core", "action_frame_id", "action_tick",
         "predicted_effect", "actual_effect", "effect_similarity",
-        "agreement_threshold", "classification",
+        "agreement_threshold", "classification", "execution_occurrence_id",
     }
     if evidence_fields != expected_evidence:
         failures.append(f"Feedback evidence fields drifted: {sorted(evidence_fields)}")
@@ -306,11 +316,11 @@ def main() -> int:
         "all guarded execution statuses audited": all(
             f"{status} =" in execution for status in EXECUTION_STATUSES
         ),
-        "evidence currently lacks occurrence UUID": "execution_occurrence_id" not in evidence_fields,
-        "current apply has no durable receipt": (
-            "native_feedback_receipts" not in apply
-            and "ALREADY_APPLIED" not in apply
-            and "EVENT_CONFLICT" not in apply
+        "evidence carries occurrence UUID": "execution_occurrence_id" in evidence_fields,
+        "apply has durable replay semantics": (
+            "native_feedback_receipts" in apply
+            and "ALREADY_APPLIED" in apply
+            and "EVENT_CONFLICT" in apply
         ),
         "apply uses fresh strict transaction": (
             "with self.transaction.mutation():" in apply
@@ -355,14 +365,13 @@ def main() -> int:
     if not isinstance(store, dict) or set(store) != {"experience", "reflexes"}:
         failures.append(f"current ExpSM envelope drifted: {list(store) if isinstance(store, dict) else type(store)}")
 
-    # Stage 1 may implement locking and dual-format reads, but Stage 2 remains absent.
-    stage1_production = "\n".join(
-        _source(path) for path in ALLOWED
-        if path.endswith(".py") and (ROOT / path).exists() and not path.startswith("tools/")
-    )
-    for forbidden in ("execution_occurrence_id", "ALREADY_APPLIED", "EVENT_CONFLICT"):
-        if forbidden in stage1_production:
-            failures.append(f"Stage-2 production semantics leaked into Stage 1: {forbidden}")
+    # Stage 2 must be explicit and remain isolated from automatic runtime wiring.
+    if "execution_occurrence_id" not in execution or "execution_occurrence_id" not in transition:
+        failures.append("Stage-2 occurrence identity is not propagated through execution/causality")
+    if "ALREADY_APPLIED" not in apply or "EVENT_CONFLICT" not in apply:
+        failures.append("Stage-2 replay result statuses are absent")
+    if "NFPFeedbackApplyWriter" in runtime:
+        failures.append("Stage-2 apply leaked into automatic runtime wiring")
     unexpected = _changed() - ALLOWED
     if unexpected:
         failures.append(f"unexpected changed files: {sorted(unexpected)}")

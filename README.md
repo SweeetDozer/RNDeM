@@ -387,16 +387,30 @@ evaluation. A separate explicit apply writer now fresh-reads that exact ID,
 requires TargetCore continuity, and updates one hit or miss plus
 confidence/repeatability from fresh counters. `safe_demo` and `draft_only`
 deny; `mutating_memory` may write through the shared atomic transaction. There
-is no automatic Feedback/apply path, `_run_tick()` wiring, durable replay
-protection, AKBSM write, or Chronicle write.
+is no automatic Feedback/apply path, `_run_tick()` wiring, AKBSM write, or
+Chronicle write. Explicit apply now has durable replay protection as described
+below.
 
 ## ExpSM Persistence Stage 1
 
-`ExpSMStoreTransaction` now normalizes the current unversioned store and the
-approved future envelope-v2 shape for reading. Authoritative writes remain in
-the current `{experience, reflexes}` format; a v2 source fails closed with
-`ENVELOPE_V2_WRITE_NOT_ENABLED`, so opaque future receipt metadata cannot be
-downgraded or erased. All seven authoritative writers share one canonical-path
+Stage 1 introduced normalization for the current unversioned store and future
+envelope-v2 reads while intentionally denying v2 mutation. All seven
+authoritative writers share one canonical-path
 `RLock` plus Linux/Fedora `flock(LOCK_EX)` on the stable sibling
 `ExpSM_data.lock`, with fresh read and readback inside the lock scope. This
-stage adds no receipts, occurrence UUID, replay guarantee, or runtime wiring.
+historical stage added no receipts, occurrence UUID, replay guarantee, or
+runtime wiring.
+
+## Durable NFP-Native Feedback Replay Stage 2
+
+Fresh remembered-action materialization now creates one UUIDv4 occurrence
+identity and carries it unchanged through causal transition and typed Feedback
+evidence. Native Feedback apply uses version-1 event identity and deterministic
+evidence digest, then atomically commits the exact operational update and an
+unbounded receipt in ExpSM envelope v2. Same event/same digest returns
+`ALREADY_APPLIED`; changed evidence or cross-source UUID reuse returns
+`EVENT_CONFLICT`. The first successful Feedback commit migrates a legacy store
+to v2, and every authoritative writer preserves receipts without exposing them
+as cognitive records. Lost acknowledgement and restart cannot count a committed
+event twice. There is still no pending-event outbox, automatic evaluator/apply
+path, or `_run_tick()` learning integration.

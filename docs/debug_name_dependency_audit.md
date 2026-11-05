@@ -395,17 +395,17 @@ No findings.
   Recommendation: keep for report/debug payloads; do not use as semantic control input
 - `clc/evaluation/value_feedback_review_gate.py:186` stable_constant_or_enum/low: `"target_role_names": [str(role) for role in candidate.get("target_role_names", ())],`
   Recommendation: keep as stable control value unless it starts depending on display/debug pattern names
-- `clc/evaluation/value_feedback_update_writer.py:186` debug_output_only/low: `"target_pattern_name": str(review.get("target_pattern_name") or self.pattern_registry.debug_name(str(review.get("target_pattern_id", "")))),`
+- `clc/evaluation/value_feedback_update_writer.py:203` debug_output_only/low: `"target_pattern_name": str(review.get("target_pattern_name") or self.pattern_registry.debug_name(str(review.get("target_pattern_id", "")))),`
   Recommendation: keep debug_name for display/logging only
-- `clc/evaluation/value_feedback_update_writer.py:188` stable_constant_or_enum/low: `"target_role_names": [str(role) for role in review.get("target_role_names", ())],`
+- `clc/evaluation/value_feedback_update_writer.py:205` stable_constant_or_enum/low: `"target_role_names": [str(role) for role in review.get("target_role_names", ())],`
   Recommendation: keep as stable control value unless it starts depending on display/debug pattern names
-- `clc/evaluation/value_feedback_update_writer.py:275` stable_constant_or_enum/low: `"target_role_names": [str(role) for role in review.get("target_role_names", ())],`
+- `clc/evaluation/value_feedback_update_writer.py:292` stable_constant_or_enum/low: `"target_role_names": [str(role) for role in review.get("target_role_names", ())],`
   Recommendation: keep as stable control value unless it starts depending on display/debug pattern names
-- `clc/evaluation/value_feedback_update_writer.py:306` stable_constant_or_enum/low: `if value_direction == "positive" or candidate_type == "value_positive_candidate":`
+- `clc/evaluation/value_feedback_update_writer.py:323` stable_constant_or_enum/low: `if value_direction == "positive" or candidate_type == "value_positive_candidate":`
   Recommendation: keep as stable control value unless it starts depending on display/debug pattern names
-- `clc/evaluation/value_feedback_update_writer.py:308` stable_constant_or_enum/low: `if value_direction == "negative" or candidate_type == "value_negative_candidate":`
+- `clc/evaluation/value_feedback_update_writer.py:325` stable_constant_or_enum/low: `if value_direction == "negative" or candidate_type == "value_negative_candidate":`
   Recommendation: keep as stable control value unless it starts depending on display/debug pattern names
-- `clc/evaluation/value_feedback_update_writer.py:310` stable_constant_or_enum/low: `if candidate_type == "value_inconclusive_candidate":`
+- `clc/evaluation/value_feedback_update_writer.py:327` stable_constant_or_enum/low: `if candidate_type == "value_inconclusive_candidate":`
   Recommendation: keep as stable control value unless it starts depending on display/debug pattern names
 - `clc/experience/causal_trace.py:79` stable_constant_or_enum/low: `and event.payload.get("decision_id") == source_decision_id`
   Recommendation: keep as stable control value unless it starts depending on display/debug pattern names

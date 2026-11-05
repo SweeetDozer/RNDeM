@@ -962,13 +962,13 @@ checks canonical TargetCore continuity, enforces `allow_expsm_update`, and uses
 fresh counters plus the shared atomic transaction/readback contract. It changes
 only one hit or miss and recomputed confidence/repeatability; immutable learned
 structure and neighboring records remain unchanged. There is still no
-automatic execution-to-evaluation-to-apply path, runtime wiring, durable replay
-protection, or autonomous use.
+automatic execution-to-evaluation-to-apply path, runtime wiring, or autonomous
+use. The local Stage-2 feature branch adds durable replay for committed events.
 
-`docs/design_nfp_native_feedback_replay_idempotency.md` is the design-only next
-gate. Source audit rejects process-local frame/tick identity and chooses an
+`docs/design_nfp_native_feedback_replay_idempotency.md` remains the approved
+design source. Its implementation rejects process-local frame/tick identity and uses an
 execution-originated occurrence UUID plus a separate evidence digest. The
-future persistence architecture is a versioned top-level ExpSM receipt ledger
+implemented persistence architecture is a versioned top-level ExpSM receipt ledger
 committed atomically with the exact record update under shared process and OS
 locks. `NFP_NATIVE_V1`, production Memory, and `_run_tick()` remain unchanged.
 
@@ -977,6 +977,6 @@ locks. `NFP_NATIVE_V1`, production Memory, and `_run_tick()` remain unchanged.
 The prerequisite persistence layer is implemented. Seven authoritative ExpSM
 writers share a canonical-path reentrant `RLock` and Linux/Fedora stable sibling
 `flock`; mutation reads occur after both locks and readback occurs before their
-release. A normalized state reads current stores and future envelope v2, but
-all writes remain current unversioned format. V2 mutation fails closed to
-prevent receipt loss. No Stage-2 replay metadata or automatic learning exists.
+release. Stage 2 enables validated envelope-v2 writes and requires every writer
+to preserve its receipt ledger. Native Feedback alone creates receipts and
+performs legacy-to-v2 migration. Automatic learning remains absent.

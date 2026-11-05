@@ -617,6 +617,15 @@ def _legacy(records: dict[str, dict[str, object]] | None = None) -> dict[str, ob
     return {"experience": normalized, "reflexes": {}}
 
 
+def _empty_receipts() -> dict[str, object]:
+    return {
+        "identity_version": 1,
+        "digest_version": 1,
+        "by_event_key": {},
+        "execution_occurrence_index": {},
+    }
+
+
 def _worker(path: str, record_id: str, field: str, start: object, result: object) -> None:
     transaction = ExpSMStoreTransaction(path)
     try:
@@ -665,7 +674,7 @@ class ExpSMStage1Tests(unittest.TestCase):
         self.assertEqual(state.format_kind, ExpSMStoreFormat.LEGACY_UNVERSIONED)
         self.assertEqual(state.legacy_facade(), legacy)
 
-        receipts = {"opaque": {"digest": "not-interpreted"}}
+        receipts = _empty_receipts()
         envelope = {"store_schema_version": 2, **legacy, "native_feedback_receipts": receipts}
         self._write(envelope)
         state = transaction.load_state_strict()
@@ -687,7 +696,7 @@ class ExpSMStage1Tests(unittest.TestCase):
                     transaction.load_for_mutation_strict()
             self.assertEqual(self.path.read_bytes(), before)
 
-    def test_legacy_write_stays_legacy_and_v2_write_is_denied(self) -> None:
+    def test_legacy_write_stays_legacy_and_v2_write_preserves_receipts(self) -> None:
         self._write(_legacy({"42": {"hits": 0}}))
         self._mutate()
         written = json.loads(self.path.read_text(encoding="utf-8"))
@@ -698,15 +707,14 @@ class ExpSMStage1Tests(unittest.TestCase):
         envelope = {
             "store_schema_version": 2,
             **_legacy({"42": {"hits": 1}}),
-            "native_feedback_receipts": {"opaque": {"keep": True}},
+            "native_feedback_receipts": _empty_receipts(),
         }
         self._write(envelope)
-        before = self.path.read_bytes()
-        transaction = ExpSMStoreTransaction(self.path)
-        with transaction.mutation():
-            with self.assertRaises(ExpSMEnvelopeV2WriteDisabledError):
-                transaction.load_for_mutation_strict()
-        self.assertEqual(self.path.read_bytes(), before)
+        self._mutate()
+        written = json.loads(self.path.read_text(encoding="utf-8"))
+        self.assertEqual(written["store_schema_version"], 2)
+        self.assertEqual(written["experience"]["42"]["hits"], 2)
+        self.assertEqual(written["native_feedback_receipts"], _empty_receipts())
 
     def test_reentrant_lock_and_stable_sibling_inode(self) -> None:
         self._write(_legacy({"42": {"hits": 0}}))
@@ -985,14 +993,9 @@ def _atomic_write_json(self, path, data):
         self.assertEqual(audit.json_dump_calls_audited, 2)
         self.assertEqual(audit.approved_draft_json_dumps, 2)
         self.assertGreaterEqual(audit.central_persistence_primitives, 3)
-        for class_name, relative in WRITERS.items():
-            source = (ROOT / relative).read_text(encoding="utf-8")
-            self.assertNotIn("execution_occurrence_id", source)
-            self.assertNotIn("ALREADY_APPLIED", source)
-            self.assertNotIn("EVENT_CONFLICT", source)
         transaction_source = (ROOT / "clc/consolidation/expsm_store_transaction.py").read_text(encoding="utf-8")
         self.assertIn("fcntl.flock(descriptor, fcntl.LOCK_EX)", transaction_source)
-        self.assertIn("ENVELOPE_V2_WRITE_NOT_ENABLED", transaction_source)
+        self.assertIn("v2 ExpSM store cannot be downgraded", transaction_source)
         runtime = (ROOT / "clc/runtime/clc_runtime.py").read_text(encoding="utf-8")
         self.assertNotIn("NFPFeedbackApplyWriter", runtime)
 
@@ -1007,7 +1010,7 @@ def main() -> int:
         return 1
     audit = _audit_writer_ast()
     print("PASS: ExpSM persistence Stage 1 dual-format and shared locking")
-    print(f"writers={len(WRITERS)} stage2_enabled=false runtime_wiring=false")
+    print(f"writers={len(WRITERS)} stage2_enabled=true runtime_wiring=false")
     print(
         "ast_audit "
         f"writer_definitions={audit.writer_definitions} "

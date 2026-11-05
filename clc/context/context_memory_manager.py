@@ -64,6 +64,7 @@ class ContextMemoryManager:
             completed = RecentCausalTransition(
                 pending.transition_id, pending.before_sensory_window,
                 pending.action_frame, window, pending.action_tick, window.end_tick,
+                pending.execution_occurrence_id,
             )
         # Validate completion before changing any active state. Late evidence expires
         # the old relation but can still become the current sensory window.
@@ -74,7 +75,9 @@ class ContextMemoryManager:
         self._nfp_current_tick = window.end_tick
         return completed
 
-    def observe_action_frame(self, action_frame: NFPFrame) -> PendingCausalTransition:
+    def observe_action_frame(
+        self, action_frame: NFPFrame, execution_occurrence_id: str | None = None,
+    ) -> PendingCausalTransition:
         from clc.context.causal_transition import PendingCausalTransition, validate_action_frame
 
         validate_action_frame(action_frame)
@@ -89,6 +92,7 @@ class ContextMemoryManager:
         pending = PendingCausalTransition(
             f"causal_transition:{self._next_transition_id:06d}", before, action_frame,
             action_frame.active_tick, action_frame.active_tick + 1,
+            execution_occurrence_id,
         )
         self._pending_causal_transition = pending
         self._current_action_frame = action_frame
