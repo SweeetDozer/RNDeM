@@ -321,6 +321,27 @@ class NFPNativeFeedbackEvaluationTests(unittest.TestCase):
         )
         self.assertEqual(positive_control.status, FeedbackStatus.HIT)
 
+    def test_execution_occurrence_uuid_alone_enforces_causal_identity(self) -> None:
+        core = NFPFeedbackTargetCore.from_record(_record())
+        transition = _transition()
+        execution = _execution(core, transition)
+        different_occurrence = replace(
+            transition,
+            execution_occurrence_id="44444444-4444-4444-8444-444444444444",
+        )
+        self.assertEqual(execution.action_frame.frame_id, different_occurrence.action_frame.frame_id)
+        self.assertEqual(execution.action_frame.active_tick, different_occurrence.action_frame.active_tick)
+        self.assertEqual(
+            evaluate_native_feedback(
+                execution, different_occurrence, NFPFeedbackEvaluationConfig(0.5)
+            ).status,
+            FeedbackStatus.TRANSITION_MISMATCH,
+        )
+        self.assertEqual(
+            evaluate_native_feedback(execution, transition, NFPFeedbackEvaluationConfig(0.5)).status,
+            FeedbackStatus.HIT,
+        )
+
     def test_no_evidence_execution_statuses(self) -> None:
         core = NFPFeedbackTargetCore.from_record(_record())
         transition = _transition()

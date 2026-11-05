@@ -8,6 +8,7 @@ import tempfile
 import unittest
 from dataclasses import replace
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -23,6 +24,11 @@ from clc.expsm.nfp_native_feedback_apply import (
     reconcile_nfp_feedback_readback_failure,
 )
 from clc.experience.expsm_native_create import ExpSMCreateStatus, NFPExpSMCreateWriter
+from clc.consolidation.expsm_commit_writer import ExpSMCommitWriter
+from clc.consolidation.expsm_store_transaction import ExpSMStoreTransaction
+from clc.consolidation.expsm_update_writer import ExpSMUpdateWriter
+from clc.evaluation.value_feedback_update_writer import ValueFeedbackUpdateWriter
+from clc.expsm.expsm_outcome_feedback import ExpSMOutcomeFeedback
 from clc.expsm.nfp_operational_retrieval import (
     NFPExpSMRetrievalConfig,
     NFPExpSMRetrievalQuery,
@@ -82,6 +88,20 @@ class ReplayIdempotencyTests(unittest.TestCase):
 
     def evidence(self, record=None, classification=NFPFeedbackEvaluationStatus.HIT):
         return replace(_evidence(record or self.record, classification), execution_occurrence_id=OCCURRENCE)
+
+    def reset_store(self) -> None:
+        self.path.write_text(json.dumps({
+            "experience": {
+                "42": _record("42").to_json_data(),
+                "43": _record("43").to_json_data(),
+            },
+            "reflexes": {},
+        }), encoding="utf-8")
+
+    def seed_v2(self) -> dict[str, object]:
+        self.reset_store()
+        self.assertEqual(self.writer.apply(self.evidence()).status, NFPFeedbackApplyStatus.UPDATED)
+        return json.loads(self.path.read_text(encoding="utf-8"))["native_feedback_receipts"]
 
     def test_duplicate_survives_reopen_without_second_increment(self) -> None:
         first = self.writer.apply(self.evidence())
@@ -175,24 +195,139 @@ class ReplayIdempotencyTests(unittest.TestCase):
         self.assertEqual(writer.apply(self.evidence()).status, NFPFeedbackApplyStatus.WRITE_FAILED)
         self.assertEqual(self.path.read_bytes(), before)
 
-    def test_v2_receipts_survive_other_authoritative_writer_families(self) -> None:
+        applied = self.writer.apply(self.evidence())
+        self.assertEqual(applied.status, NFPFeedbackApplyStatus.UPDATED)
+        after = json.loads(self.path.read_text(encoding="utf-8"))
+        self.assertEqual(after["experience"]["42"]["hits"], 4)
+        self.assertEqual(len(after["native_feedback_receipts"]["by_event_key"]), 1)
+        committed = self.path.read_bytes()
+        self.assertEqual(self.writer.apply(self.evidence()).status, NFPFeedbackApplyStatus.ALREADY_APPLIED)
+        self.assertEqual(self.path.read_bytes(), committed)
+
+    def test_historical_duplicate_survives_later_legitimate_update(self) -> None:
+        event_a = self.evidence()
+        self.assertEqual(self.writer.apply(event_a).status, NFPFeedbackApplyStatus.UPDATED)
+        event_b = replace(event_a, execution_occurrence_id="33333333-3333-4333-8333-333333333333")
+        self.assertEqual(self.writer.apply(event_b).status, NFPFeedbackApplyStatus.UPDATED)
+        before_retry = self.path.read_bytes()
+        self.assertEqual(self.writer.apply(event_a).status, NFPFeedbackApplyStatus.ALREADY_APPLIED)
+        self.assertEqual(self.path.read_bytes(), before_retry)
+        store = json.loads(before_retry)
+        self.assertEqual(store["experience"]["42"]["hits"], 5)
+        self.assertEqual(len(store["native_feedback_receipts"]["by_event_key"]), 2)
+
+    def test_malformed_and_future_receipt_versions_fail_closed(self) -> None:
         self.writer.apply(self.evidence())
-        receipt_before = json.loads(self.path.read_text(encoding="utf-8"))["native_feedback_receipts"]
-        create = NFPExpSMCreateWriter(
+        valid = json.loads(self.path.read_text(encoding="utf-8"))
+        variants = []
+        malformed = json.loads(json.dumps(valid))
+        receipt = next(iter(malformed["native_feedback_receipts"]["by_event_key"].values()))
+        receipt.pop("classification")
+        variants.append(malformed)
+        future = json.loads(json.dumps(valid))
+        future["native_feedback_receipts"]["identity_version"] = 2
+        variants.append(future)
+        for candidate in variants:
+            with self.subTest(candidate=candidate):
+                self.path.write_text(json.dumps(candidate), encoding="utf-8")
+                before = self.path.read_bytes()
+                result = self.writer.apply(replace(
+                    self.evidence(),
+                    execution_occurrence_id="44444444-4444-4444-8444-444444444444",
+                ))
+                self.assertEqual(result.status, NFPFeedbackApplyStatus.STORE_INVALID)
+                self.assertEqual(self.path.read_bytes(), before)
+
+    def test_one_atomic_replace_and_zero_for_nonmutating_outcomes(self) -> None:
+        real_replace = Path.replace
+        replacements = 0
+
+        def counted(source: Path, target: Path) -> Path:
+            nonlocal replacements
+            if Path(target) == self.path:
+                replacements += 1
+            return real_replace(source, target)
+
+        with patch("pathlib.Path.replace", counted):
+            self.assertEqual(self.writer.apply(self.evidence()).status, NFPFeedbackApplyStatus.UPDATED)
+        self.assertEqual(replacements, 1)
+        with patch("pathlib.Path.replace", counted):
+            self.assertEqual(self.writer.apply(self.evidence()).status, NFPFeedbackApplyStatus.ALREADY_APPLIED)
+            conflict = replace(self.evidence(), classification=NFPFeedbackEvaluationStatus.MISS)
+            self.assertEqual(self.writer.apply(conflict).status, NFPFeedbackApplyStatus.EVENT_CONFLICT)
+        self.assertEqual(replacements, 1)
+
+        self.reset_store()
+        failing = NFPFeedbackApplyWriter(
             self.path,
             policy_for_profile(RuntimeProfile.MUTATING_MEMORY, memory_is_temporary=True),
-        ).create(_request("request:v2-preservation"))
-        self.assertEqual(create.status, ExpSMCreateStatus.CREATED)
-        self.assertEqual(
-            json.loads(self.path.read_text(encoding="utf-8"))["native_feedback_receipts"],
-            receipt_before,
+            failure_hook=lambda stage: (_ for _ in ()).throw(OSError("pre-replace"))
+            if stage == "pre_replace" else None,
         )
-        crud = ExpSMCRUD(self.path)
-        crud.create_experience(["a"], ["b"], ["c"], ["b"], experience_id="100")
-        self.assertEqual(
-            json.loads(self.path.read_text(encoding="utf-8"))["native_feedback_receipts"],
-            receipt_before,
-        )
+        with patch("pathlib.Path.replace", counted):
+            self.assertEqual(failing.apply(self.evidence()).status, NFPFeedbackApplyStatus.WRITE_FAILED)
+        self.assertEqual(replacements, 1)
+
+    def test_v2_receipts_survive_other_authoritative_writer_families(self) -> None:
+        def helper_write(kind: str) -> None:
+            transaction = ExpSMStoreTransaction(self.path)
+            with transaction.mutation():
+                store = transaction.load_for_mutation_strict()
+                store["experience"]["43"]["hits"] += 1
+                if kind == "commit":
+                    writer = object.__new__(ExpSMCommitWriter)
+                    writer.expsm_path, writer.transaction = self.path, transaction
+                    writer._atomic_write_json(self.path, store)
+                elif kind == "update":
+                    writer = object.__new__(ExpSMUpdateWriter)
+                    writer.expsm_path, writer.transaction = self.path, transaction
+                    writer._atomic_write_json(self.path, store)
+                elif kind == "value":
+                    writer = object.__new__(ValueFeedbackUpdateWriter)
+                    writer.expsm_path, writer.transaction = self.path, transaction
+                    writer._atomic_write_json(self.path, store)
+                else:
+                    writer = object.__new__(ExpSMOutcomeFeedback)
+                    writer.transaction = transaction
+                    writer._write_data(store)
+
+        writers = {
+            "NFPExpSMCreateWriter": lambda: self.assertEqual(
+                NFPExpSMCreateWriter(
+                    self.path,
+                    policy_for_profile(RuntimeProfile.MUTATING_MEMORY, memory_is_temporary=True),
+                ).create(_request("request:v2-preservation")).status,
+                ExpSMCreateStatus.CREATED,
+            ),
+            "NFPFeedbackApplyWriter": lambda: self.assertEqual(
+                self.writer.apply(replace(
+                    self.evidence(),
+                    execution_occurrence_id="55555555-5555-4555-8555-555555555555",
+                )).status,
+                NFPFeedbackApplyStatus.UPDATED,
+            ),
+            "ExpSMCommitWriter": lambda: helper_write("commit"),
+            "ExpSMUpdateWriter": lambda: helper_write("update"),
+            "ValueFeedbackUpdateWriter": lambda: helper_write("value"),
+            "ExpSMOutcomeFeedback": lambda: helper_write("outcome"),
+            "ExpSMCRUD": lambda: ExpSMCRUD(self.path).create_experience(
+                ["a"], ["b"], ["c"], ["b"], experience_id="100"
+            ),
+        }
+        for name, mutate in writers.items():
+            with self.subTest(writer=name):
+                receipt_before = self.seed_v2()
+                before = json.loads(self.path.read_text(encoding="utf-8"))
+                mutate()
+                after = json.loads(self.path.read_text(encoding="utf-8"))
+                self.assertEqual(after["store_schema_version"], 2)
+                self.assertNotEqual(after["experience"], before["experience"])
+                if name == "NFPFeedbackApplyWriter":
+                    self.assertEqual(len(after["native_feedback_receipts"]["by_event_key"]), 2)
+                    for key, receipt in receipt_before["by_event_key"].items():
+                        self.assertEqual(after["native_feedback_receipts"]["by_event_key"][key], receipt)
+                else:
+                    self.assertEqual(after["native_feedback_receipts"], receipt_before)
 
         audit = _audit_writer_ast()
         self.assertEqual(audit.writer_definitions, 7)
