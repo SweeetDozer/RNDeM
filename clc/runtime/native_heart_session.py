@@ -13,6 +13,7 @@ from clc.actuation.remembered_action_execution import (
 from clc.context.causal_transition import PendingCausalTransition, RecentCausalTransition
 from clc.context.context_memory_manager import ContextMemoryManager
 from clc.context.short_memory import ShortMemory
+from clc.echo.expectations import EchoExpectations, EchoMatch
 from clc.expsm.expsm_activation_module import ExpSMActivationModule
 from clc.expsm.nfp_operational_retrieval import (
     NFPExpSMRetrievalQuery, NFPExpSMRetriever, NFPExpSMRetrievalConfig,
@@ -48,6 +49,7 @@ class NativeHeartTick:
     execution: NFPRememberedActionExecutionResult | None
     advancement: str
     diagnostic: str
+    echo_matches: tuple[EchoMatch, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -75,11 +77,13 @@ class NativeHeartSession:
         self, components: NativeHeartComponents, *, max_ticks: int,
         sensor: Callable[[int], VisualFieldSnapshot | None] | None = None,
         initial_tick: int = 0,
+        echo: EchoExpectations | None = None,
     ) -> None:
         self.heart = Heart(max_ticks=max_ticks, initial_tick=initial_tick)
         if components.world.current_tick != initial_tick:
             raise ValueError("initial Heart/world ticks must agree")
         self.components = components
+        self.echo = echo
         self.sensor = sensor
         self.time_adapter = SyntheticTimeAdapter(components.world)
         self.session_id = str(uuid4())
@@ -143,6 +147,7 @@ class NativeHeartSession:
                     self._unresolved.discard(recent.execution_occurrence_id)
             expired = manager.expire_pending_if_overdue(tick)
             c.short_memory.prune(tick)
+            echo_matches = self.echo.advance(tick, observation) if self.echo is not None else ()
             self.diagnostic = "no_new_input"
             # No query on an old present. Pending is resolved/expired before admission.
             if observation is not None and self.heart.admission_open:
@@ -170,14 +175,14 @@ class NativeHeartSession:
                         self.heart.stop("uncertain_execution; restart_forbidden")
                         self.diagnostic += "; physical_result_may_be_uncertain; stopped"
                         self.records.append(NativeHeartTick(
-                            tick, observation, recent, expired, execution, advancement, self.diagnostic,
+                            tick, observation, recent, expired, execution, advancement, self.diagnostic, echo_matches,
                         ))
                         return
             advancement = self.time_adapter.finish(
                 actuator_advanced=execution is not None and execution.actuator_signal is not None,
             )
             self.records.append(NativeHeartTick(
-                tick, observation, recent, expired, execution, advancement, self.diagnostic,
+                tick, observation, recent, expired, execution, advancement, self.diagnostic, echo_matches,
             ))
         except BaseException:
             self.time_adapter.block()
