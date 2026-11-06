@@ -343,11 +343,32 @@ class ContextShortMemoryTests(unittest.TestCase):
             self.assertEqual(len(short), 0)
 
     def test_public_fields_have_no_semantic_or_hidden_world_data(self) -> None:
-        common = {"transition_id", "before_sensory_window", "action_frame", "action_tick"}
+        common = {"transition_id", "before_sensory_window", "action_frame", "action_tick",
+                  "execution_occurrence_id"}
         self.assertEqual({field.name for field in fields(PendingCausalTransition)},
                          common | {"expected_observation_tick"})
         self.assertEqual({field.name for field in fields(RecentCausalTransition)},
                          common | {"after_sensory_window", "observation_tick"})
+        # Stage 2 adds technical attempt identity, not semantics or causal proof.
+        occurrence = "22222222-2222-4222-8222-222222222222"
+        pending = self.open_pending()
+        self.assertIsNone(pending.execution_occurrence_id)
+        bound = replace(pending, execution_occurrence_id=occurrence)
+        self.assertIs(bound.before_sensory_window, pending.before_sensory_window)
+        self.assertIs(bound.action_frame, pending.action_frame)
+        manager = self.new_context()
+        manager.observe_external_sensory_window(pending.before_sensory_window)
+        tracked = manager.observe_action_frame(pending.action_frame, occurrence)
+        completed = manager.observe_external_sensory_window(sensory(11))
+        self.assertEqual(tracked.execution_occurrence_id, occurrence)
+        self.assertEqual(completed.execution_occurrence_id, occurrence)
+        self.assertIs(completed.before_sensory_window, tracked.before_sensory_window)
+        self.assertIs(completed.action_frame, tracked.action_frame)
+        for record in (pending, recent(11)):
+            for invalid in ("move_right_success", "", 123,
+                            "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA", "22222222-2222-1222-8222-222222222222"):
+                with self.subTest(record=type(record).__name__, invalid=invalid), self.assertRaises(ValueError):
+                    replace(record, execution_occurrence_id=invalid)
         self.assertEqual(vars(self.short).keys(),
                          {"_max_entries", "_max_age_ticks", "_entries", "_current_tick", "_last_observation_tick"})
 
@@ -386,7 +407,13 @@ class ContextShortMemoryTests(unittest.TestCase):
             allowed = {"__future__", "dataclasses", "clc.patterns", "clc.context.causal_transition"}
             for node in ast.walk(tree):
                 if isinstance(node, ast.ImportFrom):
-                    self.assertIn(node.module, allowed)
+                    if node.module == "uuid":
+                        self.assertEqual(filename, "causal_transition.py")
+                        self.assertEqual(node.level, 0)
+                        self.assertEqual([(alias.name, alias.asname) for alias in node.names],
+                                         [("UUID", None)])
+                    else:
+                        self.assertIn(node.module, allowed)
                 self.assertNotIsInstance(node, ast.Import)
                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
                     self.assertNotIn(node.func.id, {"open", "eval", "exec", "__import__"})
@@ -406,15 +433,40 @@ class ContextShortMemoryTests(unittest.TestCase):
         self.assertEqual(managers, ["clc/context/context_memory_manager.py"])
         script = '''
 import contextlib, io, runpy, sys
+# Import isolation is distinct from loading native value types during validation.
+import clc.runtime.clc_runtime
+isolated = ("clc.patterns", "clc.transduction", "clc.actuation",
+            "clc.context.short_memory", "clc.context.causal_transition")
+for module in isolated:
+    assert not any(name == module or name.startswith(module + ".") for name in sys.modules), module
 from clc.context.context_memory_manager import ContextMemoryManager
 def forbidden(*args, **kwargs):
     raise AssertionError("normal runtime invoked NFP memory")
 for name in ("observe_external_sensory_window", "observe_action_frame", "expire_pending_if_overdue"):
     setattr(ContextMemoryManager, name, forbidden)
-with contextlib.redirect_stdout(io.StringIO()):
-    runpy.run_path("main.py", run_name="__main__")
-for module in ("clc.patterns", "clc.transduction", "clc.actuation", "clc.context.short_memory", "clc.context.causal_transition"):
-    assert module not in sys.modules, module
+# Catch construction of native state even if modules are loaded lazily by demo.
+# Native type definitions and legacy store validation may import patterns/causal types.
+def no_native_activation(frame, event, arg):
+    if event != "call":
+        return
+    module = frame.f_globals.get("__name__", "")
+    name = frame.f_code.co_name
+    if (module in ("clc.patterns.model", "clc.context.causal_transition")
+            and name in ("__init__", "__post_init__")):
+        forbidden()
+    if (module == "clc.expsm.expsm_activation_module" and name == "activate_native"
+            or module == "clc.action.decision_selector" and name == "select_native"):
+        forbidden()
+sys.setprofile(no_native_activation)
+try:
+    with contextlib.redirect_stdout(io.StringIO()):
+        runpy.run_path("main.py", run_name="__main__")
+finally:
+    sys.setprofile(None)
+for module in ("clc.transduction", "clc.actuation", "clc.context.short_memory",
+               "clc.expsm.nfp_operational_retrieval", "clc.expsm.nfp_native_feedback",
+               "clc.expsm.nfp_native_feedback_apply"):
+    assert not any(name == module or name.startswith(module + ".") for name in sys.modules), module
 '''
         result = subprocess.run([sys.executable, "-B", "-c", script], cwd=ROOT,
                                 capture_output=True, text=True)

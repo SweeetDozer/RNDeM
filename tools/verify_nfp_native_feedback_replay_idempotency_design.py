@@ -151,6 +151,9 @@ WRITER_INVENTORY = {
 }
 
 ALLOWED = {
+    # RND-011: reconcile ShortMemory assertions with existing Stage-2 contracts.
+    "tools/verify_nfp_context_short_memory.py",
+    "docs/RND-011_short_memory_contract_reconciliation.md",
     # RND-110/F01: public CRUD save regression coverage and audit/remediation.
     "tools/verify_expsm_crud_save_authority.py",
     "docs/RND-110_memory_write_authority_audit.md",
