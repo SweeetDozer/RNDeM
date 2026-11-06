@@ -221,6 +221,9 @@ def main() -> int:
 
     changed = _changed_files()
     allowed = {
+        "clc/runtime/native_bounded_delivery.py",
+        "docs/RND-014_native_bounded_delivery.md",
+        "tools/verify_native_bounded_delivery.py",
         # RND-013: approved exact Heart B2 integration paths.
         "clc/runtime/heart.py",
         "clc/runtime/synthetic_time_adapter.py",
