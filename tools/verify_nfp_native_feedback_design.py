@@ -53,6 +53,9 @@ TERMS = (
     "INTERNAL_REACTIVATION", "No replay field is silently added",
 )
 ALLOWED = {
+    "docs/RND-015_legacy_native_joint_checkpoint.md",
+    "tools/legacy_native_joint_checkpoint.py",
+    "tools/verify_legacy_native_joint_checkpoint.py",
     "clc/runtime/native_bounded_delivery.py",
     "docs/RND-014_native_bounded_delivery.md",
     "tools/verify_native_bounded_delivery.py",
