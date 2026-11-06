@@ -18,6 +18,7 @@ from clc.expsm.expsm_activation_module import ExpSMActivationModule
 from clc.expsm.nfp_operational_retrieval import (
     NFPExpSMRetrievalQuery, NFPExpSMRetriever, NFPExpSMRetrievalConfig,
 )
+from clc.internal.multitick import MultiTickComparison, WorkLimits, WorkSnapshot
 from clc.patterns import NFPWindow
 from clc.runtime.heart import Heart, HeartState
 from clc.runtime.synthetic_time_adapter import SyntheticTimeAdapter
@@ -78,12 +79,15 @@ class NativeHeartSession:
         sensor: Callable[[int], VisualFieldSnapshot | None] | None = None,
         initial_tick: int = 0,
         echo: EchoExpectations | None = None,
+        internal_work_limits: WorkLimits | None = None,
     ) -> None:
         self.heart = Heart(max_ticks=max_ticks, initial_tick=initial_tick)
         if components.world.current_tick != initial_tick:
             raise ValueError("initial Heart/world ticks must agree")
         self.components = components
         self.echo = echo
+        self._internal_work = (MultiTickComparison(internal_work_limits)
+                               if internal_work_limits is not None else None)
         self.sensor = sensor
         self.time_adapter = SyntheticTimeAdapter(components.world)
         self.session_id = str(uuid4())
@@ -92,6 +96,28 @@ class NativeHeartSession:
         self._seen_snapshots: set[int] = set()
         self._unresolved: set[str] = set()
         self._in_flight = False
+        self._inside_pulse = False
+
+    def submit_internal_comparison(self, left: NFPWindow, right: NFPWindow) -> WorkSnapshot:
+        if self._internal_work is None:
+            raise ValueError("internal work is not enabled")
+        if self.heart.state is HeartState.STOPPED or self._inside_pulse:
+            raise ValueError("submit only at a live session boundary")
+        return self._internal_work.submit(left, right, current_tick=self.heart.tick)
+
+    def internal_work_snapshot(self) -> WorkSnapshot | None:
+        return self._internal_work.snapshot() if self._internal_work is not None else None
+
+    def cancel_internal_work(self) -> WorkSnapshot | None:
+        return self._internal_work.cancel() if self._internal_work is not None else None
+
+    def release_internal_work(self) -> None:
+        if self._internal_work is not None:
+            self._internal_work.release()
+
+    def _close_internal_work(self) -> None:
+        if self.heart.state is HeartState.STOPPED:
+            self.cancel_internal_work()
 
     def start(self) -> None:
         self.heart.start()
@@ -104,6 +130,7 @@ class NativeHeartSession:
 
     def stop(self) -> NativeHeartStop:
         self.heart.stop()
+        self._close_internal_work()
         return self.stop_report()
 
     def stop_report(self) -> NativeHeartStop:
@@ -117,14 +144,21 @@ class NativeHeartSession:
 
     def step(self) -> NativeHeartTick | None:
         before = len(self.records)
-        self.heart.step(self._pulse)
+        try:
+            self.heart.step(self._pulse)
+        finally:
+            self._close_internal_work()
         return self.records[-1] if len(self.records) > before else None
 
     def run(self, **pacing: object) -> tuple[NativeHeartTick, ...]:
-        self.heart.run(self._pulse, **pacing)
+        try:
+            self.heart.run(self._pulse, **pacing)
+        finally:
+            self._close_internal_work()
         return tuple(self.records)
 
     def _pulse(self, tick: int) -> None:
+        self._inside_pulse = True
         c = self.components
         manager = c.context_manager
         observation = recent = expired = execution = None
@@ -148,6 +182,8 @@ class NativeHeartSession:
             expired = manager.expire_pending_if_overdue(tick)
             c.short_memory.prune(tick)
             echo_matches = self.echo.advance(tick, observation) if self.echo is not None else ()
+            if self._internal_work is not None and self.heart.admission_open:
+                self._internal_work.advance(tick)
             self.diagnostic = "no_new_input"
             # No query on an old present. Pending is resolved/expired before admission.
             if observation is not None and self.heart.admission_open:
@@ -189,3 +225,6 @@ class NativeHeartSession:
             self.heart.stop("session_failure; restart_forbidden")
             self.diagnostic += "; session_failed; no_retry"
             raise
+
+        finally:
+            self._inside_pulse = False
