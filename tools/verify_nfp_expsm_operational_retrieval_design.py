@@ -221,6 +221,9 @@ def main() -> int:
 
     changed = _changed_files()
     allowed = {
+        # RND-110/F01: exact audit and CRUD regression paths.
+        "tools/verify_expsm_crud_save_authority.py",
+        "docs/RND-110_memory_write_authority_audit.md",
         "README.md",
         "docs/design_nfp_expsm_operational_retrieval.md",
         "docs/design_persistent_nfp_expsm_representation.md",

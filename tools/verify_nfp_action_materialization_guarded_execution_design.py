@@ -85,6 +85,9 @@ HARDENED_CONTRACTS = {
     ),
 }
 ALLOWED = {
+    # RND-110/F01: exact audit and CRUD regression paths.
+    "tools/verify_expsm_crud_save_authority.py",
+    "docs/RND-110_memory_write_authority_audit.md",
     "README.md", "docs/design_nfp_action_materialization_guarded_execution.md",
     "docs/design_nfp_expsm_operational_retrieval.md",
     "docs/design_first_closed_loop_action_consequence.md",

@@ -26,6 +26,19 @@ class ExpSMError(Exception):
     """Base error for ExpSM operations."""
 
 
+class ExpSMStaleSnapshotError(ExpSMError):
+    """The authoritative store changed since this instance loaded its snapshot."""
+
+
+class ExpSMReceiptIntegrityError(ExpSMError):
+    """An administrative save attempted to replace the durable Feedback ledger."""
+
+
+def _snapshot_identity(store: Any) -> str:
+    """Independent, type-sensitive identity; unaffected by mutable caller data."""
+    return json.dumps(store, sort_keys=True, ensure_ascii=False, allow_nan=False)
+
+
 class ExperienceNotFoundError(ExpSMError):
     """Raised when a requested experience does not exist."""
 
@@ -41,6 +54,7 @@ def authoritative_mutation(method: Callable[..., Any]) -> Callable[..., Any]:
     def wrapped(self: "ExpSMCRUD", *args: Any, **kwargs: Any) -> Any:
         with self.transaction.mutation():
             self.data = self.transaction.load_for_mutation_strict()
+            self._baseline = _snapshot_identity(self.data)
             return method(self, *args, **kwargs)
 
     return wrapped
@@ -53,17 +67,40 @@ class ExpSMCRUD:
         self.data_file = Path(data_file)
         self.transaction = ExpSMStoreTransaction(self.data_file)
         self.data = self.load()
+        self._baseline = _snapshot_identity(self.data)
 
     def load(self) -> dict[str, dict[str, dict[str, Any]]]:
-        """Load ExpSM data from disk."""
+        """Return a current snapshot without replacing local data or its save baseline."""
         return self.transaction.load_complete_strict()
 
     def save(self) -> None:
-        """Save ExpSM data to disk."""
+        """Save local edits only if the complete loaded snapshot is still current.
+
+        Raise ExpSMStaleSnapshotError without writing or discarding local edits
+        on conflict. Reopen the CRUD instance to explicitly load a new baseline;
+        load() alone is a read, not a rebase. V2 receipt ledgers are immutable
+        through this administrative API, including their indexes and metadata.
+        Save preserves the current store format: legacy-to-v2 migration and
+        receipt creation belong to native Feedback APPLY, not this API.
+        Successful saves and decorated fresh-read mutations renew the baseline.
+        IO/validation errors propagate; a post-replace error can be indeterminate
+        and must be reconciled by reading authority, not blindly retried.
+        """
         with self.transaction.mutation():
-            self.transaction.load_state_strict()
+            current = self.transaction.load_complete_strict()
+            if _snapshot_identity(current) != self._baseline:
+                raise ExpSMStaleSnapshotError("ExpSM changed since this snapshot was loaded")
+            self.transaction.normalize_store(self.data)
+            if (
+                self.data.get("store_schema_version") != current.get("store_schema_version")
+                or ("native_feedback_receipts" in self.data) != ("native_feedback_receipts" in current)
+                or _snapshot_identity(self.data.get("native_feedback_receipts"))
+                != _snapshot_identity(current.get("native_feedback_receipts"))
+            ):
+                raise ExpSMReceiptIntegrityError("Administrative save must preserve store format and Feedback ledger")
             self.transaction.write_complete_store(self.data)
             self.data = self.transaction.load_complete_strict()
+            self._baseline = _snapshot_identity(self.data)
 
     def get_all(self) -> dict[str, Any]:
         """Return a copy of all ExpSM data."""

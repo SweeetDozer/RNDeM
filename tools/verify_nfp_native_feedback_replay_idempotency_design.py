@@ -151,6 +151,9 @@ WRITER_INVENTORY = {
 }
 
 ALLOWED = {
+    # RND-110/F01: public CRUD save regression coverage and audit/remediation.
+    "tools/verify_expsm_crud_save_authority.py",
+    "docs/RND-110_memory_write_authority_audit.md",
     "docs/design_nfp_native_feedback_replay_idempotency.md",
     "docs/design_nfp_native_feedback.md",
     "docs/current_architecture_checkpoint.md",
