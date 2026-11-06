@@ -42,6 +42,15 @@ class SyntheticClosedLoopVisualWorld:
         self._next_snapshot_id += 1
         return snapshot
 
+    def advance_idle(self, *, expected_tick: int) -> None:
+        """Advance model time only; no motor signal, occurrence or state change."""
+        if isinstance(expected_tick, bool):
+            raise TypeError("expected_tick must be an integer")
+        expected_tick = _non_negative_int(expected_tick, "expected_tick")
+        if expected_tick != self.current_tick:
+            raise ValueError("idle boundary must equal world current_tick")
+        self.current_tick += 1
+
     def apply_actuator_signal(self, signal: ActuatorSignal) -> None:
         if not isinstance(signal, ActuatorSignal):
             raise TypeError("signal must be ActuatorSignal")

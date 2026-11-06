@@ -221,6 +221,13 @@ def main() -> int:
 
     changed = _changed_files()
     allowed = {
+        # RND-013: approved exact Heart B2 integration paths.
+        "clc/runtime/heart.py",
+        "clc/runtime/synthetic_time_adapter.py",
+        "clc/runtime/native_heart_session.py",
+        "tools/verify_native_heart_b2.py",
+        "docs/RND-013_native_heart_b2.md",
+        "scenarios/support/synthetic_closed_loop_visual_world.py",
         # RND-110/F01: exact audit and CRUD regression paths.
         "tools/verify_expsm_crud_save_authority.py",
         "docs/RND-110_memory_write_authority_audit.md",

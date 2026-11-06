@@ -151,6 +151,13 @@ WRITER_INVENTORY = {
 }
 
 ALLOWED = {
+    # RND-013: approved exact Heart B2 integration paths.
+    "clc/runtime/heart.py",
+    "clc/runtime/synthetic_time_adapter.py",
+    "clc/runtime/native_heart_session.py",
+    "tools/verify_native_heart_b2.py",
+    "docs/RND-013_native_heart_b2.md",
+    "scenarios/support/synthetic_closed_loop_visual_world.py",
     # RND-011: reconcile ShortMemory assertions with existing Stage-2 contracts.
     "tools/verify_nfp_context_short_memory.py",
     "docs/RND-011_short_memory_contract_reconciliation.md",
