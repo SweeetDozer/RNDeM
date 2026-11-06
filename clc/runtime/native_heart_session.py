@@ -4,6 +4,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from uuid import uuid4
+import math
+import time
 
 from clc.action.decision_selector import DecisionSelector
 from clc.actuation.remembered_action_execution import (
@@ -18,6 +20,7 @@ from clc.expsm.expsm_activation_module import ExpSMActivationModule
 from clc.expsm.nfp_operational_retrieval import (
     NFPExpSMRetrievalQuery, NFPExpSMRetriever, NFPExpSMRetrievalConfig,
 )
+from clc.internal.admission import AdmissionLimits, ComparisonAdmission, ComparisonRequest
 from clc.internal.multitick import MultiTickComparison, WorkLimits, WorkSnapshot
 from clc.patterns import NFPWindow
 from clc.runtime.heart import Heart, HeartState
@@ -80,6 +83,7 @@ class NativeHeartSession:
         initial_tick: int = 0,
         echo: EchoExpectations | None = None,
         internal_work_limits: WorkLimits | None = None,
+        admission_limits: AdmissionLimits | None = None,
     ) -> None:
         self.heart = Heart(max_ticks=max_ticks, initial_tick=initial_tick)
         if components.world.current_tick != initial_tick:
@@ -88,6 +92,11 @@ class NativeHeartSession:
         self.echo = echo
         self._internal_work = (MultiTickComparison(internal_work_limits)
                                if internal_work_limits is not None else None)
+        if admission_limits is not None and internal_work_limits is None:
+            raise ValueError("DAR requires explicit internal_work_limits")
+        self._admission = (ComparisonAdmission(admission_limits, internal_work_limits)
+                           if admission_limits is not None else None)
+        self._dar_dispatching = False
         self.sensor = sensor
         self.time_adapter = SyntheticTimeAdapter(components.world)
         self.session_id = str(uuid4())
@@ -99,6 +108,8 @@ class NativeHeartSession:
         self._inside_pulse = False
 
     def submit_internal_comparison(self, left: NFPWindow, right: NFPWindow) -> WorkSnapshot:
+        if self._admission is not None and not self._dar_dispatching:
+            raise ValueError("DAR owns the slot; use submit_comparison_request")
         if self._internal_work is None:
             raise ValueError("internal work is not enabled")
         if self.heart.state is HeartState.STOPPED or self._inside_pulse:
@@ -109,15 +120,23 @@ class NativeHeartSession:
         return self._internal_work.snapshot() if self._internal_work is not None else None
 
     def cancel_internal_work(self) -> WorkSnapshot | None:
+        if self._admission is not None:
+            raise ValueError("DAR owns the slot; cancel by request ID")
         return self._internal_work.cancel() if self._internal_work is not None else None
 
     def release_internal_work(self) -> None:
+        if self._admission is not None:
+            raise ValueError("DAR owns the slot; release by request ID")
         if self._internal_work is not None:
             self._internal_work.release()
 
     def _close_internal_work(self) -> None:
         if self.heart.state is HeartState.STOPPED:
-            self.cancel_internal_work()
+            if self._admission is None:
+                self.cancel_internal_work()
+            else:
+                for request in self.comparison_requests():
+                    self.cancel_comparison_request(request.request_id)
 
     def start(self) -> None:
         self.heart.start()
@@ -145,17 +164,90 @@ class NativeHeartSession:
     def step(self) -> NativeHeartTick | None:
         before = len(self.records)
         try:
+            self._dispatch_comparison()
             self.heart.step(self._pulse)
+            self._collect_comparison()
         finally:
             self._close_internal_work()
         return self.records[-1] if len(self.records) > before else None
 
     def run(self, **pacing: object) -> tuple[NativeHeartTick, ...]:
         try:
-            self.heart.run(self._pulse, **pacing)
+            if self._admission is None:
+                self.heart.run(self._pulse, **pacing)
+            else:
+                self._run_admitted(**pacing)
         finally:
             self._close_internal_work()
         return tuple(self.records)
+
+    def _request_boundary(self):
+        if self._admission is None:
+            raise ValueError("DAR is not enabled")
+        if self._inside_pulse:
+            raise ValueError("request mutation only at a session boundary")
+        return self._admission
+
+    def submit_comparison_request(self, left: NFPWindow, right: NFPWindow) -> ComparisonRequest:
+        admission = self._request_boundary()
+        if self.heart.state is HeartState.STOPPED:
+            raise ValueError("session stopped")
+        return admission.submit(left, right, self.heart.tick)
+
+    def comparison_requests(self) -> tuple[ComparisonRequest, ...]:
+        return self._admission.snapshots() if self._admission is not None else ()
+
+    def cancel_comparison_request(self, request_id: str) -> ComparisonRequest:
+        admission = self._request_boundary()
+        if admission.active == request_id:
+            admission.update(self._internal_work.cancel())
+            self._internal_work.release()
+        return admission.cancel_queued(request_id)
+
+    def release_comparison_request(self, request_id: str) -> None:
+        self._request_boundary().release(request_id)
+
+    def _collect_comparison(self):
+        if self._admission is not None and self._admission.active is not None:
+            self._admission.update(self._internal_work.snapshot())
+            if self._admission.active is None:
+                self._internal_work.release()
+
+    def _dispatch_comparison(self):
+        if self._admission is None or not self.heart.admission_open:
+            return
+        entry = self._admission.next_inputs()
+        if entry is not None:
+            key, (left, right) = entry
+            self._dar_dispatching = True
+            try:
+                work = self.submit_internal_comparison(left, right)
+            finally:
+                self._dar_dispatching = False
+            self._admission.dispatched(key, work)
+
+    def _run_admitted(self, *, paced=False, interval=0.01,
+                      clock=time.monotonic, sleep=time.sleep):
+        # Same pacing policy as Heart.run; each dispatch precedes Heart.step.
+        if not math.isfinite(interval) or interval <= 0:
+            raise ValueError("interval must be finite and positive")
+        self.start()
+        try:
+            deadline = clock() if paced else 0.0
+            while self.heart.state is HeartState.RUNNING:
+                if paced:
+                    delay = deadline - clock()
+                    while delay > 0 and self.heart.state is HeartState.RUNNING:
+                        sleep(min(delay, 0.05))
+                        delay = deadline - clock()
+                    if self.heart.state is not HeartState.RUNNING:
+                        break
+                self.step()
+                if paced:
+                    deadline = clock() + interval
+        except BaseException:
+            self.heart.stop("paced_or_pulse_failure; restart_forbidden")
+            raise
 
     def _pulse(self, tick: int) -> None:
         self._inside_pulse = True

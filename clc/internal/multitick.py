@@ -17,6 +17,21 @@ class WorkLimits:
                 raise ValueError(f'{name} must be positive')
 
 
+def validate_comparison(left: NFPWindow, right: NFPWindow, limits: WorkLimits,
+                        current_tick: int) -> int:
+    """Shared admission validation; return coordinates retained by both inputs."""
+    non_negative_integer(current_tick, "current_tick")
+    if not isinstance(left, NFPWindow) or not isinstance(right, NFPWindow):
+        raise TypeError('comparison requires native NFP windows')
+    if (left.modality, left.topology, left.length) != (right.modality, right.topology, right.length):
+        raise ValueError('incompatible NFP windows')
+    if max(left.end_tick, right.end_tick) > current_tick:
+        raise ValueError('future NFP input')
+    if left.length * left.topology.size > limits.max_cells:
+        raise ValueError('input exceeds cell budget')
+    return 2 * left.length * left.topology.size
+
+
 @dataclass(frozen=True)
 class FrameSourceDescriptor:
     frame_id: str
@@ -84,14 +99,7 @@ class MultiTickComparison:
         non_negative_integer(current_tick, 'current_tick')
         if self._snapshot is not None:
             raise ValueError('single retained process slot is occupied; release terminal process')
-        if not isinstance(left, NFPWindow) or not isinstance(right, NFPWindow):
-            raise TypeError('comparison requires native NFP windows')
-        if (left.modality, left.topology, left.length) != (right.modality, right.topology, right.length):
-            raise ValueError('incompatible NFP windows')
-        if max(left.end_tick, right.end_tick) > current_tick:
-            raise ValueError('future NFP input')
-        if left.length * left.topology.size > self.limits.max_cells:
-            raise ValueError('input exceeds cell budget')
+        validate_comparison(left, right, self.limits, current_tick)
         sources = (WindowSourceDescriptor.capture(left), WindowSourceDescriptor.capture(right))
         self._inputs = (left, right)
         self._snapshot = WorkSnapshot(str(uuid4()), 'queued', (left.window_id, right.window_id),
