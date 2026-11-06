@@ -19,6 +19,7 @@ from clc.echo.expectations import EchoExpectations, EchoMatch
 from clc.expsm.expsm_activation_module import ExpSMActivationModule
 from clc.expsm.nfp_operational_retrieval import (
     NFPExpSMRetrievalQuery, NFPExpSMRetriever, NFPExpSMRetrievalConfig,
+    NFPExpSMRetrievalStatus,
 )
 from clc.internal.admission import AdmissionLimits, ComparisonAdmission, ComparisonRequest
 from clc.internal.multitick import MultiTickComparison, WorkLimits, WorkSnapshot
@@ -84,6 +85,8 @@ class NativeHeartSession:
         echo: EchoExpectations | None = None,
         internal_work_limits: WorkLimits | None = None,
         admission_limits: AdmissionLimits | None = None,
+        exploration_config=None,
+        exploration_authorization=None,
     ) -> None:
         self.heart = Heart(max_ticks=max_ticks, initial_tick=initial_tick)
         if components.world.current_tick != initial_tick:
@@ -100,6 +103,16 @@ class NativeHeartSession:
         self.sensor = sensor
         self.time_adapter = SyntheticTimeAdapter(components.world)
         self.session_id = str(uuid4())
+        from clc.actuation.synthetic_exploration import SyntheticExplorationPolicy
+        if exploration_authorization is not None and exploration_config is None:
+            raise ValueError("exploration authorization requires explicit config")
+        if exploration_config is not None:
+            from scenarios.support.synthetic_closed_loop_visual_world import SyntheticClosedLoopVisualWorld
+            if not isinstance(components.world, SyntheticClosedLoopVisualWorld):
+                raise ValueError("exploration supports only SyntheticClosedLoopVisualWorld")
+        self.exploration = (SyntheticExplorationPolicy(
+            exploration_config, exploration_authorization, self.session_id, components.world,
+        ) if exploration_config is not None else None)
         self.records: list[NativeHeartTick] = []
         self.diagnostic = "ready"
         self._seen_snapshots: set[int] = set()
@@ -254,6 +267,7 @@ class NativeHeartSession:
         c = self.components
         manager = c.context_manager
         observation = recent = expired = execution = None
+        exploratory = None
         advancement = "none"
         self.diagnostic = "opening_tick"
         try:
@@ -271,6 +285,8 @@ class NativeHeartSession:
                 if recent is not None:
                     c.short_memory.remember(recent, current_tick=tick)
                     self._unresolved.discard(recent.execution_occurrence_id)
+                    if self.exploration is not None:
+                        self.exploration.observe(recent)
             expired = manager.expire_pending_if_overdue(tick)
             c.short_memory.prune(tick)
             echo_matches = self.echo.advance(tick, observation) if self.echo is not None else ()
@@ -283,14 +299,29 @@ class NativeHeartSession:
                 activated = c.activation.activate_native(retrieval.candidates)
                 selected = c.selector.select_native(activated)
                 self.diagnostic = "no_native_match" if not retrieval.candidates else "selection_none"
-                if selected is not None and self.heart.admission_open:
+                exploratory = None
+                if (selected is None and not retrieval.candidates
+                        and retrieval.status is NFPExpSMRetrievalStatus.NO_COMPARABLE_RECORDS
+                        and self.exploration is not None
+                        and self.heart.admission_open):
+                    exploratory = self.exploration.issue(
+                        observation, tick=tick, pending=manager.pending_causal_transition,
+                        unresolved=self._unresolved,
+                    )
+                if (selected is not None or exploratory is not None) and self.heart.admission_open:
                     self._in_flight = True
                     self.diagnostic = "execution_incomplete; physical_result_may_be_uncertain"
-                    execution = c.coordinator.execute(
-                        SelectedNFPExecutionRequest(selected, tick), context_manager=manager,
-                        world=c.world, system_state=c.system_state,
-                        observe_consequence=False, short_memory=c.short_memory,
-                    )
+                    if exploratory is not None:
+                        execution = c.coordinator.execute_exploratory(
+                            exploratory, policy=self.exploration, context_manager=manager,
+                            world=c.world, system_state=c.system_state,
+                        )
+                    else:
+                        execution = c.coordinator.execute(
+                            SelectedNFPExecutionRequest(selected, tick), context_manager=manager,
+                            world=c.world, system_state=c.system_state,
+                            observe_consequence=False, short_memory=c.short_memory,
+                        )
                     self._in_flight = False
                     self.diagnostic = execution.status.value
                     if execution.actuator_signal is not None and execution.execution_occurrence_id:
@@ -315,6 +346,13 @@ class NativeHeartSession:
         except BaseException:
             self.time_adapter.block()
             self.heart.stop("session_failure; restart_forbidden")
+            if self.exploration is not None:
+                receipt = self.exploration.execution_receipt
+                if (exploratory is not None and receipt is not None
+                        and receipt.intent_id == exploratory.intent_id
+                        and receipt.apply_entry and receipt.execution_occurrence_id is not None):
+                    self._unresolved.add(receipt.execution_occurrence_id)
+                self.exploration.recover_interruption(exploratory)
             self.diagnostic += "; session_failed; no_retry"
             raise
 

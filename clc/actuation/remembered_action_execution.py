@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from clc.actuation.motor import ACTION_MOTOR_TOPOLOGY, ActionTransducer, ActuatorSignal
@@ -16,6 +17,10 @@ from clc.patterns import NFPFrame, NFPWindow, PatternModality, PatternOrigin, Pa
 from clc.system.mode_action_guard import ModeActionGuard
 from clc.system.system_state import SystemState
 from clc.transduction import VisualFieldTransducer
+
+
+if TYPE_CHECKING:
+    from clc.actuation.synthetic_exploration import ExploratoryIntent
 
 
 class NFPRememberedActionExecutionStatus(str, Enum):
@@ -115,6 +120,8 @@ class NFPRememberedActionExecutionResult:
     detail: str = ""
     target_core: NFPFeedbackTargetCore | None = None
     execution_occurrence_id: str | None = None
+    exploratory_intent: ExploratoryIntent | None = None
+    guard_passed: bool = False
 
     @property
     def executed(self) -> bool:
@@ -242,6 +249,64 @@ class NFPRememberedActionExecutionCoordinator:
                 **common,
             )
 
+        return self._execute_materialized(
+            intent, common=common, context_manager=context_manager, world=world,
+            system_state=system_state, observe_consequence=observe_consequence,
+            short_memory=short_memory,
+        )
+
+    def execute_exploratory(self, intent, *, policy, context_manager, world, system_state):
+        """Same execution boundary; exploration has no remembered provenance."""
+        from clc.actuation.synthetic_exploration import (
+            ExploratoryIntent, MaterializedExploratoryAction, SyntheticExplorationPolicy,
+        )
+        if not isinstance(intent, ExploratoryIntent) or not isinstance(policy, SyntheticExplorationPolicy):
+            return NFPRememberedActionExecutionResult(
+                NFPRememberedActionExecutionStatus.INVALID_SELECTED_EXPERIENCE,
+                detail="exploration_request_type_invalid",
+            )
+        before = context_manager.current_external_sensory_window
+        if not policy.admit(intent, before, world):
+            return NFPRememberedActionExecutionResult(
+                NFPRememberedActionExecutionStatus.INVALID_SELECTED_EXPERIENCE,
+                detail="exploration_admission_denied",
+            )
+        receipt = policy._new_execution_receipt(intent)
+        try:
+            if context_manager.pending_causal_transition is not None:
+                result = NFPRememberedActionExecutionResult(
+                    NFPRememberedActionExecutionStatus.CAUSAL_SLOT_OCCUPIED,
+                )
+            else:
+                frame = NFPFrame(
+                    frame_id=str(uuid4()), modality=PatternModality.ACTION,
+                    origin=PatternOrigin.ACTION_GENERATED, topology=ACTION_MOTOR_TOPOLOGY,
+                    values=intent.command, active_tick=intent.context_tick,
+                )
+                materialized = MaterializedExploratoryAction(intent, frame, before, str(uuid4()))
+                receipt.execution_occurrence_id = materialized.execution_occurrence_id
+                policy.bind_execution(intent, materialized.execution_occurrence_id)
+                result = self._execute_materialized(
+                    materialized, common={"exploratory_intent": intent},
+                    context_manager=context_manager, world=world, system_state=system_state,
+                    observe_consequence=False, short_memory=None, exploration_policy=policy, execution_receipt=receipt,
+                )
+            receipt.result_status = result.status.value
+            # External exception text is not retained by the exploratory session.
+            if result.detail:
+                result = replace(result, detail="exploratory_execution_diagnostic")
+            policy.finish(intent, result)
+            return result
+        except BaseException:
+            policy.recover_interruption(intent)
+            raise
+
+    def _execute_materialized(self, intent, *, common, context_manager, world,
+                              system_state, observe_consequence, short_memory, exploration_policy=None,
+                              execution_receipt=None):
+        # One shared authoritative guard/transducer/apply/pending boundary.
+        before_context_at_T = intent.before_context_at_T
+        active_tick = intent.action_frame.active_tick
         frame = intent.action_frame
         materialized = {
             **common,
@@ -261,6 +326,11 @@ class NFPRememberedActionExecutionCoordinator:
                 detail="native_action_denied_by_mode",
                 **materialized,
             )
+        materialized["guard_passed"] = True
+        if execution_receipt is not None:
+            execution_receipt.guard_passed = True
+        if exploration_policy is not None:
+            exploration_policy.pass_guard(intent.exploratory_intent)
         try:
             signal = self.action_transducer.transduce(frame)
         except Exception as exc:
@@ -269,8 +339,14 @@ class NFPRememberedActionExecutionCoordinator:
                 detail=str(exc),
                 **materialized,
             )
+        if exploration_policy is not None:
+            exploration_policy.enter_apply(intent.exploratory_intent)
         try:
+            if execution_receipt is not None:
+                execution_receipt.apply_entry = True
             world.apply_actuator_signal(signal)
+            if execution_receipt is not None:
+                execution_receipt.apply_returned = True
         except Exception as exc:
             return NFPRememberedActionExecutionResult(
                 NFPRememberedActionExecutionStatus.WORLD_EXECUTION_FAILED,
@@ -290,6 +366,10 @@ class NFPRememberedActionExecutionCoordinator:
                 detail=str(exc),
                 **executed,
             )
+        if execution_receipt is not None:
+            execution_receipt.pending_registered = True
+        if exploration_policy is not None:
+            exploration_policy.confirm_pending(intent.exploratory_intent)
         if not observe_consequence:
             return NFPRememberedActionExecutionResult(
                 NFPRememberedActionExecutionStatus.ACTION_EXECUTED_OBSERVATION_PENDING,

@@ -291,10 +291,25 @@ class RememberedActionExecutionTests(unittest.TestCase):
         self.assertFalse((names | calls) & forbidden)
         execute = next(node for node in ast.walk(tree)
                        if isinstance(node, ast.FunctionDef) and node.name == "execute")
-        world_calls = [node for node in ast.walk(execute) if isinstance(node, ast.Call)
-                       and isinstance(node.func, ast.Attribute)
-                       and node.func.attr == "apply_actuator_signal"]
-        self.assertEqual(len(world_calls), 1)
+        shared = next(node for node in ast.walk(tree)
+                      if isinstance(node, ast.FunctionDef) and node.name == "_execute_materialized")
+        exploratory = next(node for node in ast.walk(tree)
+                           if isinstance(node, ast.FunctionDef) and node.name == "execute_exploratory")
+        def attribute_calls(node, name):
+            return [call for call in ast.walk(node) if isinstance(call, ast.Call)
+                    and isinstance(call.func, ast.Attribute) and call.func.attr == name]
+        # RND-022: both entry points delegate; the whole coordinator still owns
+        # exactly one apply site, behind the same guard and transducer.
+        self.assertEqual(len(attribute_calls(tree, "apply_actuator_signal")), 1)
+        self.assertEqual(len(attribute_calls(shared, "apply_actuator_signal")), 1)
+        for entry in (execute, exploratory):
+            self.assertEqual(attribute_calls(entry, "apply_actuator_signal"), [])
+            self.assertEqual(len(attribute_calls(entry, "_execute_materialized")), 1)
+        apply = attribute_calls(shared, "apply_actuator_signal")[0]
+        guard, = attribute_calls(shared, "is_native_action_allowed")
+        transduce, = attribute_calls(shared, "transduce")[:1]
+        self.assertLess(guard.lineno, apply.lineno)
+        self.assertLess(transduce.lineno, apply.lineno)
 
 
 def main() -> int:

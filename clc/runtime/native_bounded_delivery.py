@@ -243,11 +243,14 @@ class NativeDeliverySession(NativeHeartSession):
                  limits: DeliveryLimits = DeliveryLimits(),
                  ingress: Callable[[int, BoundedNativeDelivery], None] | None = None,
                  sample_enabled: Callable[[int], bool] | None = None,
-                 initial_tick: int = 0):
+                 initial_tick: int = 0, exploration_config=None,
+                 exploration_authorization=None):
         if components.context_manager.pending_causal_transition is not None:
             raise ValueError('cannot bind an execution started outside this delivery session')
         super().__init__(components, max_ticks=max_ticks, initial_tick=initial_tick,
-                         sensor=self._sample_and_dispatch)
+                         sensor=self._sample_and_dispatch,
+                         exploration_config=exploration_config,
+                         exploration_authorization=exploration_authorization)
         self.delivery = BoundedNativeDelivery(self.session_id, limits)
         self.ingress = ingress
         self.sample_enabled = sample_enabled

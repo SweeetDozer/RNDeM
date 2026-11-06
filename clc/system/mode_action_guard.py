@@ -8,6 +8,7 @@ from clc.system.system_state import SystemState
 
 if TYPE_CHECKING:
     from clc.actuation.remembered_action_execution import MaterializedNFPActionIntent
+    from clc.actuation.synthetic_exploration import MaterializedExploratoryAction
 
 
 MIN_CONSOLIDATION_TICKS = 3
@@ -43,15 +44,17 @@ class ModeActionGuard:
 
     def is_native_action_allowed(
         self,
-        action_intent: "MaterializedNFPActionIntent",
+        action_intent: "MaterializedNFPActionIntent | MaterializedExploratoryAction",
         system_state: SystemState,
         tick: int,
     ) -> bool:
         """Allow a current structural ACTION without fabricating legacy semantics."""
         from clc.actuation.remembered_action_execution import MaterializedNFPActionIntent
 
-        if not isinstance(action_intent, MaterializedNFPActionIntent):
-            raise TypeError("action_intent must be MaterializedNFPActionIntent")
+        from clc.actuation.synthetic_exploration import MaterializedExploratoryAction
+
+        if not isinstance(action_intent, (MaterializedNFPActionIntent, MaterializedExploratoryAction)):
+            raise TypeError("action_intent must be a typed materialized native action")
         if not isinstance(system_state, SystemState):
             raise TypeError("system_state must be SystemState")
         if action_intent.action_frame.active_tick != tick:
