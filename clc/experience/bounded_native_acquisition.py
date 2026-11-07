@@ -88,6 +88,31 @@ def _integers_fit(*values):
                for value in values)
 
 
+def _bounded_identity(value):
+    # Exact scalars only: str subclasses can retain arbitrary runtime graphs.
+    return type(value) is str and 0 < len(value) <= METADATA_CHARS
+
+
+@dataclass(frozen=True)
+class ExploratoryAcquisitionProvenance:
+    """Bounded audit handoff, not a new evidence or execution authority."""
+    intent_id: str
+    authorization_id: str
+    test_owner_id: str
+    configuration_id: str
+    execution_occurrence_id: str
+    session_id: str
+    source_id: str
+    transition_id: str
+
+    def __post_init__(self):
+        if not all(_bounded_identity(value) for value in (
+                self.intent_id, self.authorization_id, self.test_owner_id,
+                self.configuration_id, self.execution_occurrence_id,
+                self.session_id, self.source_id, self.transition_id)):
+            raise ValueError('provenance IDs require exact bounded built-in strings')
+
+
 @dataclass(frozen=True)
 class AcquisitionEnvelope:
     session_id: str
@@ -106,6 +131,7 @@ class AcquisitionEnvelope:
     transition: RecentCausalTransition
     execution: ExecutionProvenance
     sensor_events: tuple[DeliveryEvent, DeliveryEvent]
+    exploratory_provenance: ExploratoryAcquisitionProvenance | None = None
 
 
 @dataclass(frozen=True)
@@ -137,7 +163,7 @@ class BoundedNativeAcquisition:
         if not isinstance(limits, AcquisitionLimits):
             raise TypeError('limits must be AcquisitionLimits')
         self._session_ref = weakref.ref(session)
-        if not _texts_fit(session.session_id, session.delivery.VISUAL_SOURCE):
+        if not all(_bounded_identity(v) for v in (session.session_id, session.delivery.VISUAL_SOURCE)):
             raise ValueError('session scope exceeds metadata budget')
         self._session_id = session.session_id
         self._source_id = session.delivery.VISUAL_SOURCE
@@ -238,6 +264,10 @@ class BoundedNativeAcquisition:
         # terminal conflict even when the altered transition would fail binding.
         if not isinstance(transition, RecentCausalTransition):
             return AdmissionResult('invalid_transition')
+        # Check IDs before digest/asdict can copy subclass-owned nested state.
+        if any(type(v) is not str for v in (
+                transition.transition_id, transition.execution_occurrence_id)):
+            return AdmissionResult('exploratory_authorization_mismatch')
         frames = (*transition.before_sensory_window.frames, transition.action_frame,
                   *transition.after_sensory_window.frames)
         if (len(transition.before_sensory_window.frames) != 1
@@ -273,6 +303,13 @@ class BoundedNativeAcquisition:
         if isinstance(binding, str):
             return AdmissionResult(binding)
         execution = next(r.execution for r in session.records if r.tick == transition.action_tick)
+        try:
+            exploratory = self._exploratory_binding(execution, transition, session)
+        except BaseException as error:
+            self._stop('stopped_provenance_error', occurrence=occurrence, digest=digest, error=error)
+            raise
+        if isinstance(exploratory, str):
+            return AdmissionResult(exploratory)
         projection = ExecutionProvenance(
             execution.status, execution.source_experience_id, occurrence,
             transition.action_frame.frame_id, transition.action_tick,
@@ -312,7 +349,7 @@ class BoundedNativeAcquisition:
             transition.action_frame.frame_id, transition.after_sensory_window.window_id,
             tuple(e.delivery_event_id for e in binding), transition.action_tick,
             transition.observation_tick, digest, evidence.evidence_id, evidence, transition,
-            projection, binding,
+            projection, binding, exploratory,
         )
         try:
             grouped = self._grouper.observe(evidence)
@@ -382,6 +419,70 @@ class BoundedNativeAcquisition:
         if events[1].port is not Port.CONSEQUENCE or events[1].execution_occurrence_id != t.execution_occurrence_id:
             return 'sensor_occurrence_mismatch'
         return tuple(events)
+
+    def _exploratory_binding(self, execution, transition, session):
+        from clc.actuation.synthetic_exploration import ExploratoryIntent, SyntheticExplorationPolicy
+        from clc.experience.expsm_representation import SerializedObservedEffectV1
+        intent, policy = execution.exploratory_intent, session.exploration
+        if not all(_bounded_identity(v) for v in (session.session_id, session.delivery.VISUAL_SOURCE)):
+            return 'exploratory_authorization_mismatch'
+        diagnostics = ()
+        if policy is not None:
+            if (not isinstance(policy, SyntheticExplorationPolicy)
+                    or not _bounded_identity(policy.session_id)
+                    or policy.session_id != session.session_id):
+                return 'exploratory_authorization_mismatch'
+            diagnostics = policy.diagnostics
+            if type(diagnostics) is not tuple or len(diagnostics) > 64:
+                return 'exploratory_authorization_missing'
+        # Occurrence is meaningful only inside the genuine live session scope.
+        # Unrelated historical sessions cannot classify this execution.
+        scoped = [e for e in diagnostics
+                  if isinstance(e.intent, ExploratoryIntent)
+                  and type(e.intent.session_id) is str
+                  and e.intent.session_id == session.session_id]
+        occurrences = [e for e in scoped
+                       if e.execution_occurrence_id == transition.execution_occurrence_id]
+        if intent is None:
+            if occurrences:
+                return 'exploratory_authorization_mismatch'
+            # The actual remembered materializer requires both a source and a
+            # typed predicted effect. A source ID alone proves no such origin.
+            if (not _bounded_identity(execution.source_experience_id)
+                    or not isinstance(execution.predicted_effect, SerializedObservedEffectV1)):
+                return 'exploratory_authorization_missing'
+            return None
+        if not isinstance(intent, ExploratoryIntent) or policy is None:
+            return 'exploratory_authorization_missing'
+        auth = policy.authorization
+        if auth is None:
+            return 'exploratory_authorization_missing'
+        values = (intent.intent_id, auth.authorization_id, auth.test_owner_id,
+                  auth.configuration_id, transition.execution_occurrence_id,
+                  session.session_id, session.delivery.VISUAL_SOURCE, transition.transition_id)
+        # Check all compared identity fields before invoking their equality.
+        if not all(_bounded_identity(v) for v in (
+                *values, intent.authorization_id, intent.test_owner_id,
+                intent.configuration_id, intent.session_id, intent.context_window_id,
+                policy.config.configuration_id)):
+            return 'exploratory_authorization_mismatch'
+        entries = [e for e in scoped if e.intent is intent]
+        if (len(entries) != 1 or len(occurrences) != 1 or occurrences[0] is not entries[0]
+                or not entries[0].admitted or not entries[0].guarded
+                or not entries[0].applied or entries[0].denied or entries[0].uncertain
+                or entries[0].outcome != ExecutionStatus.ACTION_EXECUTED_OBSERVATION_PENDING.value
+                or execution.source_experience_id is not None
+                or execution.predicted_effect is not None or execution.target_core is not None
+                or intent.authorization_id != auth.authorization_id
+                or intent.test_owner_id != auth.test_owner_id
+                or intent.configuration_id != auth.configuration_id
+                or intent.configuration_id != policy.config.configuration_id
+                or intent.session_id != policy.session_id
+                or intent.context_window_id != transition.before_sensory_window.window_id
+                or intent.context_tick != transition.action_tick
+                or intent.command != transition.action_frame.values):
+            return 'exploratory_authorization_mismatch'
+        return ExploratoryAcquisitionProvenance(*values)
 
     def _execution_metadata_fit(self, x):
         # The complete result/target_core/prediction are borrowed only during
